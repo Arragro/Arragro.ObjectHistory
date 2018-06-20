@@ -1,29 +1,14 @@
-﻿using JsonDiffPatchDotNet;
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using System;
+﻿using System;
+using ConsoleApp.Models;
+
+using System.Threading.Tasks;
+using Arragro.ObjectHistory.ObjectHistoryClientProvider;
 
 namespace ConsoleApp
 {
-    public class Parent
-    {
-        public int ParentId { get; set; }
-        public string Test { get; set; }
-
-        public Child Child { get; set; }
-    }
-
-    public class Child
-    {
-        public int ChildId { get; set; }
-        public string Test { get; set; }
-
-        public Parent Parent { get; set; }
-    }
-
     class Program
     {
-        static void Main(string[] args)
+        static async Task Main(string[] args)
         {
             Console.WriteLine("Hello World!");
 
@@ -57,24 +42,9 @@ namespace ConsoleApp
 
             parent.Child = child;
             parent2.Child = child2;
-
-            var jsonSettings = new Newtonsoft.Json.JsonSerializerSettings
-            {
-                // PreserveReferencesHandling = PreserveReferencesHandling.All
-            };
-
-            var json = JsonConvert.SerializeObject(parent, Formatting.Indented, jsonSettings);
-            var json2 = JsonConvert.SerializeObject(parent2, Formatting.Indented, jsonSettings);
-
-            var jdp = new JsonDiffPatch();
-            var left = JToken.Parse(json);
-            var right = JToken.Parse(json2);
-
-            JToken patch = jdp.Diff(left, right);
-
-            Console.WriteLine(json);
-            Console.WriteLine(json2);
-            Console.WriteLine(patch);
+            var objectHistoryClient = new Arragro.ObjectHistory.ObjectHistoryClientProvider.ObjectHistoryClient("UseDevelopmentStorage=true");
+            await objectHistoryClient.SaveObjectHistoryAsync<Parent>(() => $"{parent.ParentId}", parent, parent2);
+            Console.WriteLine("Complete");
 
             Console.ReadKey();
         }
