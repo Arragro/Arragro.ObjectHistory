@@ -1,4 +1,4 @@
-﻿using ConsoleApp.ObjectHistoryClient.Models;
+﻿using Arragro.ObjectHistory.Core.Models;
 using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.WindowsAzure.Storage.Queue;
@@ -20,20 +20,17 @@ namespace Arragro.ObjectHistory.ObjectHistoryClientProvider
         private readonly CloudQueue _queue;
         private readonly Newtonsoft.Json.JsonSerializerSettings _jsonSettings;
 
-        public ObjectHistoryClient(
-            string storageConnectionString,
-            string objectContainerName = "trackedobjects",
-            string messageQueueName = "objectprocessor")
+        public ObjectHistoryClient(ConfigurationSettings configurationSettings)
         {
-            _storageConnectionString = storageConnectionString;
+            _storageConnectionString = configurationSettings.ObjectHistoryClientSettings.StorageConnectionString;
             _account = CloudStorageAccount.Parse(_storageConnectionString);
             _blobClient = _account.CreateCloudBlobClient();
             _queueClient = _account.CreateCloudQueueClient();
 
-            _queue = _queueClient.GetQueueReference(messageQueueName);
+            _queue = _queueClient.GetQueueReference(configurationSettings.ObjectHistoryClientSettings.MessageQueueName);
             _queue.CreateIfNotExistsAsync().Wait();
 
-            _objectContainer = _blobClient.GetContainerReference(objectContainerName);
+            _objectContainer = _blobClient.GetContainerReference(configurationSettings.ObjectHistoryClientSettings.ObjectContainerName);
             _objectContainer.CreateIfNotExistsAsync().Wait();
             _jsonSettings = new JsonSerializerSettings
             {
@@ -49,27 +46,25 @@ namespace Arragro.ObjectHistory.ObjectHistoryClientProvider
             var partitionKey = $"{fullyQualifiedName}-{key}";
             var objectHistoryJson = String.Empty;
 
+            var trackedObject = new TrackedObject(partitionKey,
+                                            string.Format("{0:D19}", DateTime.MaxValue.Ticks - DateTime.UtcNow.Ticks),
+                                            DateTime.UtcNow.ToString(), Guid.NewGuid().ToString());
+
             try
             {
-                var oldJson = JsonConvert.SerializeObject(oldObject, Formatting.Indented, _jsonSettings);
-                var newJson = JsonConvert.SerializeObject(newObject, Formatting.Indented, _jsonSettings);
-                objectHistoryJson = String.Format("{{ \n \"new\":{0},\n \"old\":{1} \n}}", newJson, oldJson);
+                trackedObject.OldJson = JsonConvert.SerializeObject(oldObject, Formatting.Indented, _jsonSettings);
+                trackedObject.NewJson = JsonConvert.SerializeObject(newObject, Formatting.Indented, _jsonSettings);
             }
             catch (Exception ex)
             {
                 throw new Exception(String.Format("There was an issue with serializing the object to json, please review the exception and retry. - {0}", ex.InnerException));
             }
 
-            var trackedObjectMessage = new TrackedObjectMessage(partitionKey, 
-                                            string.Format("{0:D19}", DateTime.MaxValue.Ticks - DateTime.UtcNow.Ticks), 
-                                            DateTime.UtcNow.ToString(),
-                                            Guid.NewGuid().ToString());
-
-            var trackedObjectMessageJson = JsonConvert.SerializeObject(trackedObjectMessage, Formatting.Indented);
+            var trackedObjectJson = JsonConvert.SerializeObject(trackedObject, Formatting.Indented);
             
-            await UploadJsonFileAsync(trackedObjectMessage.Folder, "objecthistory.json", objectHistoryJson);
+            await UploadJsonFileAsync(trackedObject.Folder, "objecthistory.json", trackedObjectJson);
             
-            await SendQueueMessage(trackedObjectMessageJson);
+            await SendQueueMessage(trackedObject.Folder);
         }
 
         private async Task UploadJsonFileAsync(string folder, string fileName, string objectHistoryJson)

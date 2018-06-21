@@ -1,13 +1,15 @@
-﻿namespace ConsoleApp.ObjectHistoryClient.Models
+﻿namespace Arragro.ObjectHistory.Core.Models
 {
-    public class TrackedObjectMessage
+    public class TrackedObject
     {
         public string PartitionKey { get; set; }
         public string RowKey { get; set; }
         public string TimeStamp { get; set; }
         public string Folder { get; set; }
+        public string NewJson { get; set; }
+        public string OldJson { get; set; }
 
-        public TrackedObjectMessage(string partitionKey, string rowKey, string timeStamp, string folder)
+        public TrackedObject(string partitionKey, string rowKey, string timeStamp, string folder)
         {
             PartitionKey = partitionKey;
             RowKey = rowKey;

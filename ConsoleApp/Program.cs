@@ -1,52 +1,44 @@
-﻿using System;
-using ConsoleApp.Models;
-
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
+using Arragro.ObjectHistory.Core.Models;
 using Arragro.ObjectHistory.ObjectHistoryClientProvider;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Options;
 
 namespace ConsoleApp
 {
-    class Program
+    public class Program
     {
-        static async Task Main(string[] args)
+        public static async Task Main(string[] args)
         {
-            Console.WriteLine("Hello World!");
+            var builder = new HostBuilder()
+                .ConfigureAppConfiguration((hostingContext, config) =>
+                {
+                    config.AddJsonFile("appsettings.json", optional: true);
+                    config.AddEnvironmentVariables();
 
-            var parent = new Parent
-            {
-                ParentId = 1,
-                Test = "Test"
-            };
+                    if (args != null)
+                    {
+                        config.AddCommandLine(args);
+                    }
+                })
+                .ConfigureServices((hostContext, services) =>
+                {
+                    services.AddOptions()
+                    //services.Configure<ObjectHistoryClientConfiguration>(hostContext.Configuration.GetSection("ObjectHistoryClientSettings"));
+                    .AddSingleton(hostContext.Configuration.Get<ConfigurationSettings>())
+                    .AddSingleton<ObjectHistoryClient>();
 
-            var child = new Child
-            {
-                ChildId = 1,
-                Test = "Test",
-                Parent = parent
-            };
+                    services.AddSingleton<IHostedService, App>();
+                })
+                .ConfigureLogging((hostingContext, logging) => {
+                    logging.AddConfiguration(hostingContext.Configuration.GetSection("Logging"));
+                    logging.AddConsole();
+                });
 
-            parent.Child = child;
-
-            var parent2 = new Parent
-            {
-                ParentId = 2,
-                Test = "Test 2"
-            };
-
-            var child2 = new Child
-            {
-                ChildId = 2,
-                Test = "Test 2",
-                Parent = parent2
-            };
-
-            parent.Child = child;
-            parent2.Child = child2;
-            var objectHistoryClient = new Arragro.ObjectHistory.ObjectHistoryClientProvider.ObjectHistoryClient("UseDevelopmentStorage=true");
-            await objectHistoryClient.SaveObjectHistoryAsync<Parent>(() => $"{parent.ParentId}", parent, parent2);
-            Console.WriteLine("Complete");
-
-            Console.ReadKey();
+            await builder.RunConsoleAsync();
         }
     }
 }

@@ -8,4 +8,8 @@
     <PackageReference Include="WindowsAzure.Storage" Version="9.2.0" />
   </ItemGroup>
 
+  <ItemGroup>
+    <ProjectReference Include="..\Arragro.ObjectHistory.Core\Arragro.ObjectHistory.Core.csproj" />
+  </ItemGroup>
+
 </Project>
