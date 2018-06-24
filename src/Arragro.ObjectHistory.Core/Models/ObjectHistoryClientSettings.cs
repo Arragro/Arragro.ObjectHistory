@@ -7,8 +7,4 @@
         public string MessageQueueName { get; set; }
     }
 
-    public class ConfigurationSettings
-    {
-        public ObjectHistoryClientSettings ObjectHistoryClientSettings { get; set; }      
-    }
 }

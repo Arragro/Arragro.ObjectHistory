@@ -20,17 +20,17 @@ namespace Arragro.ObjectHistory.ObjectHistoryClientProvider
         private readonly CloudQueue _queue;
         private readonly Newtonsoft.Json.JsonSerializerSettings _jsonSettings;
 
-        public ObjectHistoryClient(ConfigurationSettings configurationSettings)
+        public ObjectHistoryClient(ObjectHistoryClientSettings configurationSettings)
         {
-            _storageConnectionString = configurationSettings.ObjectHistoryClientSettings.StorageConnectionString;
+            _storageConnectionString = configurationSettings.StorageConnectionString;
             _account = CloudStorageAccount.Parse(_storageConnectionString);
             _blobClient = _account.CreateCloudBlobClient();
             _queueClient = _account.CreateCloudQueueClient();
 
-            _queue = _queueClient.GetQueueReference(configurationSettings.ObjectHistoryClientSettings.MessageQueueName);
+            _queue = _queueClient.GetQueueReference(configurationSettings.MessageQueueName);
             _queue.CreateIfNotExistsAsync().Wait();
 
-            _objectContainer = _blobClient.GetContainerReference(configurationSettings.ObjectHistoryClientSettings.ObjectContainerName);
+            _objectContainer = _blobClient.GetContainerReference(configurationSettings.ObjectContainerName);
             _objectContainer.CreateIfNotExistsAsync().Wait();
             _jsonSettings = new JsonSerializerSettings
             {
