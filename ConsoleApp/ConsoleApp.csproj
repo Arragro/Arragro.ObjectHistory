@@ -24,11 +24,11 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\src\Arragro.ObjectHistory.ObjectHistoryClientProvider\Arragro.ObjectHistory.ObjectHistoryClientProvider.csproj" />
+    <Folder Include="Helpers\" />
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Helpers\" />
+    <ProjectReference Include="..\src\Arragro.ObjectHistory.ObjectHistoryClientProvider\Arragro.ObjectHistory.Client.csproj" />
   </ItemGroup>
 
   <ItemGroup>

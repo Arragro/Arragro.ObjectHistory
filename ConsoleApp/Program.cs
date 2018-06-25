@@ -26,7 +26,7 @@ namespace ConsoleApp
                 .ConfigureServices((hostContext, services) =>
                 {
                     var objectHistoryClientSettings = new ObjectHistoryClientSettings();
-                    hostContext.Configuration.GetSection("ObjectHistoryClientSettings").Bind(objectHistoryClientSettings);
+                    hostContext.Configuration.GetSection("ObjectHistoryClientSettings").Baind(objectHistoryClientSettings);
 
                     services.AddArragroObjectHistory(objectHistoryClientSettings);
                     services.AddSingleton<IHostedService, App>();
