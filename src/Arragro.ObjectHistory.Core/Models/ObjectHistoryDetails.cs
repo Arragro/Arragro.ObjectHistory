@@ -1,19 +1,24 @@
-﻿namespace Arragro.ObjectHistory.Core.Models
+﻿using Microsoft.WindowsAzure.Storage.Table;
+
+namespace Arragro.ObjectHistory.Core.Models
 {
-    public class TrackedObject
+    public class ObjectHistoryDetails
     {
         public string PartitionKey { get; set; }
         public string RowKey { get; set; }
         public string TimeStamp { get; set; }
         public string Folder { get; set; }
+        public string User { get; set; }
         public string NewJson { get; set; }
         public string OldJson { get; set; }
+        public string Diff { get; set; }
 
-        public TrackedObject(string partitionKey, string rowKey, string timeStamp, string folder)
+        public ObjectHistoryDetails(string partitionKey, string rowKey, string timeStamp, string user, string folder)
         {
             PartitionKey = partitionKey;
             RowKey = rowKey;
             TimeStamp = timeStamp;
+            User = user;
             Folder = folder;
         }
     }

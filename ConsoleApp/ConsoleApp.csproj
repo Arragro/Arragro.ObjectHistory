@@ -24,11 +24,8 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Folder Include="Helpers\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\src\Arragro.ObjectHistory.ObjectHistoryClientProvider\Arragro.ObjectHistory.Client.csproj" />
+    <ProjectReference Include="..\src\Arragro.ObjectHistory.Server\Arragro.ObjectHistory.Server.csproj" />
   </ItemGroup>
 
   <ItemGroup>

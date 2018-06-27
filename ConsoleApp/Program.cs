@@ -3,7 +3,8 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
-using Arragro.ObjectHistory.ObjectHistoryClientProvider.Extensions;
+using Arragro.ObjectHistory.Client.Extensions;
+using Arragro.ObjectHistory.Server.Extensions;
 using Arragro.ObjectHistory.Core.Models;
 
 namespace ConsoleApp
@@ -25,10 +26,10 @@ namespace ConsoleApp
                 })
                 .ConfigureServices((hostContext, services) =>
                 {
-                    var objectHistoryClientSettings = new ObjectHistoryClientSettings();
-                    hostContext.Configuration.GetSection("ObjectHistoryClientSettings").Baind(objectHistoryClientSettings);
-
-                    services.AddArragroObjectHistory(objectHistoryClientSettings);
+                    var objectHistoryClientSettings = new ObjectHistorySettings();
+                    hostContext.Configuration.GetSection("ObjectHistoryClientSettings").Bind(objectHistoryClientSettings);
+                    services.AddArragroObjectHistoryServer(objectHistoryClientSettings);
+                    services.AddArragroObjectHistoryClient(objectHistoryClientSettings);
                     services.AddSingleton<IHostedService, App>();
                 })
                 .ConfigureLogging((hostingContext, logging) => {
