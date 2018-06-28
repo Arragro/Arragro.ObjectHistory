@@ -1,4 +1,5 @@
 ﻿using Microsoft.WindowsAzure.Storage.Table;
+using System;
 
 namespace Arragro.ObjectHistory.Core.Models
 {
@@ -23,8 +24,9 @@ namespace Arragro.ObjectHistory.Core.Models
             ETag = objectHistoryEntity.ETag;
         }
 
-        public string Folder { get; set; }
-        public string OriginTimestamp { get; set; }
+        public string ApplicationName { get; set; }
+        public Guid Folder { get; set; }
+        public DateTime OriginTimestamp { get; set; }
         public string User { get; set; }
     }
 }

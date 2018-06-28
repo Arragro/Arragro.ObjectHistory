@@ -11,7 +11,7 @@ namespace Arragro.ObjectHistory.Core.Helpers
 {
     public class AzureStorageHelper
     {
-        public async Task UploadJsonFileAsync(CloudBlobContainer objectContainer, string folder, string fileName, string objectHistoryJson)
+        public async Task UploadJsonFileAsync(CloudBlobContainer objectContainer, Guid folder, string fileName, string objectHistoryJson)
         {
             try
             {
@@ -56,14 +56,38 @@ namespace Arragro.ObjectHistory.Core.Helpers
             }
         }
 
-        public async Task AddObjectHistoryEntityRecord(ObjectHistoryDetails objectHistoryDetails, CloudTable table)
+        public async Task AddObjectHistoryEntityRecord(ObjectHistoryDetail objectHistoryDetails, CloudTable table)
         {
             try
             {
-                var objectHistoryEntity = new ObjectHistoryEntity(objectHistoryDetails.PartitionKey, objectHistoryDetails.RowKey);
-                objectHistoryEntity.OriginTimestamp = objectHistoryDetails.TimeStamp;
-                objectHistoryEntity.User = objectHistoryDetails.User;
-                objectHistoryEntity.Folder = objectHistoryDetails.Folder;
+                var objectHistoryEntity = new ObjectHistoryEntity(objectHistoryDetails.PartitionKey, objectHistoryDetails.RowKey)
+                {
+                    ApplicationName = objectHistoryDetails.ApplicationName,
+                    OriginTimestamp = objectHistoryDetails.TimeStamp,
+                    User = objectHistoryDetails.User,
+                    Folder = objectHistoryDetails.Folder
+                };
+
+                var insertOperation = TableOperation.Insert(objectHistoryEntity);
+                await table.ExecuteAsync(insertOperation);
+            }
+            catch (Exception ex)
+            {
+                throw new Exception(String.Format("Somthing has gone wrong with the adding of the table record. Please review the inner exception. {0}", ex.InnerException));
+            }
+
+        }
+
+        public async Task AddObjectHistoryGlobal(ObjectHistoryDetail objectHistoryDetails, CloudTable table)
+        {
+            try
+            {
+                var objectHistoryEntity = new ObjectHistoryGlobalEntity(objectHistoryDetails.ApplicationName, objectHistoryDetails.RowKey)
+                {
+                    OriginTimestamp = objectHistoryDetails.TimeStamp,
+                    User = objectHistoryDetails.User,
+                    Folder = objectHistoryDetails.Folder
+                };
 
                 var insertOperation = TableOperation.Insert(objectHistoryEntity);
                 await table.ExecuteAsync(insertOperation);

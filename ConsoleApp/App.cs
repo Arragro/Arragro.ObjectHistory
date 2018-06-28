@@ -26,13 +26,15 @@ namespace ConsoleApp
         {
             _logger.LogInformation("Starting");
 
-            QueryTable();
-
-            //MakeChanges();
+            MakeChanges();
 
             Thread.Sleep(5000);
 
-            //CheckQueue();
+            CheckQueue();
+
+            Thread.Sleep(5000);
+
+            QueryTable();
 
             return Task.CompletedTask;
         }
@@ -50,7 +52,7 @@ namespace ConsoleApp
                 Test = "Test"
             };
 
-            var entities = await _objectHistoryClient.GetObjectHistoryAsync<Parent>(() => $"{parent.ParentId}", null);
+            var entities = await _objectHistoryClient.GetObjectHistoryAsync<Parent>(() => $"{parent.ParentId}", "1");
 
             Console.WriteLine(entities);
 

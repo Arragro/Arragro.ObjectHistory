@@ -9,7 +9,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arragro.ObjectHistory.Clien
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arragro.ObjectHistory.Core", "src\Arragro.ObjectHistory.Core\Arragro.ObjectHistory.Core.csproj", "{0959FEC5-8867-4F1E-9BB3-60278315F9F2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Arragro.ObjectHistory.Server", "src\Arragro.ObjectHistory.Server\Arragro.ObjectHistory.Server.csproj", "{E6D7D7A2-0884-4FB7-9D57-923B25CCF79F}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arragro.ObjectHistory.Server", "src\Arragro.ObjectHistory.Server\Arragro.ObjectHistory.Server.csproj", "{E6D7D7A2-0884-4FB7-9D57-923B25CCF79F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{8AB6BEE0-F819-49F1-83DC-D54472AED6D6}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

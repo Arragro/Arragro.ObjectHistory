@@ -25,6 +25,7 @@ namespace Arragro.ObjectHistory.Server
         private readonly CloudBlobContainer _objectContainer;
         private readonly CloudQueue _queue;
         private readonly CloudTable _table;
+        private readonly CloudTable _globalTable;
 
         private readonly JsonHelper _jsonHelper;
         private readonly AzureStorageHelper _azureStorageHelper;
@@ -43,8 +44,12 @@ namespace Arragro.ObjectHistory.Server
             _objectContainer = _blobClient.GetContainerReference(configurationSettings.ObjectContainerName);
             _objectContainer.CreateIfNotExistsAsync().Wait();
 
-            _table = _tableClient.GetTableReference(configurationSettings.TableName);
+            _table = _tableClient.GetTableReference(configurationSettings.ObjectHistoryTable);
             _table.CreateIfNotExistsAsync().Wait();
+
+            _globalTable = _tableClient.GetTableReference(configurationSettings.GlobalHistoryTable);
+            _globalTable.CreateIfNotExistsAsync().Wait();
+
 
             _azureStorageHelper = new AzureStorageHelper();
             _jsonHelper = new JsonHelper();
@@ -78,7 +83,7 @@ namespace Arragro.ObjectHistory.Server
             if (blob.Name.EndsWith(".json"))
             {
                 var objectHistoryDetailsJson = blob.DownloadTextAsync().Result;
-                var objectHistoryDetails = _jsonHelper.GetObjectFromJson<ObjectHistoryDetails>(objectHistoryDetailsJson);
+                var objectHistoryDetails = _jsonHelper.GetObjectFromJson<ObjectHistoryDetail>(objectHistoryDetailsJson);
 
 //check id old is the same as last new
 
@@ -89,6 +94,8 @@ namespace Arragro.ObjectHistory.Server
                 await _azureStorageHelper.UploadJsonFileAsync(_objectContainer, objectHistoryDetails.Folder, "ObjectHistory.json", objectHistoryJson);
 
                 await _azureStorageHelper.AddObjectHistoryEntityRecord(objectHistoryDetails, _table);
+
+                await _azureStorageHelper.AddObjectHistoryGlobal(objectHistoryDetails, _globalTable);
 
                 await blob.DeleteAsync();
             }
