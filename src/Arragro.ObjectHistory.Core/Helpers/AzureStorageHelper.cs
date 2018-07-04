@@ -5,6 +5,7 @@ using Microsoft.WindowsAzure.Storage.Table;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Arragro.ObjectHistory.Core.Helpers
@@ -95,6 +96,24 @@ namespace Arragro.ObjectHistory.Core.Helpers
             catch (Exception ex)
             {
                 throw new Exception(String.Format("Somthing has gone wrong with the adding of the table record. Please review the inner exception. {0}", ex.InnerException));
+            }
+
+        }
+        public async Task<Guid> GetLatestBlobFolderNameByPartitionKey(string partitionKey, CloudTable table)
+        {
+            try
+            {
+                var query = new TableQuery<ObjectHistoryEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
+
+                var queryResult = await table.ExecuteQuerySegmentedAsync(query.Take(1), null);
+
+                var folder = (queryResult.Results).Select(x => x.Folder).FirstOrDefault();
+
+                return folder;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
             }
 
         }

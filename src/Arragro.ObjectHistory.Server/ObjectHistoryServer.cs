@@ -8,13 +8,14 @@ using Microsoft.WindowsAzure.Storage.Table;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 
 namespace Arragro.ObjectHistory.Server
 {
     public class ObjectHistoryServer
     {
-        private const string OBJECT_HISTORY_FILENAME = "objecthistory.json";
+        private const string OBJECT_HISTORY_FILENAME = "ObjectHistory.json";
 
         private readonly string _storageConnectionString;
 
@@ -73,33 +74,101 @@ namespace Arragro.ObjectHistory.Server
             return message.Result;
         }
 
-        private async Task ValidateAndProcessQueueMessage(string blobName)
+        private CloudBlockBlob GetObjectHistoryBlob(string blobName)
         {
-            var blob = _objectContainer.GetBlockBlobReference(blobName);
-
-            if (!blob.ExistsAsync().Result)
-                throw new Exception("Blob file {0} in queue does not exist in either the container.");
-
-            if (blob.Name.EndsWith(".json"))
+            try
             {
-                var objectHistoryDetailsJson = blob.DownloadTextAsync().Result;
-                var objectHistoryDetails = _jsonHelper.GetObjectFromJson<ObjectHistoryDetail>(objectHistoryDetailsJson);
+                var blob = _objectContainer.GetBlockBlobReference(blobName);
 
-//check id old is the same as last new
+                if (!blob.ExistsAsync().Result)
+                    throw new Exception("Blob file {0} in queue does not exist in the container.");
 
-                objectHistoryDetails.Diff = ProcessDiff(objectHistoryDetails.OldJson, objectHistoryDetails.NewJson).ToString();
+                if (!blob.Name.EndsWith(".json"))
+                    throw new Exception("Blob file extension for {0} is not .json ");
 
-                var objectHistoryJson = _jsonHelper.GetJson(objectHistoryDetails);
-
-                await _azureStorageHelper.UploadJsonFileAsync(_objectContainer, objectHistoryDetails.Folder, "ObjectHistory.json", objectHistoryJson);
-
-                await _azureStorageHelper.AddObjectHistoryEntityRecord(objectHistoryDetails, _table);
-
-                await _azureStorageHelper.AddObjectHistoryGlobal(objectHistoryDetails, _globalTable);
-
-                await blob.DeleteAsync();
+                return blob;
+            }
+            catch (Exception)
+            {
+                throw;
             }
         }
+
+        private async Task ValidateAndProcessQueueMessage(string blobName)
+        {
+            var blob = GetObjectHistoryBlob(blobName);
+
+            var objectHistoryDetailsJson = blob.DownloadTextAsync().Result;
+            var objectHistoryDetails = _jsonHelper.GetObjectFromJson<ObjectHistoryDetail>(objectHistoryDetailsJson);
+
+            objectHistoryDetails.Diff = ProcessDiff(objectHistoryDetails.OldJson, objectHistoryDetails.NewJson).ToString();
+
+            await CheckAndUpdateHistory(objectHistoryDetails.PartitionKey, _table, objectHistoryDetails);
+
+            var objectHistoryJson = _jsonHelper.GetJson(objectHistoryDetails);
+
+            await _azureStorageHelper.UploadJsonFileAsync(_objectContainer, objectHistoryDetails.Folder, "ObjectHistory.json", objectHistoryJson);
+
+            await _azureStorageHelper.AddObjectHistoryEntityRecord(objectHistoryDetails, _table);
+
+            await _azureStorageHelper.AddObjectHistoryGlobal(objectHistoryDetails, _globalTable);
+
+            await blob.DeleteAsync();
+            
+        }
+
+        private async Task CheckAndUpdateHistory(string partitionKey, CloudTable table, ObjectHistoryDetail objectHistoryDetail)
+        {
+            var lastObjectHistorydetailFolder = await _azureStorageHelper.GetLatestBlobFolderNameByPartitionKey(partitionKey, table);
+
+            if (lastObjectHistorydetailFolder != Guid.Empty)
+            {
+                var blobName = String.Format("{0}/{1}", lastObjectHistorydetailFolder.ToString(), OBJECT_HISTORY_FILENAME);
+                
+                var blob = GetObjectHistoryBlob(blobName);
+
+                var lastObjectHistorydetailJson = blob.DownloadTextAsync().Result;
+                var lastObjectHistorydetails = _jsonHelper.GetObjectFromJson<ObjectHistoryDetail>(lastObjectHistorydetailJson);
+
+                var leapDiff = ProcessDiff(objectHistoryDetail.OldJson, lastObjectHistorydetails.NewJson);
+
+                var isDiff = false;
+
+                if (leapDiff != null)
+                    isDiff = leapDiff.HasValues;
+
+                if (isDiff)
+                {
+                    var timespan = objectHistoryDetail.TimeStamp.Subtract(lastObjectHistorydetails.TimeStamp);
+                    var catchupTimestamp = lastObjectHistorydetails.TimeStamp.AddSeconds(timespan.TotalSeconds / 2);
+
+                    var trackedObject = new ObjectHistoryDetail(partitionKey,
+                               string.Format("{0:D19}",
+                               DateTime.MaxValue.Ticks - catchupTimestamp.Ticks),
+                               objectHistoryDetail.ApplicationName,
+                               catchupTimestamp,
+                               "System Update",
+                               Guid.NewGuid())
+                    {
+                        OldJson = _jsonHelper.GetJson(lastObjectHistorydetails, true),
+                        NewJson = _jsonHelper.GetJson(objectHistoryDetail, true),
+                        Diff = leapDiff.ToString()
+                    };
+
+                    var catchupTrackedObjectJson = _jsonHelper.GetJson(trackedObject);
+                    await _azureStorageHelper.UploadJsonFileAsync(_objectContainer, trackedObject.Folder, OBJECT_HISTORY_FILENAME, catchupTrackedObjectJson);
+
+
+                    await _azureStorageHelper.AddObjectHistoryEntityRecord(trackedObject, _table);
+
+                    await _azureStorageHelper.AddObjectHistoryGlobal(trackedObject, _globalTable);
+
+
+                }
+            }
+
+        }
+
 
         private JToken ProcessDiff(string oldjson, string newjson)
         {

@@ -7,7 +7,7 @@ namespace ConsoleApp.Models
     public class Child
     {
         public int ChildId { get; set; }
-        public string Test { get; set; }
+        public string Name { get; set; }
 
         public Parent Parent { get; set; }
     }

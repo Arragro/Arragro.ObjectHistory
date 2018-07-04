@@ -37,6 +37,11 @@ namespace ConsoleApp
                     logging.AddConsole();
                 });
 
+            var host = new HostBuilder()
+                .Build();
+
+            host.RunAsync();
+
             await builder.RunConsoleAsync();
         }
     }

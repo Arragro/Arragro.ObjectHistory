@@ -27,6 +27,7 @@ namespace ConsoleApp
             _logger.LogInformation("Starting");
 
             MakeChanges();
+           // MakeOutOfBandChange();
 
             Thread.Sleep(5000);
 
@@ -49,7 +50,7 @@ namespace ConsoleApp
             var parent = new Parent
             {
                 ParentId = 1,
-                Test = "Test"
+                Name = "Prof. X"
             };
 
             var entities = await _objectHistoryClient.GetObjectHistoryAsync<Parent>(() => $"{parent.ParentId}", "1");
@@ -63,40 +64,76 @@ namespace ConsoleApp
             //}
         }
 
-        public async void MakeChanges()
+        public async void MakeOutOfBandChange()
         {
             var parent = new Parent
             {
                 ParentId = 1,
-                Test = "Test"
+                Name = "Rogue"
             };
 
             var child = new Child
             {
                 ChildId = 1,
-                Test = "Test",
+                Name = "Storm",
                 Parent = parent
             };
 
             parent.Child = child;
 
-            var parent2 = new Parent
+            var updateParent = new Parent
             {
                 ParentId = 1,
-                Test = "Test 2"
+                Name = "Professor Xavier"
             };
 
             var child2 = new Child
             {
                 ChildId = 1,
-                Test = "Test 2",
-                Parent = parent2
+                Name = "David",
+                Parent = updateParent
             };
 
             parent.Child = child;
-            parent2.Child = child2;
+            updateParent.Child = child2;
 
-            await _objectHistoryClient.SaveObjectHistoryAsync<Parent>(() => $"{parent.ParentId}", parent, parent2, "prof. X");
+            await _objectHistoryClient.SaveObjectHistoryAsync<Parent>(() => $"{parent.ParentId}", parent, updateParent, "prof. X");
+        }
+
+        public async void MakeChanges()
+        {
+            var parent = new Parent
+            {
+                ParentId = 1,
+                Name = "Prof. X"
+            };
+
+            var child = new Child
+            {
+                ChildId = 1,
+                Name = "Legion",
+                Parent = parent
+            };
+
+            parent.Child = child;
+
+            var updateParent = new Parent
+            {
+                ParentId = 1,
+                Name = "Logan"
+            };
+
+            var child2 = new Child
+            {
+                ChildId = 1,
+                Name = "Laura",
+                Parent = updateParent
+            };
+
+            parent.Child = child;
+            updateParent.Child = child2;
+
+            await _objectHistoryClient.SaveObjectHistoryAsync<Parent>(() => $"{parent.ParentId}", parent, updateParent, "prof. X");
 
         }
 
