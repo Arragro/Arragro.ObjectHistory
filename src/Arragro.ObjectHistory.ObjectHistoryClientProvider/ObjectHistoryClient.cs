@@ -22,6 +22,7 @@ namespace Arragro.ObjectHistory.Client
         private readonly CloudBlobContainer _objectContainer;
         private readonly CloudQueue _queue;
         private readonly CloudTable _table;
+        private readonly CloudTable _globalTable;
 
         private readonly JsonHelper _jsonHelper;
         private readonly AzureStorageHelper _azureStorageHelper;
@@ -42,6 +43,9 @@ namespace Arragro.ObjectHistory.Client
 
             _table = _tableClient.GetTableReference(configurationSettings.ObjectHistoryTable);
             _table.CreateIfNotExistsAsync().Wait();
+
+            _globalTable = _tableClient.GetTableReference(configurationSettings.GlobalHistoryTable);
+            _globalTable.CreateIfNotExistsAsync().Wait();
 
             _azureStorageHelper = new AzureStorageHelper();
             _jsonHelper = new JsonHelper();
@@ -75,7 +79,7 @@ namespace Arragro.ObjectHistory.Client
             await _azureStorageHelper.SendQueueMessage(_queue, String.Format("{0}/{1}",trackedObject.Folder, OBJECT_HISTORY_FILENAME));
         }
         
-        public async Task<string> GetObjectHistoryAsync<T>(Func<string> getKeys, string continuationToken = null)
+        public async Task<string> GetObjectHistoryAsync<T>(Func<string> getKeys, TableContinuationToken continuationToken = null)
         {
             var fullyQualifiedName = typeof(T).FullName;
             var key = getKeys();
@@ -86,11 +90,14 @@ namespace Arragro.ObjectHistory.Client
             return entities;
         }
 
-        public async Task<string> GetObjectHistoryAsync(string partitionKey, string continuationToken)
+        public async Task<ObjectHistoryQueryResultContainer> GetObjectHistoryAsync(string partitionKey, TableContinuationToken continuationToken = null)
         {
-            var entities = _jsonHelper.GetJson(await _azureStorageHelper.GetObjectHistoryRecordsByPartitionKey(partitionKey, _table, null));
+            return  await _azureStorageHelper.GetObjectHistoryRecordsByPartitionKey(partitionKey, _table, continuationToken);
+        }
 
-            return entities;
+        public async Task<ObjectHistoryQueryResultContainer> GetGlobalObjectHistoryAsync(string partitionKey, TableContinuationToken continuationToken = null)
+        {
+            return await _azureStorageHelper.GetObjectHistoryRecordsByPartitionKey(partitionKey, _globalTable, continuationToken);
         }
     }
 }

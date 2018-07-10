@@ -1,0 +1,35 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewBag.Title = "Index";
+}
+<div div id="logDetails">
+    <h2>Object History Records</h2>
+
+    <div id="objectHistoryRecords">
+        <table class="table" data-bind="visible: results().length > 0">
+            <thead>
+                <tr>
+                    <th>Details</th>
+                    <th>ModifiedBy</th>
+                    <th class="hidden-xs">ModifiedDate</th>
+                </tr>
+            </thead>
+            <tbody data-bind="foreach: results">
+                <tr>
+                    @*<td><a class="btn btn-success" data-bind="attr: { href: getDownloadHref(folder) }">View Diff</a></td>*@
+                    <td><a data-bind="text: folder"></a></td>
+                    <td class="hidden-xs" data-bind="text: modifiedBy"></td>
+                    <td class="hidden-xs" data-bind="date: modifiedDate"></td>
+                </tr>
+            </tbody>
+        </table>
+
+
+        <div>
+            <p data-bind="visible: results().length === 0">There are no results for the above search criteria</p>
+        </div>
+
+        <button class="btn btn-lg btn-primary" data-bind="click: getMoreFileLogs, visible: continuationToken() != null">Get more File Logs</button>
+    </div>
+</div>

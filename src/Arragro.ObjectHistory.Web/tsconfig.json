@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "noUnusedLocals": false,
+    "noUnusedParameters": true,
+    "moduleResolution": "node",
+    "target": "es6",
+    "jsx": "preserve",
+    "sourceMap": true,
+    "experimentalDecorators": true
+  },
+  "compileOnSave": false,
+  "exclude": [
+    "node_modules",
+    "typings/custom"
+  ]
+}

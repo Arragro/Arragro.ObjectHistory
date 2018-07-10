@@ -1,0 +1,673 @@
+﻿@import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
+
+@import "mixin.scss";
+$headerFontFamily: Muli;
+
+
+#documentbody {
+    color: darken($gray, 15%);
+    padding-top: 4.8rem;
+    transition: padding-top .4s;
+    font-family: Muli;
+    font-size: 16px;
+
+    &.navbar-shrink {
+        padding-top: 3rem;
+    }
+}
+
+svg#ArragroLogo {
+    width: 100%;
+    height: 100%;
+}
+
+.navbar {
+    padding: 0;
+    background-color: lighten($gray, 50%);
+    border-bottom: 1px solid lighten($gray, 30%);
+    font-family: $headerFontFamily;
+    transition: padding .4s;
+
+    > .container {
+        padding: .6rem 0;
+        transition: all .4s ease-in-out;
+
+        .navbar-brand,
+        ul {
+            transition: all .4s ease-in-out;
+        }
+    }
+
+    .navbar-brand {
+        font-size: 1.8rem;
+        font-weight: 600;
+        color: $gray;
+
+        img {
+            height: 50px;
+            width: auto;
+            margin-top: -.1rem;
+        }
+
+        &:focus, &:hover {
+            color: $blue;
+        }
+    }
+
+    .navbar-nav .nav-link {
+        font-size: 1.4rem;
+        font-weight: 400;
+        color: $gray;
+
+        &:focus, &:hover, &.active {
+            color: $blue;
+            font-weight: 600;
+        }
+    }
+
+    &.navbar-shrink {
+        > .container {
+            padding: 0;
+
+            .navbar-brand,
+            ul {
+                transform: scale(.8);
+            }
+        }
+    }
+}
+
+h1, h2, h3, h4, h5, h6 {
+    font-family: $headerFontFamily;
+}
+
+/*@media (min-width: 1024px) {
+    body {
+        padding-top: 3.8rem;
+    }
+
+    .navbar {
+        > .container {
+            padding: 0 0;
+        }
+    }
+}*/
+
+footer {
+    border-top: 1px solid $lightGray;
+    background-color: $lighterGray;
+    padding: 2rem 0;
+
+    a {
+        color: $gray;
+
+        &:focus, &:hover {
+            .icon, .text {
+                color: $blue;
+                fill: $blue;
+            }
+        }
+    }
+
+    address ul {
+        padding-left: 0;
+
+        li {
+            list-style: none;
+
+            .contact {
+                padding: 1rem;
+
+                .icon {
+                    width: 1.6rem;
+                    fill: $gray;
+
+                    svg {
+                        font-size: 1.3rem;
+                    }
+                }
+
+                .text {
+                    margin-left: 1rem;
+                }
+            }
+        }
+    }
+}
+
+@media (max-width: 767px) {
+    .navbar-expand-md > .container, .navbar-expand-md > .container-fluid {
+        padding-right: 10px;
+        padding-left: 10px;
+    }
+}
+
+
+@media (min-width: 768px) {
+    .navbar-light {
+        .navbar-brand {
+            @include transform-nav();
+
+            &:focus, &:hover {
+                @include transform-nav-grow(1.05);
+            }
+        }
+
+        .navbar-nav .nav-link {
+            @include transform-nav();
+
+            &:focus, &:hover, &.active {
+                @include transform-nav-grow(1.05);
+            }
+        }
+    }
+
+    footer a {
+        .icon, .text {
+            @include transform-nav();
+        }
+
+        &:focus, &:hover {
+            .icon, .text {
+                @include transform-nav-grow(1.05);
+            }
+        }
+    }
+}
+
+@media (min-width: 1500px) {
+    .container {
+        max-width: 1440px;
+    }
+}
+
+.form-control {
+    display: block;
+    width: 100%;
+    padding: .375rem .75rem;
+    font-size: 1rem;
+    line-height: 1.5;
+    color: #495057;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    border-radius: 0;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+
+    &:focus {
+        color: #495057;
+        background-color: #fff;
+        border-color: $blue;
+        outline: 0;
+        box-shadow: 0 0 0 0.2rem rgba($blue,.25);
+    }
+}
+
+.hide {
+    display: none;
+}
+
+#contactFormContainer {
+    perspective: 1000px;
+    position: relative;
+
+    #contactFormTitle {
+        text-align: center;
+    }
+
+    .flipper {
+        width: 100%;
+        max-height: 100%;
+        transform-style: preserve-3d;
+        transition: all .6s ease-in-out;
+        visibility: visible;
+        opacity: 1;
+    }
+
+    .front, .back {
+        position: absolute;
+        backface-visibility: hidden;
+    }
+
+    #contactForm {
+        visibility: visible;
+        opacity: 1;
+        width: 100%;
+        padding: 3rem 0;
+        background: lighten($blue, 35%);
+        border-top: 1px solid $lightGray;
+
+        button {
+            height: 60px;
+            width: 100%;
+            border-radius: 0;
+            margin-top: -.7rem;
+            background-color: $blue;
+
+            &:hover {
+                background-color: darken($blue, 20%);
+            }
+        }
+
+        .g-recaptcha {
+            height: 78px;
+            margin-top: -.3rem;
+        }
+    }
+
+    .flipper.flipped {
+        transform: none;
+        max-height: 300px;
+        transition: none;
+
+        & .back {
+            max-height: 300px;
+            transition: max-height 2s ease-in-out;
+            visibility: visible;
+            opacity: 1;
+        }
+
+        .front {
+            display: none;
+        }
+
+        @media (min-width: 768px) {
+            max-height: 100%;
+            transition: all .6s ease-in-out;
+            transform: rotateX(180deg);
+
+            & .back {
+                max-height: 100%;
+                transition: none;
+            }
+
+            .front {
+                display: block;
+            }
+        }
+    }
+
+    #sentMessage {
+        width: 100%;
+        overflow: hidden;
+
+        h2 {
+            font-size: 1.5rem;
+        }
+
+        [class^='cloud'] {
+            transform: scale(.9);
+        }
+
+        @media (min-width: 768px) {
+            h2 {
+                font-size: 2rem;
+            }
+
+            [class^='cloud'] {
+                transform: initial;
+            }
+        }
+    }
+
+    .back {
+        text-align: center;
+        background-color: darken($blue, 5%);
+        color: white;
+        text-shadow: 2px 2px 8px darken($blue, 50%);
+        visibility: hidden;
+        opacity: 0;
+        max-height: 100%;
+
+        @media (min-width: 768px) {
+            transform: rotateX(180deg);
+            transition: none;
+            visibility: visible;
+            opacity: 1;
+        }
+    }
+
+    .back.hide {
+        transform: none;
+    }
+
+    .starting-clouds {
+        @include generate-clouds(null, true);
+    }
+}
+
+header#errorNotFoundPageHeader,
+header#errorPageHeader {
+    @include header();
+    height: 71vh;
+
+    &#errorNotFoundPageHeader {
+        background-color: #ededed;
+    }
+
+    &#errorPageHeader {
+        background-color: #495057;
+    }
+
+    #background-wrap {
+        height: 110%;
+    }
+
+    @include overrideHeaderMediaQueries(71vh);
+}
+
+header#standardHeader {
+    @include header();
+    height: 100px;
+
+    @include overrideHeaderMediaQueries(120px);
+
+    @media (orientation: landscape) and (max-width: 812px) {
+        height: 100px;
+    }
+
+    @media (orientation: portrait) and (min-width: 736px) {
+        height: 120px;
+    }
+
+    .background-wrap {
+        .starting-clouds {
+            top: -7%;
+        }
+
+        .infinite-clouds {
+            > div {
+                position: absolute;
+                height: 100%;
+                width: 100%;
+                top: -14%;
+            }
+
+
+            > div:first-child {
+                top: -16%;
+            }
+        }
+
+        .banner-text {
+            height: 100%;
+            position: relative;
+            z-index: 99;
+            text-align: center;
+            word-break: normal;
+            word-wrap: normal;
+            color: white;
+            font-size: 2vh;
+
+            h1 {
+                font-size: 2.3rem;
+                margin-top: 0rem;
+                text-shadow: 2px 2px 8px darken($blue, 50%);
+                z-index: 50;
+            }
+
+            p {
+                margin-bottom: 0rem;
+            }
+        }
+
+        [class^='cloud-'], .start {
+            transform: scale(.5);
+
+            @media (orientation: landscape) {
+                transform: scale(.7);
+            }
+
+            @media (orientation: landscape) and (min-width: 968px) {
+                transform: scale(.5);
+            }
+
+            @media (orientation: landscape) and (min-width: 1440px) {
+                transform: scale(.55);
+            }
+        }
+
+        #background-wrap {
+            height: 100px;
+        }
+    }
+}
+
+#tileBulletPage {
+    .section {
+        padding: 1rem 0 2rem 0;
+
+        .cloud {
+            width: 100%;
+            margin: 0 auto;
+
+            @media (min-width: 768px) {
+                width: 70%;
+            }
+
+            @media (min-width: 992px) {
+                width: 100%;
+            }
+        }
+
+        .image img {
+            object-position: 0 0;
+            max-height: 300px;
+            width: 100%;
+            object-fit: cover;
+        }
+    }
+
+    .case-study-bayleys-web {
+
+        .image img {
+            max-height: 370px;
+        }
+    }
+}
+
+#contact {
+    .contact-container {
+        position: relative;
+        height: 155vh;
+        font-size: 1rem;
+
+        @media (orientation: landscape) and (min-device-width:412px) {
+            height: 275vh;
+        }
+
+        @media (orientation: landscape) and (min-device-width:533px) {
+            height: 310vh;
+        }
+
+        @media (orientation: landscape) and (min-device-width:568px) {
+            height: 310vh;
+        }
+
+        @media (orientation: landscape) and (min-device-width:640px) {
+            height: 270vh;
+        }
+
+        @media (orientation: landscape) and (min-device-width:650px) {
+            height: 265vh;
+        }
+
+        @media (orientation: landscape) and (min-device-width:700px) {
+            height: 240vh;
+        }
+
+        @media (orientation: landscape) and (min-device-width: 768px) and (min-device-height: 800px) {
+            height: 40vh;
+        }
+
+        @media (orientation: landscape) and (min-device-width:800px) and (min-device-height:375px) {
+            height: 135vh;
+        }
+
+        @media (orientation: landscape) and (min-device-width:800px) and (min-device-height:500px) {
+            height: 50vh;
+        }
+
+        @media (orientation: landscape) and (min-device-width:960px) and (min-device-height:600px) {
+            height: 90vh;
+        }
+
+        @media (orientation: landscape) and (min-device-width:1024px) and (min-device-height:768px) {
+            height: 40vh;
+        }
+
+        @media (orientation: portrait) and (min-device-height:533px) {
+            height: 190vh;
+        }
+
+        @media (orientation: portrait) and (min-device-height:568px) {
+            height: 155vh;
+        }
+
+        @media (orientation: portrait) and (min-device-height:641px) {
+            height: 150vh;
+        }
+
+        @media (orientation: portrait) and (min-device-height:700px) {
+            height: 135vh;
+        }
+
+        @media (orientation: portrait) and (min-device-height: 736px) {
+            height: 135vh;
+        }
+
+        @media (orientation: portrait) and (min-device-height: 812px) {
+            height: 120vh;
+        }
+
+        @media (orientation: portrait) and (min-device-height: 823px) {
+            height: 120vh;
+        }
+
+        @media (orientation: portrait) and (min-device-height: 1020px) {
+            height: 53vh;
+        }
+
+        @media (orientation: portrait) and (min-device-height: 1200px) {
+            height: 65vh;
+        }
+
+        @media (orientation: portrait) and (min-device-height: 1280px) {
+            height: 25vh;
+        }
+
+        @media (orientation: portrait) and (min-device-height: 1280px) and (min-device-width: 800px) {
+            height: 45vh;
+        }
+
+        @media (orientation: portrait) and (min-device-height: 1366px) and (min-device-width: 1024px) {
+            height: 25vh;
+        }
+
+        @media (orientation: portrait) and (min-device-height: 1380px) {
+            height: 65vh;
+            max-height: 520px
+        }
+
+        h3, h4, h5 {
+            color: darken($blue, 8%);
+            margin-top: 1rem;
+        }
+
+        .location {
+            h5:first-child {
+                margin-top: 0;
+            }
+        }
+
+        .contact-section {
+            h5 {
+                margin-top: 1rem;
+            }
+        }
+
+        @media (min-height: 800px) and (min-width: 768px) {
+            .location {
+                h5:first-child {
+                    margin-top: 1rem;
+                }
+            }
+        }
+
+        .map-container, contact-container {
+            width: 100%;
+            top: 0;
+        }
+
+        .map-container {
+            height: 50%;
+
+            .row, [class^='col-']:last-child {
+                height: 100%;
+            }
+
+            @media (min-width: 768px) {
+                height: 100%;
+                position: absolute;
+            }
+        }
+
+        .contact-details {
+            height: 50%;
+
+            .location, .contact-details {
+                width: 100%;
+            }
+
+            .pt-5 {
+                padding-top: 1rem !important;
+            }
+
+            @media (min-width: 768px) {
+                height: 100%;
+
+                .pt-5 {
+                    padding-top: 2rem !important;
+                }
+            }
+
+            @media (orientation: landscape) and (min-width: 768px) and (min-height: 1180px) {
+                .contact-section {
+                    padding-top: 1rem;
+                }
+            }
+
+            @media (orientation: landscape) and (max-width: 812px) {
+                .pt-5 {
+                    padding-top: 1rem !important;
+                }
+            }
+
+            @media (orientation: landscape) and (max-width: 768px) {
+                .pt-5 {
+                    padding-top: 1rem !important;
+                }
+            }
+        }
+    }
+}
+
+.table tbody tr:hover td, .table tbody tr:hover th {
+    background-color: #007bff;
+}
+
+#login {
+    .input-group > .input-group-prepend {
+        flex: 0 0 55px;
+    }
+
+    .input-group .input-group-text {
+        width: 100%;
+    }
+}
+
+
+#arragrologo {
+    width: 50%;
+    height: 50%;
+}

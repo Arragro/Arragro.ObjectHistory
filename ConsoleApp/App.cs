@@ -53,7 +53,7 @@ namespace ConsoleApp
                 Name = "Prof. X"
             };
 
-            var entities = await _objectHistoryClient.GetObjectHistoryAsync<Parent>(() => $"{parent.ParentId}", "1");
+            var entities = await _objectHistoryClient.GetObjectHistoryAsync<Parent>(() => $"{parent.ParentId}");
 
             Console.WriteLine(entities);
 

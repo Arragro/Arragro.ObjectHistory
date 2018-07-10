@@ -127,7 +127,7 @@ namespace Arragro.ObjectHistory.Core.Helpers
                 var queryResult = await table.ExecuteQuerySegmentedAsync(query.Take(1), token);
                 token = queryResult.ContinuationToken;
 
-                var entityResults = new ObjectHistoryQueryResultContainer(queryResult.Results, token);
+                var entityResults = new ObjectHistoryQueryResultContainer(queryResult.Results, token, partitionKey);
 
                 return entityResults;
             }
