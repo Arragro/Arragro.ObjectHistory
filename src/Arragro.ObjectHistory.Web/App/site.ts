@@ -4,15 +4,49 @@ import 'jquery-validation-unobtrusive'
 import 'bootstrap'
 
 
-function getHref(folderGuid, fileName) {
-    return "/ObjectHistoryDetails?folder=" + folderGuid + "/" + fileName;
-}
-function getParameterByName(name) {
-    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-        results = regex.exec(location.search);
-    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
-}
+//class GlobalLogsViewModel {
+//    partitionKey: KnockoutObservable<string>
+//    results: KnockoutObservableArray<any>
+//    continuationToken: KnockoutObservable<string>
+
+//    constructor() {
+//        this.getLogs();
+//        this.results = ko.observableArray<any>(new Array);
+
+//    }
+
+//    getMoreFileLogs(){
+//       this.getLogs();
+//    }; 
+
+//    getLogs() {
+//        var postData = {
+//            tableContinuationToken: this.continuationToken
+//        };
+
+//        $.post("/arragro-object-history/get-global-logs", postData, function (data) {
+//            this.partitionKey = ko.observable(data.partitionKey);
+//            this.continuationToken = ko.observable(data.continuationToken);
+
+//            ko.utils.arrayPushAll(this.results, data.results);
+//        });
+
+//    };
+//}
+
+
+
+
+//function getHref(folder) {
+//    return "/ObjectHistoryDetails?folder=" + folder;
+//}
+
+//function getParameterByName(name) {
+//    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
+//    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
+//        results = regex.exec(location.search);
+//    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
+//}
 
 
 
@@ -30,28 +64,20 @@ function GlobalLogsViewModel() {
         };
 
         $.post("/arragro-object-history/get-global-logs", postData, function (data) {
+            self.partitionKey(data.partitionKey);
             self.continuationToken(data.continuationToken);
             ko.utils.arrayPushAll(self.results, data.results);
         });
     };
 
     self.getDownloadHref = function (folder) {
-        return '/FileDetails/Download?folder=' + folder;
+        return '/arragro-object-history/download?folder=' + folder;
     };
-
 
     self.getMoreFileLogs = function () {
         getLogs();
     };  
 
-    var loadFormFromUrl = function () {
-        var partitionKey = getParameterByName('partitionKey');
-
-        if (partitionKey !== null && partitionKey.length > 0)
-            self.partitionKey(partitionKey);
-    }
-
-    loadFormFromUrl();
     getLogs();
 }
 
@@ -71,6 +97,7 @@ $(function () {
 
     if ($('#logDetails').length > 0) {
 
+        //ko.applyBindings(new GlobalLogsViewModel());
         ko.applyBindings(new GlobalLogsViewModel());
     }
 });

@@ -11,7 +11,8 @@ namespace Arragro.ObjectHistory.Client
 {
     public class ObjectHistoryClient
     {
-        private const string OBJECT_HISTORY_FILENAME = "objecthistoryrequest.json";
+        private const string OBJECT_HISTORY_REQUEST_FILENAME = "objecthistoryrequest.json";
+        private const string OBJECT_HISTORY_FILENAME = "ObjectHistory.json";
 
         private readonly string _storageConnectionString;
 
@@ -74,9 +75,9 @@ namespace Arragro.ObjectHistory.Client
 
             var trackedObjectJson = _jsonHelper.GetJson(trackedObject);
             
-            await _azureStorageHelper.UploadJsonFileAsync(_objectContainer, trackedObject.Folder, OBJECT_HISTORY_FILENAME, trackedObjectJson);
+            await _azureStorageHelper.UploadJsonFileAsync(_objectContainer, trackedObject.Folder, OBJECT_HISTORY_REQUEST_FILENAME, trackedObjectJson);
             
-            await _azureStorageHelper.SendQueueMessage(_queue, String.Format("{0}/{1}",trackedObject.Folder, OBJECT_HISTORY_FILENAME));
+            await _azureStorageHelper.SendQueueMessage(_queue, String.Format("{0}/{1}",trackedObject.Folder, OBJECT_HISTORY_REQUEST_FILENAME));
         }
         
         public async Task<string> GetObjectHistoryAsync<T>(Func<string> getKeys, TableContinuationToken continuationToken = null)
@@ -98,6 +99,11 @@ namespace Arragro.ObjectHistory.Client
         public async Task<ObjectHistoryQueryResultContainer> GetGlobalObjectHistoryAsync(string partitionKey, TableContinuationToken continuationToken = null)
         {
             return await _azureStorageHelper.GetObjectHistoryRecordsByPartitionKey(partitionKey, _globalTable, continuationToken);
+        }
+
+        public async Task<string> GetObjectHistoryFile(string folder)
+        {
+            return await _azureStorageHelper.DownloadBlob(_objectContainer, folder, OBJECT_HISTORY_FILENAME);
         }
     }
 }

@@ -36,7 +36,7 @@
   ],
   "devDependencies": {
     "@types/gsap": "^1.19.2",
-    "@types/knockout": "^3.4.53",
+    "@types/knockout": "^3.4.58",
     "@types/source-map": "^0.5.7",
     "@types/uglify-js": "^2.6.30",
     "@types/webpack": "^3.0.14",

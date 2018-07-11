@@ -99,6 +99,7 @@ namespace Arragro.ObjectHistory.Core.Helpers
             }
 
         }
+
         public async Task<Guid> GetLatestBlobFolderNameByPartitionKey(string partitionKey, CloudTable table)
         {
             try
@@ -138,6 +139,23 @@ namespace Arragro.ObjectHistory.Core.Helpers
 
         }
 
+        public Task<string> DownloadBlob(CloudBlobContainer objectContainer, string folder, string filename)
+        {
+            try
+            {
+                var options = new BlobRequestOptions()
+                {
+                    ServerTimeout = TimeSpan.FromMinutes(10)
+                };
 
+                CloudBlockBlob cloudBlockBlob = objectContainer.GetBlockBlobReference($"{folder}/{filename}");
+
+                return cloudBlockBlob.DownloadTextAsync();
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
     }
 }

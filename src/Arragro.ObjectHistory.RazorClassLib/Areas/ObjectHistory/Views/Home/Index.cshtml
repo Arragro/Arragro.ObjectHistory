@@ -10,6 +10,7 @@
         <table class="table" data-bind="visible: results().length > 0">
             <thead>
                 <tr>
+                    <th>Link</th>
                     <th>Details</th>
                     <th>ModifiedBy</th>
                     <th class="hidden-xs">ModifiedDate</th>
@@ -17,8 +18,7 @@
             </thead>
             <tbody data-bind="foreach: results">
                 <tr>
-                    @*<td><a class="btn btn-success" data-bind="attr: { href: getDownloadHref(folder) }">View Diff</a></td>*@
-                    <td><a data-bind="text: folder"></a></td>
+                    <td><a data-bind="attr: { href: $root.getDownloadHref(folder) }, text: folder"></a></td>
                     <td class="hidden-xs" data-bind="text: modifiedBy"></td>
                     <td class="hidden-xs" data-bind="date: modifiedDate"></td>
                 </tr>

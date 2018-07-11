@@ -43,6 +43,18 @@ namespace Arragro.ObjectHistory.RazorClassLib.Areas.ObjectHistory.Controllers
             return Ok(entities);
         }
 
+        [HttpGet("download")]
+        public async Task<IActionResult> Download(string folder)
+        {
+            if (folder != null)
+            {
+                var file = await _objectHistoryClient.GetObjectHistoryFile(folder);
+                return Ok(file);
+            }
+
+            return Ok();
+            
+        }
 
         [HttpPost("get-global-logs")]
         public async Task<IActionResult> GetGlobalLogs(TableContinuationToken tableContinuationToken = null)
@@ -52,6 +64,8 @@ namespace Arragro.ObjectHistory.RazorClassLib.Areas.ObjectHistory.Controllers
 
             return Ok(entities);
         }
+
+
 
     }
 }
