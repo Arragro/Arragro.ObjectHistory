@@ -57,7 +57,7 @@ namespace Arragro.ObjectHistory.Core.Helpers
             }
         }
 
-        public async Task AddObjectHistoryEntityRecord(ObjectHistoryDetail objectHistoryDetails, CloudTable table)
+        public async Task AddObjectHistoryEntityRecord(ObjectHistoryDetailBase objectHistoryDetails, CloudTable table)
         {
             try
             {
@@ -79,7 +79,7 @@ namespace Arragro.ObjectHistory.Core.Helpers
 
         }
 
-        public async Task AddObjectHistoryGlobal(ObjectHistoryDetail objectHistoryDetails, CloudTable table)
+        public async Task AddObjectHistoryGlobal(ObjectHistoryDetailBase objectHistoryDetails, CloudTable table)
         {
             try
             {
@@ -87,6 +87,7 @@ namespace Arragro.ObjectHistory.Core.Helpers
                 {
                     OriginTimestamp = objectHistoryDetails.TimeStamp,
                     User = objectHistoryDetails.User,
+                    ObjectName = objectHistoryDetails.PartitionKey,
                     Folder = objectHistoryDetails.Folder
                 };
 
@@ -118,7 +119,6 @@ namespace Arragro.ObjectHistory.Core.Helpers
             }
 
         }
-
         public async Task<ObjectHistoryQueryResultContainer> GetObjectHistoryRecordsByPartitionKey(string partitionKey, CloudTable table, TableContinuationToken token)
         {
             try
@@ -129,6 +129,26 @@ namespace Arragro.ObjectHistory.Core.Helpers
                 token = queryResult.ContinuationToken;
 
                 var entityResults = new ObjectHistoryQueryResultContainer(queryResult.Results, token, partitionKey);
+
+                return entityResults;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+
+        }
+
+        public async Task<ObjectHistoryGlobalQueryResultContainer> GetObjectHistoryGlobalRecordsByPartitionKey(string partitionKey, CloudTable table, TableContinuationToken token)
+        {
+            try
+            {
+                var query = new TableQuery<ObjectHistoryGlobalEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
+
+                var queryResult = await table.ExecuteQuerySegmentedAsync(query.Take(1), token);
+                token = queryResult.ContinuationToken;
+
+                var entityResults = new ObjectHistoryGlobalQueryResultContainer(queryResult.Results, token, partitionKey);
 
                 return entityResults;
             }

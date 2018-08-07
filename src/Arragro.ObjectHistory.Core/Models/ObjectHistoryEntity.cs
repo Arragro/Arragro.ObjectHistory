@@ -5,6 +5,12 @@ namespace Arragro.ObjectHistory.Core.Models
 {
     public class ObjectHistoryEntity: TableEntity
     {
+        public string ApplicationName { get; set; }
+        public Guid Folder { get; set; }
+        public DateTime OriginTimestamp { get; set; }
+        public string User { get; set; }
+        public string IsAdd { get; set; }
+
         public ObjectHistoryEntity() { }
 
         public ObjectHistoryEntity(string partitionKey, string rowKey)
@@ -21,12 +27,7 @@ namespace Arragro.ObjectHistory.Core.Models
             OriginTimestamp = objectHistoryEntity.OriginTimestamp;
             Folder = objectHistoryEntity.Folder;
             Timestamp = objectHistoryEntity.Timestamp;
-            ETag = objectHistoryEntity.ETag;
+            IsAdd = objectHistoryEntity.IsAdd;
         }
-
-        public string ApplicationName { get; set; }
-        public Guid Folder { get; set; }
-        public DateTime OriginTimestamp { get; set; }
-        public string User { get; set; }
     }
 }

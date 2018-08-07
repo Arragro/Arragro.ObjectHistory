@@ -1,5 +1,6 @@
 ﻿using Arragro.ObjectHistory.Client;
 using Arragro.ObjectHistory.Core.Models;
+using Arragro.ObjectHistory.RazorClassLib.Areas.ObjectHistory.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Options;
 using Microsoft.WindowsAzure.Storage.Table;
@@ -9,16 +10,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace Arragro.ObjectHistory.RazorClassLib.Areas.ObjectHistory.Controllers
-{
-    public class Temp
-    {
-        public string PartitionKey { get; set; } = null;
-        public TableContinuationToken TableContinuationToken { get; set; } = null;
-    }
-    
+{    
     [Area("ObjectHistory")]
     [Route("arragro-object-history")]
-
     public class HomeController : Controller
     {
         private readonly ObjectHistoryClient _objectHistoryClient;
@@ -35,15 +29,33 @@ namespace Arragro.ObjectHistory.RazorClassLib.Areas.ObjectHistory.Controllers
             return View();
         }
 
-        [HttpPost("get-object-logs")]
-        public async Task<IActionResult> GetFileLogs([FromBody] Temp temp)
+        [HttpPost("get-global-logs")]
+        public async Task<IActionResult> GetGlobalLogs(TableContinuationToken tableContinuationToken = null)
         {
-            var entities =  await _objectHistoryClient.GetObjectHistoryAsync(temp.PartitionKey, temp.TableContinuationToken);
+
+            var entities = await _objectHistoryClient.GetGlobalObjectHistoryAsync(_objectHistorySettings.Value.ApplicationName, tableContinuationToken);
 
             return Ok(entities);
         }
 
-        [HttpGet("download")]
+        [HttpPost("get-object-logs")]
+        public async Task<IActionResult> GetObjectLogs([FromBody] ObjectLogsPostParameters postParameters)
+        {
+
+            var entities = await _objectHistoryClient.GetObjectHistoryAsync(postParameters.PartitionKey, postParameters.TableContinuationToken);
+
+            return Ok(entities);
+        }
+
+        [HttpPost("get-object-log")]
+        public async Task<IActionResult> GetLog(ObjectLogsPostParameters postParameters)
+        {
+            var entities = await _objectHistoryClient.GetObjectHistoryDetailRaw(postParameters.PartitionKey);
+
+            return Ok(entities);
+        }
+
+        [HttpGet("download-log-file")]
         public async Task<IActionResult> Download(string folder)
         {
             if (folder != null)
@@ -55,17 +67,5 @@ namespace Arragro.ObjectHistory.RazorClassLib.Areas.ObjectHistory.Controllers
             return Ok();
             
         }
-
-        [HttpPost("get-global-logs")]
-        public async Task<IActionResult> GetGlobalLogs(TableContinuationToken tableContinuationToken = null)
-        {
-           
-            var entities = await _objectHistoryClient.GetGlobalObjectHistoryAsync(_objectHistorySettings.Value.ApplicationName, tableContinuationToken);
-
-            return Ok(entities);
-        }
-
-
-
     }
 }

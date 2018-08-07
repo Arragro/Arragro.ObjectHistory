@@ -11,14 +11,16 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arragro.ObjectHistory.Core"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arragro.ObjectHistory.Server", "src\Arragro.ObjectHistory.Server\Arragro.ObjectHistory.Server.csproj", "{E6D7D7A2-0884-4FB7-9D57-923B25CCF79F}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{8AB6BEE0-F819-49F1-83DC-D54472AED6D6}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Arragro.ObjectHistory.Web", "src\Arragro.ObjectHistory.Web\Arragro.ObjectHistory.Web.csproj", "{BDCC2218-7860-47E6-ABBB-31D65364E7E1}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arragro.ObjectHistory.Web", "src\Arragro.ObjectHistory.Web\Arragro.ObjectHistory.Web.csproj", "{BDCC2218-7860-47E6-ABBB-31D65364E7E1}"
 	ProjectSection(ProjectDependencies) = postProject
 		{BA1EA677-B090-43CB-BE2C-7B23B48C00AE} = {BA1EA677-B090-43CB-BE2C-7B23B48C00AE}
 	EndProjectSection
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Arragro.ObjectHistory.RazorClassLib", "src\Arragro.ObjectHistory.RazorClassLib\Arragro.ObjectHistory.RazorClassLib.csproj", "{BA1EA677-B090-43CB-BE2C-7B23B48C00AE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arragro.ObjectHistory.RazorClassLib", "src\Arragro.ObjectHistory.RazorClassLib\Arragro.ObjectHistory.RazorClassLib.csproj", "{BA1EA677-B090-43CB-BE2C-7B23B48C00AE}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arragro.ObjectHistory.IntegrationTests", "tests\Arragro.ObjectHistory.IntegrationTests\Arragro.ObjectHistory.IntegrationTests.csproj", "{0E38C0F3-4D51-469E-9A17-BA81DCF16F08}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{5871BB9B-4CCE-4223-84F6-8EE3AC63E918}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,9 +52,16 @@ Global
 		{BA1EA677-B090-43CB-BE2C-7B23B48C00AE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{BA1EA677-B090-43CB-BE2C-7B23B48C00AE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{BA1EA677-B090-43CB-BE2C-7B23B48C00AE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0E38C0F3-4D51-469E-9A17-BA81DCF16F08}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0E38C0F3-4D51-469E-9A17-BA81DCF16F08}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0E38C0F3-4D51-469E-9A17-BA81DCF16F08}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0E38C0F3-4D51-469E-9A17-BA81DCF16F08}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{0E38C0F3-4D51-469E-9A17-BA81DCF16F08} = {5871BB9B-4CCE-4223-84F6-8EE3AC63E918}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D79B9168-1D29-440C-B873-FCBCF6E5E4C0}

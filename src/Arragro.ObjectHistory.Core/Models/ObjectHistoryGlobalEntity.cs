@@ -7,6 +7,7 @@ namespace Arragro.ObjectHistory.Core.Models
 {
     public class ObjectHistoryGlobalEntity : TableEntity
     {
+        public ObjectHistoryGlobalEntity() { }
         public ObjectHistoryGlobalEntity(string partitionKey, string rowKey)
         {
             this.PartitionKey = partitionKey;
@@ -14,6 +15,7 @@ namespace Arragro.ObjectHistory.Core.Models
         }
 
         public string User { get; set; }
+        public string ObjectName { get; set; }
         public Guid Folder { get; set; }
         public DateTime OriginTimestamp { get; set; }
 

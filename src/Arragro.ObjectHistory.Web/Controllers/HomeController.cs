@@ -5,34 +5,61 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Arragro.ObjectHistory.Web.Models;
+using Arragro.ObjectHistory.Web.Core.Interfaces;
+using System.ComponentModel.DataAnnotations;
+using Arragro.ObjectHistory.Web.Core.Entities;
 
 namespace Arragro.ObjectHistory.Web.Controllers
 {
     public class HomeController : Controller
     {
-        public IActionResult Index()
+        private readonly ITrainingSessionRepository _sessionRepository;
+
+        public HomeController(ITrainingSessionRepository sessionRepository)
         {
-            return View();
+            _sessionRepository = sessionRepository;
         }
 
-        public IActionResult About()
+        public async Task<IActionResult> Index()
         {
-            ViewData["Message"] = "Your application description page.";
+            var sessionList = await _sessionRepository.ListAsync();
 
-            return View();
+            var model = sessionList.Select(session => new TrainingSessionViewModel()
+            {
+                Id = session.Id,
+                DateCreated = session.DateCreated,
+                Name = session.Name,
+                DrillCount = session.Drills.Count
+            });
+
+            return View(model);
         }
 
-        public IActionResult Contact()
+        public class NewSessionModel
         {
-            ViewData["Message"] = "Your contact page.";
-
-            return View();
+            [Required]
+            public string SessionName { get; set; }
         }
 
-        public IActionResult Privacy()
+        [HttpPost]
+        public async Task<IActionResult> Index(NewSessionModel model)
         {
-            return View();
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            else
+            {
+                await _sessionRepository.AddAsync(new TrainingSession()
+                {
+                    DateCreated = DateTime.Now,
+                    Name = model.SessionName
+                });
+            }
+
+            return RedirectToAction(actionName: nameof(Index));
         }
+
 
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()

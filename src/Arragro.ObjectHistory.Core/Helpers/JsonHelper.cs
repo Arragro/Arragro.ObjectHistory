@@ -21,17 +21,17 @@ namespace Arragro.ObjectHistory.Core.Helpers
             {
                 if (preserveReferencesHandling)
                 {
-                    return JsonConvert.SerializeObject(customObject, Formatting.Indented, _jsonSettings);
+                    return JsonConvert.SerializeObject(customObject, _jsonSettings);
                 }
                 else
                 {
-                    return JsonConvert.SerializeObject(customObject, Formatting.Indented);
+                    return JsonConvert.SerializeObject(customObject);
                 }
 
             }
             catch (Exception ex)
             {
-                throw new Exception(String.Format("There was an issue with serializing the object to json, please review the exception and retry. - {0}", ex.InnerException));
+                throw new Exception(String.Format("There was an issue with serializing the object to json, please review the exception and retry. - {0}", ex.Message));
             }
         }
 
@@ -43,7 +43,7 @@ namespace Arragro.ObjectHistory.Core.Helpers
             }
             catch (Exception ex)
             {
-                throw new Exception(String.Format("There was an issue with deserializing the json into object {0} , please review the exception and retry. - {1}", typeof(T).FullName, ex.InnerException));
+                throw new Exception(String.Format("There was an issue with deserializing the json into object {0} , please review the exception and retry. - {1}", typeof(T).FullName, ex.Message));
             }
             
         }

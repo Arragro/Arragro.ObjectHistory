@@ -99,11 +99,13 @@ namespace Arragro.ObjectHistory.Server
             var blob = GetObjectHistoryBlob(blobName);
 
             var objectHistoryDetailsJson = blob.DownloadTextAsync().Result;
-            var objectHistoryDetails = _jsonHelper.GetObjectFromJson<ObjectHistoryDetail>(objectHistoryDetailsJson);
+            var objectHistoryDetails = _jsonHelper.GetObjectFromJson<ObjectHistoryDetailRead>(objectHistoryDetailsJson);
 
-            objectHistoryDetails.Diff = ProcessDiff(objectHistoryDetails.OldJson, objectHistoryDetails.NewJson).ToString();
-
-            await CheckAndUpdateHistory(objectHistoryDetails.PartitionKey, _table, objectHistoryDetails);
+            if (!objectHistoryDetails.IsAdd)
+            {
+                objectHistoryDetails.Diff = ProcessDiff(objectHistoryDetails.OldJson.ToString(), objectHistoryDetails.NewJson.ToString());
+                await CheckAndUpdateHistory(objectHistoryDetails.PartitionKey, _table, objectHistoryDetails);
+            }
 
             var objectHistoryJson = _jsonHelper.GetJson(objectHistoryDetails);
 
@@ -117,7 +119,7 @@ namespace Arragro.ObjectHistory.Server
             
         }
 
-        private async Task CheckAndUpdateHistory(string partitionKey, CloudTable table, ObjectHistoryDetail objectHistoryDetail)
+        private async Task CheckAndUpdateHistory(string partitionKey, CloudTable table, ObjectHistoryDetailRead objectHistoryDetail)
         {
             var lastObjectHistorydetailFolder = await _azureStorageHelper.GetLatestBlobFolderNameByPartitionKey(partitionKey, table);
 
@@ -128,9 +130,9 @@ namespace Arragro.ObjectHistory.Server
                 var blob = GetObjectHistoryBlob(blobName);
 
                 var lastObjectHistorydetailJson = blob.DownloadTextAsync().Result;
-                var lastObjectHistorydetails = _jsonHelper.GetObjectFromJson<ObjectHistoryDetail>(lastObjectHistorydetailJson);
+                var lastObjectHistorydetails = _jsonHelper.GetObjectFromJson<ObjectHistoryDetailRead>(lastObjectHistorydetailJson);
 
-                var leapDiff = ProcessDiff(objectHistoryDetail.OldJson, lastObjectHistorydetails.NewJson);
+                var leapDiff = ProcessDiff(objectHistoryDetail.OldJson.ToString(), lastObjectHistorydetails.NewJson.ToString());
 
                 var isDiff = false;
 
@@ -142,7 +144,7 @@ namespace Arragro.ObjectHistory.Server
                     var timespan = objectHistoryDetail.TimeStamp.Subtract(lastObjectHistorydetails.TimeStamp);
                     var catchupTimestamp = lastObjectHistorydetails.TimeStamp.AddSeconds(timespan.TotalSeconds / 2);
 
-                    var trackedObject = new ObjectHistoryDetail(partitionKey,
+                    var trackedObject = new ObjectHistoryDetailRaw(partitionKey,
                                string.Format("{0:D19}",
                                DateTime.MaxValue.Ticks - catchupTimestamp.Ticks),
                                objectHistoryDetail.ApplicationName,
@@ -150,9 +152,9 @@ namespace Arragro.ObjectHistory.Server
                                "System Update",
                                Guid.NewGuid())
                     {
-                        OldJson = _jsonHelper.GetJson(lastObjectHistorydetails, true),
-                        NewJson = _jsonHelper.GetJson(objectHistoryDetail, true),
-                        Diff = leapDiff.ToString()
+                        OldJson = _jsonHelper.GetJson(lastObjectHistorydetails.OldJson, true),
+                        NewJson = _jsonHelper.GetJson(objectHistoryDetail.NewJson, true),
+                        Diff = _jsonHelper.GetJson(leapDiff)
                     };
 
                     var catchupTrackedObjectJson = _jsonHelper.GetJson(trackedObject);
@@ -162,8 +164,6 @@ namespace Arragro.ObjectHistory.Server
                     await _azureStorageHelper.AddObjectHistoryEntityRecord(trackedObject, _table);
 
                     await _azureStorageHelper.AddObjectHistoryGlobal(trackedObject, _globalTable);
-
-
                 }
             }
 
@@ -184,7 +184,6 @@ namespace Arragro.ObjectHistory.Server
             }
             catch (Exception ex)
             {
-
                 throw new Exception(String.Format("Something went wrong porcessing the json diff. Please review the exception. {0}", ex));
             }
 

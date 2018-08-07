@@ -2,60 +2,38 @@
 import 'jquery-validation'
 import 'jquery-validation-unobtrusive'
 import 'bootstrap'
+import { diff, formatters } from 'jsondiffpatch';
 
+class ObjectHistoryFile{
+    objectName: string;
+    folder: string;
+    modifiedBy: KnockoutObservable<string>;
+    modifiedDate: KnockoutObservable<Date>;
+    newJson: KnockoutObservable<string>;
+    oldJson: KnockoutObservable<string>;
+    diff: KnockoutObservable<any>;
+    fileDownloaded: boolean;
+    isAdd: boolean;
 
-//class GlobalLogsViewModel {
-//    partitionKey: KnockoutObservable<string>
-//    results: KnockoutObservableArray<any>
-//    continuationToken: KnockoutObservable<string>
-
-//    constructor() {
-//        this.getLogs();
-//        this.results = ko.observableArray<any>(new Array);
-
-//    }
-
-//    getMoreFileLogs(){
-//       this.getLogs();
-//    }; 
-
-//    getLogs() {
-//        var postData = {
-//            tableContinuationToken: this.continuationToken
-//        };
-
-//        $.post("/arragro-object-history/get-global-logs", postData, function (data) {
-//            this.partitionKey = ko.observable(data.partitionKey);
-//            this.continuationToken = ko.observable(data.continuationToken);
-
-//            ko.utils.arrayPushAll(this.results, data.results);
-//        });
-
-//    };
-//}
-
-
-
-
-//function getHref(folder) {
-//    return "/ObjectHistoryDetails?folder=" + folder;
-//}
-
-//function getParameterByName(name) {
-//    name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-//    var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"),
-//        results = regex.exec(location.search);
-//    return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
-//}
-
-
-
+    constructor(model: any) {
+        this.objectName = model.objectName;
+        this.folder = model.folder;
+        this.modifiedBy = ko.observable(model.modifiedBy);
+        this.modifiedDate = ko.observable(model.modifiedDate);
+        this.fileDownloaded = false;
+        this.oldJson = ko.observable();
+        this.newJson = ko.observable();
+        this.diff = ko.observable();
+        this.isAdd = model.isAdd;
+    }
+}
 
 function GlobalLogsViewModel() {
     var self = this;
 
     self.partitionKey = ko.observable();
-    self.results = ko.observableArray([]);
+    self.objectHistoryFiles = ko.observableArray([]);
+    self.relatedObjectLogs = ko.observableArray([]);
     self.continuationToken = ko.observable();
 
     var getLogs = function () {
@@ -66,13 +44,53 @@ function GlobalLogsViewModel() {
         $.post("/arragro-object-history/get-global-logs", postData, function (data) {
             self.partitionKey(data.partitionKey);
             self.continuationToken(data.continuationToken);
-            ko.utils.arrayPushAll(self.results, data.results);
+            for (var i = 0; i < data.results.length; i++) {
+                var objectHistoryFile = new ObjectHistoryFile(data.results[i]);
+                self.objectHistoryFiles.push(objectHistoryFile);
+            }
+        });
+    };
+
+    self.getRelatedObjectLogs = function (data) {
+
+            var postData = {
+                partitionKey: data.objectName
+            }
+
+
+        $.post("/arragro-object-history/get-object-logs", postData, function (postResults) {
+            self.partitionKey(postResults.partitionKey);
+            self.continuationToken(postResults.continuationToken);
+            for (var i = 0; i < postResults.results.length; i++) {
+                var objectHistoryFile = new ObjectHistoryFile(postResults.results[i]);
+                self.objectHistoryFiles.push(objectHistoryFile);
+            }
         });
     };
 
     self.getDownloadHref = function (folder) {
-        return '/arragro-object-history/download?folder=' + folder;
+        return '/arragro-object-history/diff?folder=' + folder;
     };
+
+
+    self.getfile = function (data) {
+
+        var objectHistoryFile = ko.utils.arrayFirst(self.objectHistoryFiles(), (item: ObjectHistoryFile) => { return item.folder === data.folder; });
+
+        if (objectHistoryFile.fileDownloaded === false) {
+            var postParameters = {
+                partitionKey: data.folder
+            }
+
+            $.post("/arragro-object-history/get-object-log", postParameters, function (jsonFile) {
+                objectHistoryFile.diff(formatters.html.format(jsonFile.diff, jsonFile.oldJson));
+                objectHistoryFile.oldJson(jsonFile.oldJson);
+                objectHistoryFile.newJson(jsonFile.newJson);
+                objectHistoryFile.fileDownloaded = true;
+                self.objectHistoryFiles.valueHasMutated();
+            });
+        }
+    }
 
     self.getMoreFileLogs = function () {
         getLogs();
@@ -82,7 +100,6 @@ function GlobalLogsViewModel() {
 }
 
 $(function () {
-
     ko.bindingHandlers.date = {
         update: function (element, valueAccessor) {
             var value = valueAccessor();
@@ -96,8 +113,7 @@ $(function () {
 
 
     if ($('#logDetails').length > 0) {
-
-        //ko.applyBindings(new GlobalLogsViewModel());
+        ko.options.useOnlyNativeEvents = true;
         ko.applyBindings(new GlobalLogsViewModel());
     }
 });

@@ -1,23 +1,22 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Arragro.ObjectHistory.Core.Models
 {
-    public class ObjectHistoryQueryResult
+    public class ObjectHistoryGlobalQueryResult
     {
         public Guid Folder { get; set; }
         public string RowKey { get; set; }
-        public string ApplicationName { get; set; }
+        public string ObjectName { get; set; }
         public string ModifiedBy { get; set; }
         public DateTime ModifiedDate { get; set; }
-        public ObjectHistoryQueryResult(ObjectHistoryEntity objectHistoryGlobalEntity)
+        public ObjectHistoryGlobalQueryResult(ObjectHistoryGlobalEntity objectHistoryGlobalEntity)
         {
             Folder = objectHistoryGlobalEntity.Folder;
             RowKey = objectHistoryGlobalEntity.RowKey;
-            ApplicationName = objectHistoryGlobalEntity.ApplicationName;
+            ObjectName = objectHistoryGlobalEntity.ObjectName;
             ModifiedBy = objectHistoryGlobalEntity.User;
             ModifiedDate = objectHistoryGlobalEntity.OriginTimestamp;
+           
         }
     }
 }

@@ -26,22 +26,30 @@ namespace ConsoleApp
         {
             _logger.LogInformation("Starting");
 
-            MakeChanges();
-           // MakeOutOfBandChange();
-
+            //MakeChanges();
+            // MakeOutOfBandChange();
             Thread.Sleep(5000);
+            //Thread.Sleep(5000);
+            while (true)
+            {
+                Console.WriteLine("Waiting 20 seconds");
+                Thread.Sleep(20000);
+                CheckQueue();
 
-            CheckQueue();
 
-            Thread.Sleep(5000);
+            }
+            
 
-            QueryTable();
+            //Thread.Sleep(5000);
+
+            //QueryTable();
 
             return Task.CompletedTask;
         }
 
         private async void CheckQueue()
         {
+            Console.WriteLine("processing messages");
            await _objectHistoryServer.ProcessMessages();
         }
 
