@@ -1,25 +1,29 @@
-﻿using Microsoft.AspNetCore.Mvc.Testing;
+﻿using System.Collections.Generic;
+using System.Net;
 using System.Threading.Tasks;
+using AngleSharp.Dom.Html;
+using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.AspNetCore.TestHost;
+using Microsoft.Extensions.DependencyInjection;
 using Xunit;
 
-namespace Arragro.ObjectHistory.IntegrationTests
+namespace RazorPagesProject.Tests.IntegrationTests
 {
+    #region snippet1
     public class BasicTests
-        : IClassFixture<WebApplicationFactory<Web.Startup>>
+        : IClassFixture<WebApplicationFactory<Arragro.ObjectHistory.Web.Startup>>
     {
-        private readonly WebApplicationFactory<Web.Startup> _factory;
+        private readonly WebApplicationFactory<Arragro.ObjectHistory.Web.Startup> _factory;
 
-        public BasicTests(WebApplicationFactory<Web.Startup> factory)
+        public BasicTests(WebApplicationFactory<Arragro.ObjectHistory.Web.Startup> factory)
         {
             _factory = factory;
         }
 
         [Theory]
         [InlineData("/")]
-        [InlineData("/Index")]
-        [InlineData("/About")]
-        [InlineData("/Privacy")]
-        [InlineData("/Contact")]
+        [InlineData("/home")]
+        [InlineData("/session")]
         public async Task Get_EndpointsReturnSuccessAndCorrectContentType(string url)
         {
             // Arrange
@@ -33,5 +37,6 @@ namespace Arragro.ObjectHistory.IntegrationTests
             Assert.Equal("text/html; charset=utf-8",
                 response.Content.Headers.ContentType.ToString());
         }
+        #endregion
     }
 }
