@@ -1,0 +1,66 @@
+﻿@addTagHelper *, Microsoft.AspNetCore.Mvc.TagHelpers
+
+@{
+    ViewBag.Title = "Index";
+}
+<div div id="logDetails">
+    <h2>Object History Records</h2>
+
+    <div id="objectHistoryRecords">
+        <table class="table" data-bind="visible: objectHistoryFiles().length > 0">
+            <thead>
+                <tr>
+                    <th>Object Name</th>
+                    <th>Object History</th>
+                    <th>ModifiedBy</th>
+                    <th>ModifiedDate</th>
+                </tr>
+            </thead>
+            <tbody data-bind="foreach: objectHistoryFiles()">
+                <tr>
+                    <td data-bind="text: objectName"></td>
+                    <td>
+                        <a data-toggle="collapse" data-bind="attr: { href: '#div_' + folder }, text: folder, click: $root.getfile($rawData)"></a>
+                    </td>
+                    <td class="hidden-xs" data-bind="text: modifiedBy()"></td>
+                    <td class="hidden-xs" data-bind="date: modifiedDate()"></td>
+                </tr>
+                <tr data-bind="attr: { id: 'div_' + folder, class:'collapse' }">
+                    <td colspan="7" data-bind="html: diff()">
+                        <div>
+                            <h4>Related Object Logs <a data-toggle="collapse" data-bind="attr: { href: '#pre_related_' + objectName }, click: $root.getrelatedObjectLogs">(click to show)</a></h4>
+                            <table class="table collapse" data-bind="attr: { id: 'pre_related_' + objectName }">
+                                <thead>
+                                    <tr>
+                                        <th>Object Name</th>
+                                        <th>Object History</th>
+                                        <th>Modified By</th>
+                                        <th>Modified Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody data-bind="foreach: relatedObjectLogs()">
+                                    <tr>
+                                        <td data-bind="text: objectName"></td>
+                                        <td>
+                                            <a data-toggle="collapse" data-bind="attr: { href: '#div_' + folder }, text: folder, click: $root.getfile($rawData)"></a>
+                                        </td>
+                                        <td class="hidden-xs" data-bind="text: modifiedBy()"></td>
+                                        <td class="hidden-xs" data-bind="date: modifiedDate()"></td>
+                                    </tr>
+                                    <tr data-bind="attr: { id: 'div_' + folder, class:'collapse' }">
+                                        <td colspan="7" data-bind="html: diff()"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div>
+            <p data-bind="visible: objectHistoryFiles().length === 0">There are no results for the above search criteria</p>
+        </div>
+
+        <button class="btn btn-lg btn-primary" data-bind="click: getMoreFileLogs, visible: continuationToken() != null">Get more File Logs</button>
+    </div>
+</div>
