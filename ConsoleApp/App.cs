@@ -29,20 +29,19 @@ namespace ConsoleApp
             //MakeChanges();
             // MakeOutOfBandChange();
             Thread.Sleep(5000);
-            //Thread.Sleep(5000);
-            while (true)
+            while (!cancellationToken.IsCancellationRequested)
             {
                 Console.WriteLine("Waiting 20 seconds");
                 Thread.Sleep(20000);
                 CheckQueue();
-
-
             }
-            
 
-            //Thread.Sleep(5000);
+            return Task.CompletedTask;
+        }
 
-            //QueryTable();
+        public Task StopAsync(CancellationToken cancellationToken)
+        { 
+            _logger.LogInformation("Stopping.");
 
             return Task.CompletedTask;
         }
@@ -143,13 +142,6 @@ namespace ConsoleApp
 
             await _objectHistoryClient.SaveObjectHistoryAsync<Parent>(() => $"{parent.ParentId}", parent, updateParent, "prof. X");
 
-        }
-
-        public Task StopAsync(CancellationToken cancellationToken)
-        {
-            _logger.LogInformation("Stopping.");
-
-            return Task.CompletedTask;
         }
 
         public void Dispose()

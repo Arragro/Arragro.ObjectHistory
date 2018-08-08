@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 
 namespace Arragro.ObjectHistory.RazorClassLib.MyFeature.Pages
 {
-    public class Page1Model : PageModel
+    public class Page2Model : PageModel
     {
         public void OnGet()
         {

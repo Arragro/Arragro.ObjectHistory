@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using Arragro.Core.EntityFrameworkCore.Extensions;
 using Arragro.ObjectHistory.Client.Extensions;
 using Arragro.ObjectHistory.Core.Models;
 using Arragro.ObjectHistory.Web.Core.Entities;
@@ -32,7 +33,8 @@ namespace Arragro.ObjectHistory.Web
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<DemoDbContext>(
-                optionsBuilder => optionsBuilder.UseInMemoryDatabase("InMemoryDb"));
+                //optionsBuilder => optionsBuilder.UseInMemoryDatabase("InMemoryDb"));
+                optionsBuilder => optionsBuilder.UseSqlServer("data source=localhost;initial catalog=ArragroObjectTracker;integrated security=True;MultipleActiveResultSets=True;App=EntityFramework;", sqlOptions => sqlOptions.EnableRetryOnFailure(3)));
 
             var objectHistoryClientSettings = new ObjectHistorySettings();
             Configuration.GetSection("ObjectHistoryClientSettings").Bind(objectHistoryClientSettings);
@@ -57,8 +59,9 @@ namespace Arragro.ObjectHistory.Web
         {
             if (env.IsDevelopment())
             {
+                var demoDbContext = app.ApplicationServices.GetService<DemoDbContext>();
                 var repository = app.ApplicationServices.GetService<ITrainingSessionRepository>();
-                InitializeDatabaseAsync(repository).Wait();
+                CreateAndMigrateDatabase(demoDbContext, repository);
 
                 app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
                 {
@@ -87,6 +90,22 @@ namespace Arragro.ObjectHistory.Web
                     name: "default",
                     template: "{controller=Home}/{action=Index}/{id?}");
             });
+        }
+
+        public void CreateAndMigrateDatabase(
+            DemoDbContext demoDbContext,
+            ITrainingSessionRepository trainingSessionRepository)
+        {
+            var demoDbExists = demoDbContext.Exists();
+
+            if (!demoDbExists || (!demoDbContext.AllMigrationsApplied()))
+            {
+                demoDbContext.Database.Migrate();
+                if (!demoDbExists)
+                {
+                    InitializeDatabaseAsync(trainingSessionRepository).Wait();
+                }
+            }
         }
 
         public async Task InitializeDatabaseAsync(ITrainingSessionRepository repo)
