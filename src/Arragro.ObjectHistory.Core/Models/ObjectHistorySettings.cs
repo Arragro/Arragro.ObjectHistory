@@ -9,5 +9,4 @@
         public string ObjectHistoryTable { get; set; }
         public string GlobalHistoryTable { get; set; }
     }
-
 }
