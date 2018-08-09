@@ -3,16 +3,13 @@ using Microsoft.WindowsAzure.Storage;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.WindowsAzure.Storage.Queue;
 using Microsoft.WindowsAzure.Storage.Table;
-using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Arragro.ObjectHistory.Core.Helpers
 {
     public class ObjectHistoryService
     {
-        public readonly string ObjectHistoryRequestFileName; 
-        public readonly string ObjectHistoryFileName;
+        public const string ObjectHistoryRequestFileName = "objecthistoryrequest.json";
+        public const string ObjectHistoryFileName = "ObjectHistory.json";
         public readonly string StorageConnectionString;
         public readonly string ApplicationName;
 
@@ -32,8 +29,6 @@ namespace Arragro.ObjectHistory.Core.Helpers
         {
             ApplicationName = configurationSettings.ApplicationName;
             StorageConnectionString = configurationSettings.StorageConnectionString;
-            ObjectHistoryRequestFileName = "objecthistoryrequest.json";
-            ObjectHistoryRequestFileName = "ObjectHistory.json";
 
 
             Account = CloudStorageAccount.Parse(StorageConnectionString);

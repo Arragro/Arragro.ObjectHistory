@@ -22,13 +22,21 @@ namespace Arragro.ObjectHistory.QueueProcessFunction
                            .AddJsonFile("local.settings.json", optional: true, reloadOnChange: true)
                            .AddEnvironmentVariables()
                            .Build();
-                        _objectHistorySettings = configurationBuilder.Get<ObjectHistorySettings>();
+                        _objectHistorySettings = new ObjectHistorySettings
+                        {
+                            ApplicationName = configurationBuilder["ObjectHistorySettings:ApplicationName"],
+                            StorageConnectionString = configurationBuilder["ObjectHistorySettings:StorageConnectionString"],
+                            ObjectContainerName = configurationBuilder["ObjectHistorySettings:ObjectContainerName"],
+                            MessageQueueName = configurationBuilder["ObjectHistorySettings:MessageQueueName"],
+                            ObjectHistoryTable = configurationBuilder["ObjectHistorySettings:ObjectHistoryTable"],
+                            GlobalHistoryTable = configurationBuilder["ObjectHistorySettings:GlobalHistoryTable"],
+                        };
                     }
                 }
             }
             return _objectHistorySettings;
         }
-        
+
         public static ObjectHistorySettings GetObjectHistorySettings(this ExecutionContext context)
         {
             return context.GetConfiguration();

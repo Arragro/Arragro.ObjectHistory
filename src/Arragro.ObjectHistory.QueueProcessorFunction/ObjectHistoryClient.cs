@@ -19,15 +19,12 @@ namespace Arragro.ObjectHistory.QueueProcessorFunction
             _objectHistoryService = new ObjectHistoryService(configurationSettings);
         }
 
-        public async Task ProcessMessages()
+        public async Task ProcessMessages(string message)
         {
-            var message = GetQueueMessage();
+            if (string.IsNullOrWhiteSpace(message))
+                throw new ArgumentNullException("message");
 
-            if (message != null)
-            {
-                await ValidateAndProcessQueueMessage(message.AsString);
-                await _objectHistoryService.Queue.DeleteMessageAsync(message);
-            }
+            await ValidateAndProcessQueueMessage(message);
         }
 
         private CloudQueueMessage GetQueueMessage()
@@ -88,7 +85,7 @@ namespace Arragro.ObjectHistory.QueueProcessorFunction
 
             if (lastObjectHistorydetailFolder != Guid.Empty)
             {
-                var blobName = String.Format("{0}/{1}", lastObjectHistorydetailFolder.ToString(), _objectHistoryService.ObjectHistoryFileName);
+                var blobName = String.Format("{0}/{1}", lastObjectHistorydetailFolder.ToString(), ObjectHistoryService.ObjectHistoryFileName);
 
                 var blob = GetObjectHistoryBlob(blobName);
 
@@ -121,7 +118,7 @@ namespace Arragro.ObjectHistory.QueueProcessorFunction
                     };
 
                     var catchupTrackedObjectJson = _objectHistoryService.JsonHelper.GetJson(trackedObject);
-                    await _objectHistoryService.AzureStorageHelper.UploadJsonFileAsync(_objectHistoryService.ObjectContainer, trackedObject.Folder, _objectHistoryService.ObjectHistoryFileName, catchupTrackedObjectJson);
+                    await _objectHistoryService.AzureStorageHelper.UploadJsonFileAsync(_objectHistoryService.ObjectContainer, trackedObject.Folder, ObjectHistoryService.ObjectHistoryFileName, catchupTrackedObjectJson);
 
 
                     await _objectHistoryService.AzureStorageHelper.AddObjectHistoryEntityRecord(trackedObject, _objectHistoryService.Table);

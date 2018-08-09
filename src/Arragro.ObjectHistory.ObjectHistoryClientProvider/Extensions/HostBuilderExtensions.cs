@@ -7,7 +7,7 @@ namespace Arragro.ObjectHistory.Client.Extensions
     {
         public static IServiceCollection AddArragroObjectHistoryClient(this IServiceCollection services, ObjectHistorySettings configuration)
         {
-            return services.AddOptions()
+            return services
                 .AddSingleton(configuration)
                 .AddSingleton<ObjectHistoryClient>();
         }

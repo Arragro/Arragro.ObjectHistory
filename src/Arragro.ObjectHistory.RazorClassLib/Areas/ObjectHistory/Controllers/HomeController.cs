@@ -26,7 +26,7 @@ namespace Arragro.ObjectHistory.RazorClassLib.Areas.ObjectHistory.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            return View("IndexKnockout");
         }
 
         [HttpPost("get-global-logs")]

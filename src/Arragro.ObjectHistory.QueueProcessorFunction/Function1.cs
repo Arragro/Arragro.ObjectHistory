@@ -12,8 +12,7 @@ namespace Arragro.ObjectHistory.QueueProcessFunction
             var configSettings = context.GetObjectHistorySettings();
             var objectHistoryClient = new ObjectHistoryClient(configSettings);
             log.Info($"C# Queue trigger function processed: {myQueueItem}");
-            objectHistoryClient.ProcessMessages().Wait();
-
+            objectHistoryClient.ProcessMessages(myQueueItem).Wait();
         }
     }
 }

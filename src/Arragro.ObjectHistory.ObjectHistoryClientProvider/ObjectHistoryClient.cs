@@ -37,9 +37,9 @@ namespace Arragro.ObjectHistory.Client
 
             var trackedObjectJson = _objectHistoryService.JsonHelper.GetJson(trackedObject);
 
-            await _objectHistoryService.AzureStorageHelper.UploadJsonFileAsync(_objectHistoryService.ObjectContainer, trackedObject.Folder, _objectHistoryService.ObjectHistoryRequestFileName, trackedObjectJson);
+            await _objectHistoryService.AzureStorageHelper.UploadJsonFileAsync(_objectHistoryService.ObjectContainer, trackedObject.Folder, ObjectHistoryService.ObjectHistoryRequestFileName, trackedObjectJson);
 
-            await _objectHistoryService.AzureStorageHelper.SendQueueMessage(_objectHistoryService.Queue, String.Format("{0}/{1}", trackedObject.Folder, _objectHistoryService.ObjectHistoryRequestFileName));
+            await _objectHistoryService.AzureStorageHelper.SendQueueMessage(_objectHistoryService.Queue, String.Format("{0}/{1}", trackedObject.Folder, ObjectHistoryService.ObjectHistoryRequestFileName));
 
         }
 
@@ -65,9 +65,9 @@ namespace Arragro.ObjectHistory.Client
 
             var trackedObjectJson = _objectHistoryService.JsonHelper.GetJson(trackedObject);
             
-            await _objectHistoryService.AzureStorageHelper.UploadJsonFileAsync(_objectHistoryService.ObjectContainer, trackedObject.Folder, _objectHistoryService.ObjectHistoryRequestFileName, trackedObjectJson);
+            await _objectHistoryService.AzureStorageHelper.UploadJsonFileAsync(_objectHistoryService.ObjectContainer, trackedObject.Folder, ObjectHistoryService.ObjectHistoryRequestFileName, trackedObjectJson);
             
-            await _objectHistoryService.AzureStorageHelper.SendQueueMessage(_objectHistoryService.Queue, String.Format("{0}/{1}",trackedObject.Folder, _objectHistoryService.ObjectHistoryRequestFileName));
+            await _objectHistoryService.AzureStorageHelper.SendQueueMessage(_objectHistoryService.Queue, String.Format("{0}/{1}",trackedObject.Folder, ObjectHistoryService.ObjectHistoryRequestFileName));
         }
         
         public async Task<string> GetObjectHistoryAsync<T>(Func<string> getKeys, TableContinuationToken continuationToken = null)
@@ -93,12 +93,12 @@ namespace Arragro.ObjectHistory.Client
 
         public async Task<string> GetObjectHistoryFile(string folder)
         {
-            return await _objectHistoryService.AzureStorageHelper.DownloadBlob(_objectHistoryService.ObjectContainer, folder, _objectHistoryService.ObjectHistoryFileName);
+            return await _objectHistoryService.AzureStorageHelper.DownloadBlob(_objectHistoryService.ObjectContainer, folder, ObjectHistoryService.ObjectHistoryFileName);
         }
 
         public async Task<ObjectHistoryDetailRaw> GetObjectHistoryDetailRaw(string folder)
         {
-            var json = await _objectHistoryService.AzureStorageHelper.DownloadBlob(_objectHistoryService.ObjectContainer, folder, _objectHistoryService.ObjectHistoryFileName);
+            var json = await _objectHistoryService.AzureStorageHelper.DownloadBlob(_objectHistoryService.ObjectContainer, folder, ObjectHistoryService.ObjectHistoryFileName);
             var read = _objectHistoryService.JsonHelper.GetObjectFromJson<ObjectHistoryDetailRead>(json);
 
             return read.GetObjectHistoryDetailRaw();
