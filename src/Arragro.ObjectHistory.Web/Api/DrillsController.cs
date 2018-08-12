@@ -34,7 +34,8 @@ namespace Arragro.ObjectHistory.Web.Api
                 Id = drill.Id,
                 Name = drill.Name,
                 Description = drill.Description,
-                Duration = drill.Duration
+                Duration = drill.Duration,
+                DateCreated = drill.DateCreated
             }).ToList();
 
             return Ok(result);
@@ -59,7 +60,8 @@ namespace Arragro.ObjectHistory.Web.Api
             {
                 Duration = model.Duration,
                 Description = model.Description,
-                Name = model.Name
+                Name = model.Name,
+                DateCreated = model.DateCreated
             };
             session.AddDrill(drill);
 

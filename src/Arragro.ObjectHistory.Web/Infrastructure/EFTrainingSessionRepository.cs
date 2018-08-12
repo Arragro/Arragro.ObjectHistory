@@ -44,10 +44,18 @@ namespace Arragro.ObjectHistory.Web.Infrastructure
 
         public Task AddAsync(TrainingSession session)
         {
-            _dbContext.TrainingSessions.Add(session);
-            _dbContext.SaveChangesAsync();
-            return _objectHistoryClient.SaveNewObjectHistoryAsync<TrainingSession>(() => $"{session.Id}", session, "User1");
-            
+            try
+            {
+                _dbContext.TrainingSessions.Add(session);
+                _dbContext.SaveChangesAsync().Wait();
+            }
+            catch (System.Exception)
+            {
+
+                throw;
+            }
+
+            return _objectHistoryClient.SaveNewObjectHistoryAsync<TrainingSession>(() => $"{session.Id}", session, "User1");         
         }
 
         public Task UpdateAsync(TrainingSession session, TrainingSession unmodifiedSession)
@@ -56,13 +64,14 @@ namespace Arragro.ObjectHistory.Web.Infrastructure
             
             try
             {
-                _dbContext.SaveChangesAsync();
-                return _objectHistoryClient.SaveObjectHistoryAsync<TrainingSession>(() => $"{session.Id}", unmodifiedSession, session, "User1");
+                var task =_dbContext.SaveChangesAsync();
             }
             catch (System.Exception)
             {
                 throw;
             }
+
+            return _objectHistoryClient.SaveObjectHistoryAsync<TrainingSession>(() => $"{session.Id}", unmodifiedSession, session, "User1");
         }
     }
 }

@@ -122,14 +122,15 @@ namespace Arragro.ObjectHistory.Web
             var session = new TrainingSession()
             {
                 Name = "Test Session 1",
-                DateCreated = new DateTime()
+                DateCreated = DateTime.UtcNow
             };
 
             var drill = new Drill()
             {
                 Description = "Defensive Skills",
                 Name = "Defense",
-                Duration = 20
+                Duration = 20,
+                DateCreated = DateTime.UtcNow
             };
             session.AddDrill(drill);
             return session;

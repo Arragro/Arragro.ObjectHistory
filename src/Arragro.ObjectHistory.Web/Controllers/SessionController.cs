@@ -34,7 +34,8 @@ namespace Arragro.ObjectHistory.Web.Controllers
             {
                 DateCreated = session.DateCreated,
                 Name = session.Name,
-                Id = session.Id
+                Id = session.Id,
+                DrillCount = session.Drills.Count()
             };
 
             return View(viewModel);

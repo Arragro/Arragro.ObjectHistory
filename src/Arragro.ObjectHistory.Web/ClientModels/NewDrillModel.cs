@@ -14,6 +14,8 @@ namespace Arragro.ObjectHistory.Web.ClientModels
         [Required]
         public string Description { get; set; }
 
+        public DateTime DateCreated { get; set; }
+
         [Required]
         public int Duration { get; set; }
 
