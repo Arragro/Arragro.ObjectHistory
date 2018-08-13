@@ -1,13 +1,14 @@
 {
     "compilerOptions": {
         "sourceMap": true,
-        "keyofStringsOnly": true, 
+        "keyofStringsOnly": true,
         "target": "es5",
         "jsx": "react",
         "module": "es6",
         "moduleResolution": "node",
         "experimentalDecorators": true,
-        "declaration": false,
+        "declaration": true,
+        "declarationDir": "./dist/types",
         "removeComments": true,
         "noImplicitReturns": true,
         "noUnusedLocals": true,
@@ -15,5 +16,10 @@
         "outDir": "./dist/",
         "lib": ["es6", "es7", "dom"]
     },
+    "compileOnSave": false,
+    "include": [
+        "./ReactAppLibrary/**/*.ts*",
+        "./types"
+    ],
     "exclude": ["dist", "build", "node_modules", "App"]
 }

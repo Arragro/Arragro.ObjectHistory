@@ -1,4 +1,4 @@
-{
+﻿{
   "extends": "tslint-config-standard",
   "rules": {
     "ter-indent": [ true, 4 ],
@@ -11,8 +11,6 @@
       "check-type",
       "check-typecast"
     ],
-    "exclude": ["**/*.js"],
-    "no-irregular-whitespace":  false,
-    "semicolon": [true, "never"]
+    "ter-no-irregular-whitespace": true
   }
 }

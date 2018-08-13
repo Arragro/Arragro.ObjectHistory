@@ -6,6 +6,9 @@ const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CompressionPlugin = require("compression-webpack-plugin");
 const TsConfigPathsPlugin = require('awesome-typescript-loader').TsConfigPathsPlugin;
 const PurifyCSSPlugin = require('purifycss-webpack');
+const { dependencies } = require('./package.json');
+
+const libraryName = 'arragrocms-management';
 
 module.exports = (env) => {
     const devMode = env === null || env['run-prod'] === undefined || env['run-prod'] === null || env['run-prod'] === false;
@@ -23,14 +26,11 @@ module.exports = (env) => {
                 new TsConfigPathsPlugin(/* { tsconfig, compiler } */)
             ]
         },
-        devServer: {
-            hot: true
-        },
         module: {
             rules: [
                 {
                     test: /\.ts(x?)$/,
-                    include: /ReactApp/,
+                    include: /ReactAppLib/,
                     exclude: [
                         /node_modules/,
                         /obj/
@@ -38,7 +38,19 @@ module.exports = (env) => {
                     loader: 'awesome-typescript-loader',
                     query: {
                         useBabel: true,
-                        useCache: devMode
+                        "babelOptions": {
+                            "babelrc": false, /* Important line */
+                            "presets": [
+                                "react",
+                                [
+                                  "es2015",
+                                  {
+                                   "modules": false
+                                  }
+                                ]
+                            ]
+                        },
+                        configFileName: 'tsconfig.lib.json'
                     }
                 },
                 {
@@ -64,35 +76,40 @@ module.exports = (env) => {
                 },
                 { test: /\.(png|woff|woff2|eot|ttf|svg)$/, loader: 'url-loader?limit=100000' },
                 { test: /\.woff(\?\S*)?(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: 'url-loader?limit=10000&mimetype=application/font-woff' },
-                { test: /\.(ttf|eot|svg)(\?\S*)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: 'file-loader' }
+                { test: /\.(ttf|eot|svg)(\?\S*)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: 'file-loader' },
+                { test: /\.json$/, loader: 'json-loader' }
             ]
         },
         entry: {
-            main: './ReactApp/index.tsx'
+            library: ['./ReactAppLibrary/index.ts'],
         },
+        externals: [
+            'babel-polyfill',
+            ...Object.keys(dependencies || {})
+        ],
         output: {
-            path: path.join(__dirname, 'wwwroot', 'dist'),
-            filename: '[name].js',
-            chunkFilename: '[name].js',
-            publicPath: '/dist/'
+            path: path.join(__dirname, 'dist'),
+            libraryTarget: 'umd',
+            library: libraryName,
+            filename: `${libraryName}.js`
         },
-        optimization: {
-            splitChunks: {
-                cacheGroups: {
-                    styles: {
-                        name: 'bootstrap',
-                        test: /\.css$/,
-                        chunks: 'all',
-                        enforce: true
-                    },
-                    commons: {
-                        test: /[\\/]node_modules[\\/]/,
-                        name: "vendor",
-                        chunks: "all"
-                    }
-                }
-            }
-        },
+        // optimization: {
+        //     splitChunks: {
+        //         cacheGroups: {
+        //             styles: {
+        //                 name: 'bootstrap',
+        //                 test: /\.css$/,
+        //                 chunks: 'all',
+        //                 enforce: true
+        //             },
+        //             commons: {
+        //                 test: /[\\/]node_modules[\\/]/,
+        //                 name: "vendor",
+        //                 chunks: "all"
+        //             }
+        //         }
+        //     }
+        // },
         plugins: [
             new MiniCssExtractPlugin({
                 filename: "main.css",
@@ -114,19 +131,10 @@ module.exports = (env) => {
             // }),
             require('autoprefixer'),
             new webpack.optimize.OccurrenceOrderPlugin()
-        ].concat(
-            devMode ? [
-            ] : [
-                    new CompressionPlugin({
-                        asset: "[path].gz[query]",
-                        //include: /\/wwwroot/,
-                        algorithm: "gzip",
-                        test: /\.js$|\.css$|\.svg$/,
-                        threshold: 10240,
-                        minRatio: 0.8
-                    })
-                ])
-    };
+            // new webpack.optimize.CommonsChunkPlugin({ name: 'vendor', filename: 'vendor.bundle.js' }), // Moves vendor content out of other bundles
+            // new BundleAnalyzerPlugin()
+        ]
+    }
 
     return config;
 };

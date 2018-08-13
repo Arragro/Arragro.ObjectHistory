@@ -12,6 +12,7 @@ using System.Threading.Tasks;
 namespace Arragro.ObjectHistory.RazorClassLib.Areas.ObjectHistory.Controllers
 {    
     [Area("ObjectHistory")]
+    [IgnoreAntiforgeryToken]
     [Route("arragro-object-history")]
     public class HomeController : Controller
     {
@@ -26,7 +27,8 @@ namespace Arragro.ObjectHistory.RazorClassLib.Areas.ObjectHistory.Controllers
 
         public IActionResult Index()
         {
-            return View("IndexKnockout");
+            return View("Index");
+            // return View("IndexKnockout");
         }
 
         [HttpPost("get-global-logs")]
@@ -48,9 +50,9 @@ namespace Arragro.ObjectHistory.RazorClassLib.Areas.ObjectHistory.Controllers
         }
 
         [HttpPost("get-object-log")]
-        public async Task<IActionResult> GetLog(ObjectLogsPostParameters postParameters)
+        public async Task<IActionResult> GetLog(Guid folder)
         {
-            var entities = await _objectHistoryClient.GetObjectHistoryDetailRaw(postParameters.PartitionKey);
+            var entities = await _objectHistoryClient.GetObjectHistoryDetailRaw(folder);
 
             return Ok(entities);
         }

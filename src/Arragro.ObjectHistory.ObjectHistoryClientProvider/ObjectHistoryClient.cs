@@ -96,9 +96,9 @@ namespace Arragro.ObjectHistory.Client
             return await _objectHistoryService.AzureStorageHelper.DownloadBlob(_objectHistoryService.ObjectContainer, folder, ObjectHistoryService.ObjectHistoryFileName);
         }
 
-        public async Task<ObjectHistoryDetailRaw> GetObjectHistoryDetailRaw(string folder)
+        public async Task<ObjectHistoryDetailRaw> GetObjectHistoryDetailRaw(Guid folder)
         {
-            var json = await _objectHistoryService.AzureStorageHelper.DownloadBlob(_objectHistoryService.ObjectContainer, folder, ObjectHistoryService.ObjectHistoryFileName);
+            var json = await _objectHistoryService.AzureStorageHelper.DownloadBlob(_objectHistoryService.ObjectContainer, folder.ToString(), ObjectHistoryService.ObjectHistoryFileName);
             var read = _objectHistoryService.JsonHelper.GetObjectFromJson<ObjectHistoryDetailRead>(json);
 
             return read.GetObjectHistoryDetailRaw();

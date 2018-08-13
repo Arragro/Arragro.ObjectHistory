@@ -260,5 +260,5 @@ temp/Arragro.ObjectLogging.Mvc
 src/ArragroCMS.Management/dist
 /hide.ps1
 .awcache
-**/wwwroot/dist/**/*
+**/*/wwwroot/dist/**/*
 *.tgz
