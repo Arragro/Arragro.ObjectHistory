@@ -107,7 +107,7 @@ namespace Arragro.ObjectHistory.Core.Helpers
             {
                 var query = new TableQuery<ObjectHistoryEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
 
-                var queryResult = await table.ExecuteQuerySegmentedAsync(query.Take(1), null);
+                var queryResult = await table.ExecuteQuerySegmentedAsync(query.Take(10), null);
 
                 var folder = (queryResult.Results).Select(x => x.Folder).FirstOrDefault();
 
@@ -125,7 +125,7 @@ namespace Arragro.ObjectHistory.Core.Helpers
             {
                 var query = new TableQuery<ObjectHistoryEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
 
-                var queryResult = await table.ExecuteQuerySegmentedAsync(query.Take(1), token);
+                var queryResult = await table.ExecuteQuerySegmentedAsync(query.Take(10), token);
                 token = queryResult.ContinuationToken;
 
                 var entityResults = new ObjectHistoryQueryResultContainer(queryResult.Results, token, partitionKey);
@@ -145,7 +145,7 @@ namespace Arragro.ObjectHistory.Core.Helpers
             {
                 var query = new TableQuery<ObjectHistoryGlobalEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
 
-                var queryResult = await table.ExecuteQuerySegmentedAsync(query.Take(1), token);
+                var queryResult = await table.ExecuteQuerySegmentedAsync(query.Take(10), token);
                 token = queryResult.ContinuationToken;
 
                 var entityResults = new ObjectHistoryGlobalQueryResultContainer(queryResult.Results, token, partitionKey);
