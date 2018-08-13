@@ -113,27 +113,38 @@ namespace Arragro.ObjectHistory.Web
             var sessionList = await repo.ListAsync();
             if (!sessionList.Any())
             {
-                await repo.AddAsync(GetInitSession());
+                var sessions = GetInitSession();
+                foreach(var session in sessions) 
+                {
+                    await repo.AddAsync(session);
+                }
             }
         }
 
-        public static TrainingSession GetInitSession()
+        public static IEnumerable<TrainingSession> GetInitSession()
         {
-            var session = new TrainingSession()
-            {
-                Name = "Test Session 1",
-                DateCreated = DateTime.UtcNow
-            };
+            var sessions = new List<TrainingSession>();
 
-            var drill = new Drill()
+            for (var i = 0; i < 100; i++) 
             {
-                Description = "Defensive Skills",
-                Name = "Defense",
-                Duration = 20,
-                DateCreated = DateTime.UtcNow
-            };
-            session.AddDrill(drill);
-            return session;
+                var session = new TrainingSession()
+                {
+                    Name = $"Test Session {i+1}",
+                    DateCreated = DateTime.UtcNow
+                };
+
+                var drill = new Drill()
+                {
+                    Description = "Defensive Skills",
+                    Name = "Defense",
+                    Duration = 20,
+                    DateCreated = DateTime.UtcNow
+                };
+                session.AddDrill(drill);
+                sessions.Add(session);
+            }
+
+            return sessions;
         }
     }
 }

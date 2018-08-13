@@ -3,6 +3,7 @@ import { IObjectHistoryGlobalQueryResultContainer, IObjectHistoryQueryResultCont
 export interface GlobalState {
     loading: boolean
     loadingFromToken: boolean
+    loadingDetails: boolean
     globalQueryResultContainer?: IObjectHistoryGlobalQueryResultContainer
 }
 
@@ -20,7 +21,8 @@ export interface StoreState {
 export const initialState: StoreState = {
     global: {
         loading: true,
-        loadingFromToken: false
+        loadingFromToken: false,
+        loadingDetails: false
     }
     // object: {
     //     loading: true,

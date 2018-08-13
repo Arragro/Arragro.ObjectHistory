@@ -16,12 +16,28 @@ export interface ITableContinuationToken {
     targetLocation?: StorageLocation
 }
 
+export interface IObjectHistoryDetailRaw {
+    partitionKey: string
+    rowKey: string
+    applicationName: string
+    timeStamp: Date
+    folder: string
+    user: boolean
+    isAdd: boolean
+    newJson: string
+    oldJson: string
+    diff: any
+}
+
 export interface IObjectHistoryGlobalQueryResult {
     folder: string
     rowKey: string
     objectName: string
     modifiedBy: string
     modifiedDate: Date
+
+    expanded: boolean
+    historyDetail?: IObjectHistoryDetailRaw
 }
 
 export interface IObjectHistoryQueryResult {
@@ -35,7 +51,7 @@ export interface IObjectHistoryQueryResult {
 export interface IObjectHistoryGlobalQueryResultContainer {
     partitionKey: string
     results: Array<IObjectHistoryGlobalQueryResult>
-    continuationToken?: ITableContinuationToken
+    continuationToken?: ITableContinuationToken | null
 }
 
 export interface IObjectLogsPostParameters {
@@ -46,5 +62,5 @@ export interface IObjectLogsPostParameters {
 export interface IObjectHistoryQueryResultContainer {
     partitionKey: string
     results: Array<IObjectHistoryQueryResult>
-    continuationToken?: ITableContinuationToken
+    continuationToken?: ITableContinuationToken | null
 }

@@ -32,7 +32,7 @@ namespace Arragro.ObjectHistory.RazorClassLib.Areas.ObjectHistory.Controllers
         }
 
         [HttpPost("get-global-logs")]
-        public async Task<IActionResult> GetGlobalLogs(TableContinuationToken tableContinuationToken = null)
+        public async Task<IActionResult> GetGlobalLogs([FromBody] TableContinuationToken tableContinuationToken = null)
         {
 
             var entities = await _objectHistoryClient.GetGlobalObjectHistoryAsync(_objectHistorySettings.Value.ApplicationName, tableContinuationToken);
@@ -49,7 +49,7 @@ namespace Arragro.ObjectHistory.RazorClassLib.Areas.ObjectHistory.Controllers
             return Ok(entities);
         }
 
-        [HttpPost("get-object-log")]
+        [HttpGet("get-object-log/{folder}")]
         public async Task<IActionResult> GetLog(Guid folder)
         {
             var entities = await _objectHistoryClient.GetObjectHistoryDetailRaw(folder);

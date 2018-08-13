@@ -6,6 +6,8 @@ import * as Interfaces from './interfaces'
 import * as utils from './utils'
 import { App } from './app'
 
+import '../wwwroot/css/site.scss'
+
 const { configureStore } = Redux
 
 export default App

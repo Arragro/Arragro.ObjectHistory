@@ -3,7 +3,8 @@ import { IFetchResult,
          ITableContinuationToken,
          IObjectHistoryGlobalQueryResultContainer,
          IObjectLogsPostParameters,
-         IObjectHistoryQueryResultContainer
+         IObjectHistoryQueryResultContainer,
+         IObjectHistoryDetailRaw
 } from '../interfaces'
 
 export class HistoryService {
@@ -16,7 +17,7 @@ export class HistoryService {
         return HttpUtils.post('/arragro-object-history/get-object-logs', objectLogsPostParameters)
     }
 
-    getObjectLog = (folder: string): Promise<IFetchResult<Array<IObjectHistoryQueryResultContainer>>> => {
+    getObjectLog = (folder: string): Promise<IFetchResult<IObjectHistoryDetailRaw>> => {
         return HttpUtils.get(`/arragro-object-history/get-object-log/${folder}`)
     }
 }
