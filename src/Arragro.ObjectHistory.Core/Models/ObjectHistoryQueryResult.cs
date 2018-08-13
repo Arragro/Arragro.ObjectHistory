@@ -9,13 +9,22 @@ namespace Arragro.ObjectHistory.Core.Models
         public Guid Folder { get; set; }
         public string RowKey { get; set; }
         public string ApplicationName { get; set; }
+        public string ObjectName { get; set; }
         public string ModifiedBy { get; set; }
         public DateTime ModifiedDate { get; set; }
-        public ObjectHistoryQueryResult(ObjectHistoryEntity objectHistoryGlobalEntity)
+        public ObjectHistoryQueryResult(ObjectHistoryEntity objectHistoryEntity)
+        {
+            Folder = objectHistoryEntity.Folder;
+            RowKey = objectHistoryEntity.RowKey;
+            ApplicationName = objectHistoryEntity.ApplicationName;
+            ModifiedBy = objectHistoryEntity.User;
+            ModifiedDate = objectHistoryEntity.OriginTimestamp;
+        }
+        public ObjectHistoryQueryResult(ObjectHistoryGlobalEntity objectHistoryGlobalEntity)
         {
             Folder = objectHistoryGlobalEntity.Folder;
             RowKey = objectHistoryGlobalEntity.RowKey;
-            ApplicationName = objectHistoryGlobalEntity.ApplicationName;
+            ObjectName = objectHistoryGlobalEntity.ObjectName;
             ModifiedBy = objectHistoryGlobalEntity.User;
             ModifiedDate = objectHistoryGlobalEntity.OriginTimestamp;
         }

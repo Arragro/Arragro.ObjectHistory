@@ -7,9 +7,4 @@ namespace Arragro.ObjectHistory.RazorClassLib.Areas.ObjectHistory.Models
         public string PartitionKey { get; set; } = null;
         public TableContinuationToken TableContinuationToken { get; set; } = null;
     }
-
-    public class PostParameters
-    {
-        public string Folder { get; set; }
-    }
 }

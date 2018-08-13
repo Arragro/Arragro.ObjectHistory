@@ -7,7 +7,7 @@ import 'moment'
 import { Services } from '../redux/modules/global'
 import { StoreState } from '../redux/state'
 import { Aux } from '../utils'
-import { ITableContinuationToken, IObjectHistoryGlobalQueryResultContainer, IObjectHistoryGlobalQueryResult } from '../interfaces'
+import { ITableContinuationToken, IObjectHistoryQueryResultContainer, IObjectHistoryQueryResult } from '../interfaces'
 
 declare var require: any
 let moment = require('moment')
@@ -26,7 +26,7 @@ class HomePage extends React.Component<ComponentPropeties> {
         this.props.get()
     }
 
-    onShowDetailsClick = (index: number, history: IObjectHistoryGlobalQueryResult) => {
+    onShowDetailsClick = (index: number, history: IObjectHistoryQueryResult) => {
         if (!history.expanded) {
             if (history.historyDetail === undefined) {
                 this.props.getDetails(index, history.folder)
@@ -37,7 +37,7 @@ class HomePage extends React.Component<ComponentPropeties> {
         }
     }
 
-    getShowMoreDetails = (history: IObjectHistoryGlobalQueryResult, index: number) => {
+    getShowMoreDetails = (history: IObjectHistoryQueryResult, index: number) => {
         if (history.expanded) {
             return <a onClick={() => this.onShowDetailsClick(index, history)}>Hide Details</a>
         } else {
@@ -45,7 +45,7 @@ class HomePage extends React.Component<ComponentPropeties> {
         }
     }
 
-    getRows = (globalQueryResultContainer: IObjectHistoryGlobalQueryResultContainer) => {
+    getRows = (globalQueryResultContainer: IObjectHistoryQueryResultContainer) => {
 
         let output = []
 

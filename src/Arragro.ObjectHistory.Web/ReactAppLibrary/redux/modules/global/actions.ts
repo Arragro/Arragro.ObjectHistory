@@ -22,11 +22,11 @@ export namespace Actions {
     }
 
     export const getGlobalHistoryStart = () => action(Type.GET_GLOBAL_RECORDS_START)
-    export const getGlobalHistorySuccess = (result: Interfaces.IObjectHistoryGlobalQueryResultContainer) => action(Type.GET_GLOBAL_RECORDS_SUCCESS, result)
+    export const getGlobalHistorySuccess = (result: Interfaces.IObjectHistoryQueryResultContainer) => action(Type.GET_GLOBAL_RECORDS_SUCCESS, result)
     export const getGlobalHistoryError = (response: Interfaces.IFetchResult<any>) => action(Type.GET_GLOBAL_RECORDS_ERROR, response)
 
     export const getGlobalHistoryFromTokenStart = () => action(Type.GET_GLOBAL_RECORDS_FROM_TOKEN_START)
-    export const getGlobalHistoryFromTokenSuccess = (result: Interfaces.IObjectHistoryGlobalQueryResultContainer) => action(Type.GET_GLOBAL_RECORDS_FROM_TOKEN_SUCCESS, result)
+    export const getGlobalHistoryFromTokenSuccess = (result: Interfaces.IObjectHistoryQueryResultContainer) => action(Type.GET_GLOBAL_RECORDS_FROM_TOKEN_SUCCESS, result)
     export const getGlobalHistoryFromTokenError = (response: Interfaces.IFetchResult<any>) => action(Type.GET_GLOBAL_RECORDS_FROM_TOKEN_ERROR, response)
 
     export const showDetailsStart = () => action(Type.SHOW_DETAILS_START)

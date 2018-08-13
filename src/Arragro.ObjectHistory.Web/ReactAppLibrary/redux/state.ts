@@ -1,10 +1,10 @@
-import { IObjectHistoryGlobalQueryResultContainer, IObjectHistoryQueryResultContainer } from '../interfaces'
+import { IObjectHistoryQueryResultContainer } from '../interfaces'
 
 export interface GlobalState {
     loading: boolean
     loadingFromToken: boolean
     loadingDetails: boolean
-    globalQueryResultContainer?: IObjectHistoryGlobalQueryResultContainer
+    globalQueryResultContainer?: IObjectHistoryQueryResultContainer
 }
 
 export interface ObjectState {

@@ -119,7 +119,7 @@ namespace Arragro.ObjectHistory.Core.Helpers
             }
 
         }
-        public async Task<ObjectHistoryQueryResultContainer> GetObjectHistoryRecordsByPartitionKey(string partitionKey, CloudTable table, TableContinuationToken token)
+        public async Task<ObjectHistoryQueryResultContainer> GetObjectHistoryRecordsByObjectNamePartitionKey(string partitionKey, CloudTable table, TableContinuationToken token)
         {
             try
             {
@@ -139,7 +139,7 @@ namespace Arragro.ObjectHistory.Core.Helpers
 
         }
 
-        public async Task<ObjectHistoryGlobalQueryResultContainer> GetObjectHistoryGlobalRecordsByPartitionKey(string partitionKey, CloudTable table, TableContinuationToken token)
+        public async Task<ObjectHistoryQueryResultContainer> GetObjectHistoryRecordsByApplicationNamePartitionKey(string partitionKey, CloudTable table, TableContinuationToken token)
         {
             try
             {
@@ -148,7 +148,7 @@ namespace Arragro.ObjectHistory.Core.Helpers
                 var queryResult = await table.ExecuteQuerySegmentedAsync(query.Take(10), token);
                 token = queryResult.ContinuationToken;
 
-                var entityResults = new ObjectHistoryGlobalQueryResultContainer(queryResult.Results, token, partitionKey);
+                var entityResults = new ObjectHistoryQueryResultContainer(queryResult.Results, token, partitionKey);
 
                 return entityResults;
             }

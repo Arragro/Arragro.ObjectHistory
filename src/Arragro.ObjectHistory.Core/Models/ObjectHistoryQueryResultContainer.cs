@@ -1,8 +1,6 @@
 ﻿using Microsoft.WindowsAzure.Storage.Table;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 
 namespace Arragro.ObjectHistory.Core.Models
 {
@@ -12,9 +10,19 @@ namespace Arragro.ObjectHistory.Core.Models
         public IEnumerable<ObjectHistoryQueryResult> Results { get; set; }
         public TableContinuationToken ContinuationToken { get; set; }
 
-
         public ObjectHistoryQueryResultContainer(
             IEnumerable<ObjectHistoryEntity> entities,
+            TableContinuationToken continuationToken,
+            string partitionKey)
+        {
+            ContinuationToken = continuationToken;
+            PartitionKey = partitionKey;
+            //fixt
+            Results = entities.Select(x => new ObjectHistoryQueryResult(x));
+        }
+
+        public ObjectHistoryQueryResultContainer(
+            IEnumerable<ObjectHistoryGlobalEntity> entities,
             TableContinuationToken continuationToken,
             string partitionKey)
         {

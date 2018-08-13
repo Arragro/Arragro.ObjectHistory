@@ -57,7 +57,7 @@ export const global = (state = initialState.global, action: any): GlobalState =>
         testStateAndPayload(state, action.payload)
 
         let results = state.globalQueryResultContainer!.results
-        let globalQueryResultContainer = action.payload as Interfaces.IObjectHistoryGlobalQueryResultContainer
+        let globalQueryResultContainer = action.payload as Interfaces.IObjectHistoryQueryResultContainer
         for (let i = 0; i < globalQueryResultContainer.results.length; i++) {
             results.push(globalQueryResultContainer.results[i])
         }

@@ -29,10 +29,11 @@ export interface IObjectHistoryDetailRaw {
     diff: any
 }
 
-export interface IObjectHistoryGlobalQueryResult {
+export interface IObjectHistoryQueryResult {
     folder: string
     rowKey: string
     objectName: string
+    applicationName: string
     modifiedBy: string
     modifiedDate: Date
 
@@ -40,27 +41,13 @@ export interface IObjectHistoryGlobalQueryResult {
     historyDetail?: IObjectHistoryDetailRaw
 }
 
-export interface IObjectHistoryQueryResult {
-    folder: string
-    rowKey: string
-    applicationName: string
-    modifiedBy: string
-    modifiedDate: Date
-}
-
-export interface IObjectHistoryGlobalQueryResultContainer {
+export interface IObjectHistoryQueryResultContainer {
     partitionKey: string
-    results: Array<IObjectHistoryGlobalQueryResult>
+    results: Array<IObjectHistoryQueryResult>
     continuationToken?: ITableContinuationToken | null
 }
 
 export interface IObjectLogsPostParameters {
     partitionKey: string
     tableContinuationToken?: ITableContinuationToken
-}
-
-export interface IObjectHistoryQueryResultContainer {
-    partitionKey: string
-    results: Array<IObjectHistoryQueryResult>
-    continuationToken?: ITableContinuationToken | null
 }
