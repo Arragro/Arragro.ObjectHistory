@@ -9,6 +9,7 @@
   <ItemGroup>
     <None Remove="App\index.ts" />
     <None Remove="App\site.ts" />
+    <None Remove="ReactAppLibrary\enums.ts" />
   </ItemGroup>
 
   <ItemGroup>
@@ -28,6 +29,7 @@
   <ItemGroup>
     <TypeScriptCompile Include="App\index.ts" />
     <TypeScriptCompile Include="App\site.ts" />
+    <TypeScriptCompile Include="ReactAppLibrary\enums.ts" />
   </ItemGroup>
 
   <ItemGroup>

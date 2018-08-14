@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Arragro.ObjectHistory.Core.Enums;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -12,6 +13,8 @@ namespace Arragro.ObjectHistory.Core.Models
         public string ObjectName { get; set; }
         public string ModifiedBy { get; set; }
         public DateTime ModifiedDate { get; set; }
+        public QueryResultType QueryResultType { get; set;}
+
         public ObjectHistoryQueryResult(ObjectHistoryEntity objectHistoryEntity)
         {
             Folder = objectHistoryEntity.Folder;
@@ -19,6 +22,7 @@ namespace Arragro.ObjectHistory.Core.Models
             ApplicationName = objectHistoryEntity.ApplicationName;
             ModifiedBy = objectHistoryEntity.User;
             ModifiedDate = objectHistoryEntity.OriginTimestamp;
+            QueryResultType = QueryResultType.Object;
         }
         public ObjectHistoryQueryResult(ObjectHistoryGlobalEntity objectHistoryGlobalEntity)
         {
@@ -27,6 +31,7 @@ namespace Arragro.ObjectHistory.Core.Models
             ObjectName = objectHistoryGlobalEntity.ObjectName;
             ModifiedBy = objectHistoryGlobalEntity.User;
             ModifiedDate = objectHistoryGlobalEntity.OriginTimestamp;
+            QueryResultType = QueryResultType.Global;
         }
     }
 }

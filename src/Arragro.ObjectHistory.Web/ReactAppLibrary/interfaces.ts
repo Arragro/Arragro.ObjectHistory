@@ -34,6 +34,7 @@ export interface IObjectHistoryQueryResult {
     rowKey: string
     objectName: string
     applicationName: string
+    QueryResultType: string
     modifiedBy: string
     modifiedDate: Date
 
