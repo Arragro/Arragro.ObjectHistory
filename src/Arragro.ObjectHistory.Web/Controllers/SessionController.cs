@@ -40,5 +40,10 @@ namespace Arragro.ObjectHistory.Web.Controllers
 
             return View(viewModel);
         }
+
+        public ActionResult SpaIndex()
+        {
+            return View();
+        }
     }
 }

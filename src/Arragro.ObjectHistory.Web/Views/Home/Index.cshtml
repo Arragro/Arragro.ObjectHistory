@@ -1,4 +1,5 @@
-﻿@model IEnumerable<TrainingSessionViewModel>
+﻿@using Arragro.ObjectHistory.Web.Core.Entities
+@model IEnumerable<TrainingSessionViewModel>
 
 @{
     ViewBag.Title = "Training Planner";
@@ -12,7 +13,9 @@
         {
             <div class="panel panel-default">
                 <div class="panel-heading">
-                    <a href="@Url.Action("Index","Session", new {id=@session.Id})">@session.Name</a> - @session.DateCreated.ToString()
+                    <a href="/session/@session.Id">@session.Name</a>
+                    <span> - @session.DateCreated.ToString() - </span>
+                    <object-history-link type=typeof(TrainingSession) id=@session.Id></object-history-link>
                 </div>
                 <div class="panel-body">
                     @session.DrillCount drills

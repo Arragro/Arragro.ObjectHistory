@@ -34,6 +34,7 @@
   },
   "dependencies": {
     "bootstrap": "^3.3.7",
+    "formik": "^1.0.2",
     "gsap": "^1.20.4",
     "history": "^4.7.2",
     "js-cookie": "^2.2.0",
@@ -50,7 +51,8 @@
     "react-s-alert": "^1.4.1",
     "redux": "^4.0.0",
     "redux-thunk": "^2.3.0",
-    "typesafe-actions": "^2.0.4"
+    "typesafe-actions": "^2.0.4",
+    "yup": "^0.26.2"
   },
   "browserslist ": [
     "last 2 versions"
@@ -71,6 +73,7 @@
     "@types/uglify-js": "^2.6.30",
     "@types/webpack": "^3.0.14",
     "@types/webpack-env": "^1.13.5",
+    "@types/yup": "^0.24.8",
     "aspnet-prerendering": "^3.0.1",
     "aspnet-webpack": "^3.0.0",
     "aspnet-webpack-react": "^3.0.0",

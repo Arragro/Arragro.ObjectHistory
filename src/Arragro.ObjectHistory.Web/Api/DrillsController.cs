@@ -29,7 +29,7 @@ namespace Arragro.ObjectHistory.Web.Api
                 return NotFound(sessionId);
             }
 
-            var result = session.Drills.Select(drill => new DrillDTO()
+            var drills = session.Drills.Select(drill => new DrillDto
             {
                 Id = drill.Id,
                 Name = drill.Name,
@@ -38,7 +38,7 @@ namespace Arragro.ObjectHistory.Web.Api
                 DateCreated = drill.DateCreated
             }).ToList();
 
-            return Ok(result);
+            return Ok(new SessionDrillContainer(session, drills));
         }
 
         [HttpPost("create")]
@@ -69,7 +69,16 @@ namespace Arragro.ObjectHistory.Web.Api
 
             await _sessionRepository.UpdateAsync(session, unmodifiedSession);
 
-            return Ok(session);
+            var drills = session.Drills.Select(x => new DrillDto
+            {
+                Id = x.Id,
+                Name = x.Name,
+                Description = x.Description,
+                Duration = x.Duration,
+                DateCreated = x.DateCreated
+            }).ToList();
+
+            return Ok(new SessionDrillContainer(session, drills));
         }
     }
 }
