@@ -2,17 +2,24 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { Dispatch } from 'redux'
 import { formatters } from 'jsondiffpatch'
+import { RouteComponentProps } from 'react-router'
+import { Link } from 'react-router-dom'
 import 'moment'
 
 import { Services } from '../redux/modules/global'
 import { StoreState } from '../redux/state'
 import { Aux } from '../utils'
 import { ITableContinuationToken, IObjectHistoryQueryResultContainer, IObjectHistoryQueryResult } from '../interfaces'
+import { QueryResultType } from '../enums'
 
 declare var require: any
 let moment = require('moment')
 
-type ComponentPropeties = Services.GlobalConnectedState & Services.GlobalConnectedDispatch
+export interface IHomePageProps {
+    objectName?: string
+}
+
+type ComponentPropeties = Services.ObjectHistoryConnectedState & Services.ObjectHistoryConnectedDispatch & RouteComponentProps<IHomePageProps>
 
 class HomePage extends React.Component<ComponentPropeties> {
     constructor (props: ComponentPropeties) {
@@ -22,8 +29,23 @@ class HomePage extends React.Component<ComponentPropeties> {
         this.onShowDetailsClick = this.onShowDetailsClick.bind(this)
     }
 
+    handleUrlParams (objectName: string | undefined) {
+        if (objectName !== undefined) {
+            console.log(objectName)
+            this.props.getObjectRecord({ partitionKey: objectName })
+        } else {
+            this.props.get()
+        }
+    }
+
     componentDidMount () {
-        this.props.get()
+        this.handleUrlParams(this.props.match.params.objectName)
+    }
+
+    componentWillReceiveProps (nextProps: ComponentPropeties) {
+        if (nextProps.match.params.objectName !== this.props.match.params.objectName) {
+            this.handleUrlParams(nextProps.match.params.objectName)
+        }
     }
 
     onShowDetailsClick = (index: number, history: IObjectHistoryQueryResult) => {
@@ -45,15 +67,19 @@ class HomePage extends React.Component<ComponentPropeties> {
         }
     }
 
-    getRows = (globalQueryResultContainer: IObjectHistoryQueryResultContainer) => {
+    getRows = (resultContainer: IObjectHistoryQueryResultContainer) => {
 
         let output = []
 
-        for (let i = 0; i < globalQueryResultContainer.results.length; i++) {
-            let item = globalQueryResultContainer.results[i]
+        for (let i = 0; i < resultContainer.results.length; i++) {
+            let item = resultContainer.results[i]
+
+            const objectName = item.queryResultType === QueryResultType.Global ?
+                                <Link to={`/arragro-object-history/${item.objectName}`}>{item.objectName}</Link> :
+                                <Aux>{resultContainer.partitionKey}</Aux>
 
             output.push(<tr key={item.folder}>
-                <td>{item.objectName}</td>
+                <td>{objectName}</td>
                 <td>{item.modifiedBy}</td>
                 <td>{moment.utc(item.modifiedDate).local().format('DD/MM/YYYY h:mm:ss a')}</td>
                 <td>{this.getShowMoreDetails(item, i)}</td>
@@ -90,10 +116,10 @@ class HomePage extends React.Component<ComponentPropeties> {
     }
 
     render () {
-        const { global } = this.props
+        const { objectHistory } = this.props
 
-        if (global.globalQueryResultContainer === undefined ||
-            global.loading) {
+        if (objectHistory.resultContainer === undefined ||
+            objectHistory.loading) {
             return null
         }
 
@@ -108,22 +134,22 @@ class HomePage extends React.Component<ComponentPropeties> {
                     </tr>
                 </thead>
                 <tbody>
-                    {this.getRows(global.globalQueryResultContainer)}
+                    {this.getRows(objectHistory.resultContainer)}
                 </tbody>
             </table>
 
-            {this.getMoreRecords(global.globalQueryResultContainer.continuationToken)}
+            {this.getMoreRecords(objectHistory.resultContainer.continuationToken)}
         </Aux>
     }
 }
 
-const mapStateToProps = (state: StoreState): Services.GlobalConnectedState => {
+const mapStateToProps = (state: StoreState): Services.ObjectHistoryConnectedState => {
     return {
-        global: state.global
+        objectHistory: state.objectHistory
     }
 }
 
-const mapDispatchToProps = (dispatch: Dispatch): Services.GlobalConnectedDispatch => {
+const mapDispatchToProps = (dispatch: Dispatch): Services.ObjectHistoryConnectedDispatch => {
     return Services.dispatchServices(dispatch)
 }
 

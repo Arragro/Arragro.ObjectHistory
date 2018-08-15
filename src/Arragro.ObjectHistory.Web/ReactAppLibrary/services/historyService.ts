@@ -12,7 +12,7 @@ export class HistoryService {
         return HttpUtils.post('/arragro-object-history/get-global-logs', tableContinuationToken === undefined ? {} : tableContinuationToken)
     }
 
-    getObjectLogs = (objectLogsPostParameters: IObjectLogsPostParameters): Promise<IFetchResult<Array<IObjectHistoryQueryResultContainer>>> => {
+    getObjectLogs = (objectLogsPostParameters: IObjectLogsPostParameters): Promise<IFetchResult<IObjectHistoryQueryResultContainer>> => {
         return HttpUtils.post('/arragro-object-history/get-object-logs', objectLogsPostParameters)
     }
 

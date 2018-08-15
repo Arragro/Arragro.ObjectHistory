@@ -1,3 +1,5 @@
+import { QueryResultType } from './enums'
+
 export interface IFetchResult<T> {
     status: any
     ok: boolean
@@ -34,7 +36,7 @@ export interface IObjectHistoryQueryResult {
     rowKey: string
     objectName: string
     applicationName: string
-    QueryResultType: string
+    queryResultType: QueryResultType
     modifiedBy: string
     modifiedDate: Date
 

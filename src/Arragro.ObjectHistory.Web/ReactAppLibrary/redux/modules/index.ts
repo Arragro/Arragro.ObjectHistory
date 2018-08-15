@@ -1,6 +1,6 @@
-import { global, GlobalAction } from './global'
+import { objectHistory, ObjectHistoryAction } from './global'
 
 export {
-    global,
-    GlobalAction
+    objectHistory,
+    ObjectHistoryAction
 }

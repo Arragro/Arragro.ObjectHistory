@@ -1,51 +1,54 @@
 ﻿import { ActionType } from 'typesafe-actions'
 
 import * as Interfaces from '../../../interfaces'
-import { GlobalState, initialState } from '../../state'
+import { ObjectHistoryState, initialState } from '../../state'
 import { Actions } from './actions'
 
-export type GlobalAction = ActionType<typeof Actions>
+export type ObjectHistoryAction = ActionType<typeof Actions>
 
-const testStateAndPayload = (state: GlobalState, payload: any) => {
-    if (state.globalQueryResultContainer === undefined ||
+const testStateAndPayload = (state: ObjectHistoryState, payload: any) => {
+    if (state.resultContainer === undefined ||
         (payload === undefined || payload === null)) {
         throw new Error('The globalQueryResultContainer or payload is broken')
     }
 }
 
-const showHideDetails = (state: GlobalState, index: number, expanded: boolean) => {
-    let results = state.globalQueryResultContainer!.results
+const showHideDetails = (state: ObjectHistoryState, index: number, expanded: boolean) => {
+    let results = state.resultContainer!.results
 
     results[index].expanded = expanded
 
     return {
         ...state,
-        globalQueryResultContainer: {
-            ...state.globalQueryResultContainer!,
+        resultContainer: {
+            ...state.resultContainer!,
             results
         }
     }
 }
 
-export const global = (state = initialState.global, action: any): GlobalState => {
+export const objectHistory = (state = initialState.objectHistory, action: any): ObjectHistoryState => {
     switch (action.type) {
     case Actions.Type.GET_GLOBAL_RECORDS_START:
+    case Actions.Type.GET_OBJECT_RECORDS_START:
         return {
             ...state,
             loading: true,
             loadingFromToken: false
         }
     case Actions.Type.GET_GLOBAL_RECORDS_SUCCESS:
+    case Actions.Type.GET_OBJECT_RECORDS_SUCCESS:
         return {
             ...state,
             loading: false,
-            globalQueryResultContainer: action.payload
+            resultContainer: action.payload
         }
     case Actions.Type.GET_GLOBAL_RECORDS_ERROR:
+    case Actions.Type.GET_OBJECT_RECORDS_ERROR:
         return {
             ...state,
             loading: false,
-            globalQueryResultContainer: undefined
+            resultContainer: undefined
         }
     case Actions.Type.GET_GLOBAL_RECORDS_FROM_TOKEN_START:
         return {
@@ -56,18 +59,18 @@ export const global = (state = initialState.global, action: any): GlobalState =>
     case Actions.Type.GET_GLOBAL_RECORDS_FROM_TOKEN_SUCCESS: {
         testStateAndPayload(state, action.payload)
 
-        let results = state.globalQueryResultContainer!.results
-        let globalQueryResultContainer = action.payload as Interfaces.IObjectHistoryQueryResultContainer
-        for (let i = 0; i < globalQueryResultContainer.results.length; i++) {
-            results.push(globalQueryResultContainer.results[i])
+        let results = state.resultContainer!.results
+        let resultContainer = action.payload as Interfaces.IObjectHistoryQueryResultContainer
+        for (let i = 0; i < resultContainer.results.length; i++) {
+            results.push(resultContainer.results[i])
         }
         return {
             ...state,
             loadingFromToken: false,
-            globalQueryResultContainer: {
-                ...state.globalQueryResultContainer!,
+            resultContainer: {
+                ...state.resultContainer!,
                 results,
-                continuationToken: globalQueryResultContainer.continuationToken
+                continuationToken: resultContainer.continuationToken
             }
         }
     }
@@ -75,7 +78,7 @@ export const global = (state = initialState.global, action: any): GlobalState =>
         return {
             ...state,
             loadingFromToken: false,
-            globalQueryResultContainer: undefined
+            resultContainer: undefined
         }
     case Actions.Type.SHOW_DETAILS_START:
         return {
@@ -85,7 +88,7 @@ export const global = (state = initialState.global, action: any): GlobalState =>
     case Actions.Type.SHOW_DETAILS_SUCCESS: {
         testStateAndPayload(state, action.payload)
 
-        let results = state.globalQueryResultContainer!.results
+        let results = state.resultContainer!.results
         const index = action.payload.index
         const historyDetail = action.payload.result
 
@@ -94,8 +97,8 @@ export const global = (state = initialState.global, action: any): GlobalState =>
         return {
             ...state,
             loadingFromToken: false,
-            globalQueryResultContainer: {
-                ...state.globalQueryResultContainer!,
+            resultContainer: {
+                ...state.resultContainer!,
                 results
             }
         }

@@ -25,7 +25,8 @@ namespace Arragro.ObjectHistory.RazorClassLib.Areas.ObjectHistory.Controllers
             _objectHistorySettings = myAppSettings;
         }
 
-        public IActionResult Index()
+        [HttpGet("{id?}")]
+        public IActionResult Index(string id)
         {
             return View("Index");
             // return View("IndexKnockout");

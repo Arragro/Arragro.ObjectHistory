@@ -1,25 +1,19 @@
 import { IObjectHistoryQueryResultContainer } from '../interfaces'
 
-export interface GlobalState {
+export interface ObjectHistoryState {
     loading: boolean
     loadingFromToken: boolean
     loadingDetails: boolean
-    globalQueryResultContainer?: IObjectHistoryQueryResultContainer
-}
-
-export interface ObjectState {
-    loading: boolean
-    loadingFromToken: boolean
-    globalQueryResultContainer?: IObjectHistoryQueryResultContainer
+    resultContainer?: IObjectHistoryQueryResultContainer
 }
 
 export interface StoreState {
-    global: GlobalState
+    objectHistory: ObjectHistoryState
     // object: ObjectState
 }
 
 export const initialState: StoreState = {
-    global: {
+    objectHistory: {
         loading: true,
         loadingFromToken: false,
         loadingDetails: false

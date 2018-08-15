@@ -19,7 +19,7 @@ export const App: React.StatelessComponent<IAppProps> = (props) => {
 
     return <React.Fragment>
         <Switch>
-            <Route path='/:objectType?' component={ Containers.Home } />
+            <Route path='/arragro-object-history/:objectName?' component={ Containers.Home } />
         </Switch>
     </React.Fragment>
 }

@@ -1,5 +1,5 @@
 ﻿import { Dispatch, AnyAction } from 'redux'
-import { GlobalState } from '../../state'
+import { ObjectHistoryState } from '../../state'
 
 import { Actions } from './actions'
 import * as Interfaces from '../../../interfaces'
@@ -10,12 +10,13 @@ import {
 
 export namespace Services {
 
-    export interface GlobalConnectedState {
-        global: GlobalState
+    export interface ObjectHistoryConnectedState {
+        objectHistory: ObjectHistoryState
     }
 
-    export interface GlobalConnectedDispatch {
+    export interface ObjectHistoryConnectedDispatch {
         get (): void
+        getObjectRecord (objectLogPostParameters: Interfaces.IObjectLogsPostParameters): void
         getFromToken (continuationToken: Interfaces.ITableContinuationToken): void
         getDetails (index: number, folder: string): void
         showDetailsExpand (index: number): void
@@ -35,6 +36,23 @@ export namespace Services {
                     }
                 }).catch((x: Interfaces.IFetchResult<any>) => {
                     dispatch(Actions.getGlobalHistoryError(x))
+                })
+        }
+    }
+
+    function getObjectRecord (objectLogPostParameters: Interfaces.IObjectLogsPostParameters): any {
+        return function (dispatch: (action: any) => void) {
+            dispatch(Actions.getOjectHistoryStart())
+
+            HistoryService.getObjectLogs(objectLogPostParameters)
+                .then((response) => {
+                    if (!response.ok) {
+                        return dispatch(Actions.getObjectHistoryError(response as any))
+                    } else {
+                        return dispatch(Actions.getObjectHistorySuccess(response.data))
+                    }
+                }).catch((x: Interfaces.IFetchResult<any>) => {
+                    dispatch(Actions.getObjectHistoryError(x))
                 })
         }
     }
@@ -83,9 +101,10 @@ export namespace Services {
         }
     }
 
-    export const dispatchServices = (dispatch: Dispatch<AnyAction>): GlobalConnectedDispatch => {
+    export const dispatchServices = (dispatch: Dispatch<AnyAction>): ObjectHistoryConnectedDispatch => {
         return {
             get: () => dispatch(get()),
+            getObjectRecord: (objectLogPostParameters: Interfaces.IObjectLogsPostParameters) => dispatch(getObjectRecord(objectLogPostParameters)),
             getFromToken: (continuationToken: Interfaces.ITableContinuationToken) => dispatch(getFromToken(continuationToken)),
             getDetails: (index: number, folder: string) => dispatch(getDetails(index, folder)),
             showDetailsExpand: (index: number) => dispatch(showHideDetails(index, true)),

@@ -13,6 +13,14 @@ export namespace Actions {
         GET_GLOBAL_RECORDS_FROM_TOKEN_SUCCESS = 'ReactApp/global/GET_GLOBAL_RECORDS_FROM_TOKEN_SUCCESS',
         GET_GLOBAL_RECORDS_FROM_TOKEN_ERROR = 'ReactApp/global/GET_GLOBAL_RECORDS_FROM_TOKEN_ERROR',
 
+        GET_OBJECT_RECORDS_START = 'ReactApp/global/GET_OBJECT_RECORDS_START',
+        GET_OBJECT_RECORDS_SUCCESS = 'ReactApp/global/GET_OBJECT_RECORDS_SUCCESS',
+        GET_OBJECT_RECORDS_ERROR = 'ReactApp/global/GET_OBJECT_RECORDS_ERROR',
+
+        GET_OBJECT_RECORDS_FROM_TOKEN_START = 'ReactApp/global/GET_OBJECT_RECORDS_FROM_TOKEN_START',
+        GET_OBJECT_RECORDS_FROM_TOKEN_SUCCESS = 'ReactApp/global/GET_OBJECT_RECORDS_FROM_TOKEN_SUCCESS',
+        GET_OBJECT_RECORDS_FROM_TOKEN_ERROR = 'ReactApp/global/GET_OBJECT_RECORDS_FROM_TOKEN_ERROR',
+
         SHOW_DETAILS_START = 'ReactApp/global/SHOW_DETAILS_START',
         SHOW_DETAILS_SUCCESS = 'ReactApp/global/SHOW_DETAILS_SUCCESS',
         SHOW_DETAILS_ERROR = 'ReactApp/global/SHOW_DETAILS_ERROR',
@@ -28,6 +36,14 @@ export namespace Actions {
     export const getGlobalHistoryFromTokenStart = () => action(Type.GET_GLOBAL_RECORDS_FROM_TOKEN_START)
     export const getGlobalHistoryFromTokenSuccess = (result: Interfaces.IObjectHistoryQueryResultContainer) => action(Type.GET_GLOBAL_RECORDS_FROM_TOKEN_SUCCESS, result)
     export const getGlobalHistoryFromTokenError = (response: Interfaces.IFetchResult<any>) => action(Type.GET_GLOBAL_RECORDS_FROM_TOKEN_ERROR, response)
+
+    export const getOjectHistoryStart = () => action(Type.GET_OBJECT_RECORDS_START)
+    export const getObjectHistorySuccess = (result: Interfaces.IObjectHistoryQueryResultContainer) => action(Type.GET_OBJECT_RECORDS_SUCCESS, result)
+    export const getObjectHistoryError = (response: Interfaces.IFetchResult<any>) => action(Type.GET_OBJECT_RECORDS_ERROR, response)
+
+    export const getObjectHistoryFromTokenStart = () => action(Type.GET_OBJECT_RECORDS_FROM_TOKEN_START)
+    export const getObjectHistoryFromTokenSuccess = (result: Interfaces.IObjectHistoryQueryResultContainer) => action(Type.GET_OBJECT_RECORDS_FROM_TOKEN_SUCCESS, result)
+    export const getObjectHistoryFromTokenError = (response: Interfaces.IFetchResult<any>) => action(Type.GET_OBJECT_RECORDS_FROM_TOKEN_ERROR, response)
 
     export const showDetailsStart = () => action(Type.SHOW_DETAILS_START)
     export const showDetailsSuccess = (index: number, result: Interfaces.IObjectHistoryDetailRaw) => action(Type.SHOW_DETAILS_SUCCESS, { index, result })

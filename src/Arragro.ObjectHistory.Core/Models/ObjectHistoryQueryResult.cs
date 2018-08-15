@@ -24,6 +24,7 @@ namespace Arragro.ObjectHistory.Core.Models
             ModifiedDate = objectHistoryEntity.OriginTimestamp;
             QueryResultType = QueryResultType.Object;
         }
+        
         public ObjectHistoryQueryResult(ObjectHistoryGlobalEntity objectHistoryGlobalEntity)
         {
             Folder = objectHistoryGlobalEntity.Folder;

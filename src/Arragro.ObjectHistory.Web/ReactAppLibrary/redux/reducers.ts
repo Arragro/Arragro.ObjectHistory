@@ -2,14 +2,14 @@ import { combineReducers, Reducer } from 'redux'
 import { StoreState } from './state'
 
 import {
-    global,
-    GlobalAction
+    objectHistory,
+    ObjectHistoryAction
 } from './modules'
 
 export { StoreState }
 
-export type ReducerActions = GlobalAction
+export type ReducerActions = ObjectHistoryAction
 
 export const rootReducer: Reducer<StoreState> = combineReducers<StoreState, ReducerActions>({
-    global
+    objectHistory
 })
