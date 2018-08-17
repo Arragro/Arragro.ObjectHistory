@@ -5,9 +5,10 @@ import { Formik, Form } from 'formik'
 import * as Yup from 'yup'
 import 'moment'
 
-import * as utils from '../../ReactAppLibrary/utils'
+import { utils } from '../../ReactAppLibrary'
 import TextBox from '../FormikControls/TextBox'
-import httpUtils from '../../ReactAppLibrary/utils/httpUtils'
+
+const { HttpUtils } = utils
 
 declare var require: any
 let moment = require('moment')
@@ -62,6 +63,9 @@ export default class SessionPage extends React.Component<ComponentPropeties, ISe
                     alert('Something went wrong getting drill data')
                 }
             })
+            .catch(ex => {
+                console.log(ex)
+            })
     }
 
     getDrills = () => {
@@ -96,7 +100,7 @@ export default class SessionPage extends React.Component<ComponentPropeties, ISe
             sessionId: sessionDrillContainer!.id,
             ...drill
         }
-        httpUtils.post<IDrillForm, ISessionDrillContainer>('/api/drills/create', drillPostData)
+        HttpUtils.post<IDrillForm, ISessionDrillContainer>('/api/drills/create', drillPostData)
             .then((response) => {
                 if (response.ok) {
                     this.setState({
@@ -107,6 +111,9 @@ export default class SessionPage extends React.Component<ComponentPropeties, ISe
                     setSubmitting(false)
                     alert('Something went wrong posting drill data')
                 }
+            })
+            .catch(ex => {
+                console.log(ex)
             })
     }
 

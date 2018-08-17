@@ -8,7 +8,7 @@ const TsConfigPathsPlugin = require('awesome-typescript-loader').TsConfigPathsPl
 const PurifyCSSPlugin = require('purifycss-webpack');
 const { dependencies } = require('./package.json');
 
-const libraryName = 'arragrocms-management';
+const libraryName = 'arragro-object-history-web';
 
 module.exports = (env) => {
     const devMode = env === null || env['run-prod'] === undefined || env['run-prod'] === null || env['run-prod'] === false;
@@ -74,10 +74,10 @@ module.exports = (env) => {
                         }
                     ],
                 },
-                { test: /\.(png|woff|woff2|eot|ttf|svg)$/, loader: 'url-loader?limit=100000' },
-                { test: /\.woff(\?\S*)?(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: 'url-loader?limit=10000&mimetype=application/font-woff' },
-                { test: /\.(ttf|eot|svg)(\?\S*)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: 'file-loader' },
-                { test: /\.json$/, loader: 'json-loader' }
+                // { test: /\.(png|woff|woff2|eot|ttf|svg)$/, loader: 'url-loader?limit=100000' },
+                // { test: /\.woff(\?\S*)?(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: 'url-loader?limit=10000&mimetype=application/font-woff' },
+                // { test: /\.(ttf|eot|svg)(\?\S*)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: 'file-loader' },
+                // { test: /\.json$/, loader: 'json-loader' }
             ]
         },
         entry: {

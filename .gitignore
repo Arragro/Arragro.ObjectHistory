@@ -261,4 +261,5 @@ src/ArragroCMS.Management/dist
 /hide.ps1
 .awcache
 **/*/wwwroot/dist/**/*
+**/dist/**/*
 *.tgz

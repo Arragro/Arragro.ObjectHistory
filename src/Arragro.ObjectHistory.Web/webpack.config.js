@@ -33,6 +33,7 @@ module.exports = (env) => {
                     include: /ReactApp/,
                     exclude: [
                         /node_modules/,
+                        path.resolve(__dirname, "../Arragro.ObjectHistory.Web.ReactAppLibrary/node_modules"),
                         /obj/
                     ],
                     loader: 'awesome-typescript-loader',

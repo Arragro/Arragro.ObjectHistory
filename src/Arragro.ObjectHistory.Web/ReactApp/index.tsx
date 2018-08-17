@@ -4,9 +4,12 @@ import { Provider } from 'react-redux'
 import { IntlProvider } from 'react-intl'
 import { ConnectedRouter } from 'react-router-redux'
 import { AppContainer } from 'react-hot-loader'
-import { configureStore, Redux } from '../ReactAppLibrary'
+import { configureStore, Redux, utils } from '../ReactAppLibrary'
 import { App } from './app'
-import { History } from '../ReactAppLibrary/utils'
+import '../node_modules/bootstrap/dist/css/bootstrap.min.css'
+import '../ReactAppLibrary/scss/site.scss'
+
+const { History } = utils
 
 // prepare store
 const initialState = (window as any).initialReduxState as Redux.ReduxModel.StoreState
@@ -33,10 +36,9 @@ if (rootEl !== null) {
 
     if (module.hot) {
         module.hot.accept([
-            '../ReactAppLibrary/index',
             './index.tsx'
         ], () => {
-            const app = require('../ReactAppLibrary/app').default
+            const app = require('./index.tsx').default
             render(app)
         })
     }

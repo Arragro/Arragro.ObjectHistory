@@ -1,13 +1,13 @@
 {
-  "name": "object-history-web",
-  "version": "0.0.1-alpha",
-  "description": "Arragro Object History",
-  "main": "index.js",
+  "name": "@arragro/object-history-web",
+  "version": "0.0.5-alpha",
+  "description": "Arragro Object History for web projects",
+  "main": "dist/arragro-object-history-web.js",
   "scripts": {
     "postinstall-temp": "concurrently \"npm run build-dll\" \"npm run build\"",
     "lint": "tslint -p ./tsconfig.json -c ./tslint.json -e **/node_modules/** -e **/dist/** -e **/types/** -t codeFrame **/*.ts* ",
-    "prepush": "npm run lint && npm run build-dll && npm run build-prod",
-    "prepush-lib": "npm run lint && npm run build-dll && npm run build-lib",
+    "prepush": "npm run lint && npm run build-prod",
+    "prepush-lib": "npm run lint && npm run build-lib",
     "publish-prod": "npm run prepush-lib && npm pack",
     "build-dev": "webpack --progress --profile --log-level trace",
     "build-prod": "webpack --run-prod --progress --profile",
@@ -17,6 +17,13 @@
     "test-tsc": "tsc -p tsconfig.lib.json",
     "test": "echo \"Error: no test specified\" && exit 1",
     "run-app": "npm install && npm run build-prod && dotnet run -c Release"
+  },
+  "files": [
+    "dist"
+  ],
+  "typings": "./dist/types/index.d.ts",
+  "publishConfig": {
+    "registry": "https://registry.arragro.com/repository/npm-hosted/"
   },
   "repository": {
     "type": "git",
@@ -93,7 +100,6 @@
     "file-loader": "^1.1.11",
     "glob-all": "^3.1.0",
     "hoek": "^5.0.3",
-    "knockout": "^3.4.2",
     "mini-css-extract-plugin": "^0.4.1",
     "node-sass": "^4.9.1",
     "postcss-loader": "^2.1.5",

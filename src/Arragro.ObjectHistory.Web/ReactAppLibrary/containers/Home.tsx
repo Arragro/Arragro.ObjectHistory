@@ -127,7 +127,7 @@ class HomePage extends React.Component<ComponentPropeties> {
             <table className='table'>
                 <thead>
                     <tr>
-                        <th>Object Name</th>
+                        <th>Object Name 1</th>
                         <th>Modified By</th>
                         <th>Modified Date</th>
                         <th></th>

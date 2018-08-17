@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { Switch, Route } from 'react-router-dom'
 
-import * as LibraryContainers from '../ReactAppLibrary/containers'
+import { Containers as LibraryContainers } from '../ReactAppLibrary'
 import * as Containers from './Containers'
 
 export interface IAppProps {
