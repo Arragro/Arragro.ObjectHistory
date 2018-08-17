@@ -1,7 +1,22 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
-    <TargetFramework>netcoreapp2.0</TargetFramework>
+    <VersionPrefix>0.0.1</VersionPrefix>
+    <NuspecFile>$(MSBuildThisFileDirectory)$(MSBuildProjectName).nuspec</NuspecFile>
+
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <AssemblyName>Arragro.ObjectHistory.RazorClassLib</AssemblyName>
+    <PackageId>Arragro.ObjectHistory.RazorClassLib</PackageId>
+    <Title>Arragro ObjectHistory RazorClassLib</Title>
+    <Copyright>Arragro 2018 (c) Arragro Ltd.</Copyright>
+    <Description>Arragro Object History client and razor front end.</Description>
+    <PackageTags>dotnet core netstandard object-history</PackageTags>
+    <Authors>Mike Jewell,Reece Beardsall</Authors>
+    <PackageIconUrl>http://cdn.arragro.com/public/images/arragro-icon.png</PackageIconUrl>
+    <PackageLicenseUrl>http://opensource.org/licenses/MIT</PackageLicenseUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/Arragro/Arragro.ObjectHistory</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/Arragro/Arragro.ObjectHistory</PackageProjectUrl>
   </PropertyGroup>
 
   <ItemGroup>
@@ -23,4 +38,24 @@
       <Pack>$(IncludeRazorContentInPack)</Pack>
     </Content>
   </ItemGroup>
+  
+
+  <Target Name="SetNuspecProperties" BeforeTargets="GenerateNuspec">
+    <PropertyGroup>
+      <NuspecProperties>$(NuspecProperties);id=$(PackageId)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);Version=$(Version)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);config=$(Configuration)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);title=$(Title)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);authors=$(Authors)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);owners=$(Authors)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);projectUrl=$(PackageProjectUrl)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);iconUrl=$(PackageIconUrl)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);description=$(Description)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);copyright=$(Copyright)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);tags=$(PackageTags)</NuspecProperties>
+      <NuspecProperties>$(NuspecProperties);repository=$(RepositoryUrl)</NuspecProperties>
+    </PropertyGroup>
+    <Message Importance="high" Text="NuspecProperties: $(NuspecProperties)" />
+  </Target>
+
 </Project>

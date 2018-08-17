@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2012/06/nuspec.xsd">
+  <metadata>
+    <id>$id$</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>$authors$</authors>
+    <owners>$owners$</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <projectUrl>$projectUrl$</projectUrl>
+    <iconUrl>$iconUrl$</iconUrl>
+    <description>$description$</description>
+    <copyright>$copyright$</copyright>
+    <tags>$tags$</tags>
+    <repository>$repository$</repository>
+    <dependencies>
+      <group targetFramework=".NETCoreApp2.1">
+
+        <dependency id="Microsoft.AspNetCore.Mvc" version="2.1.1" exclude="Build,Analyzers" />
+
+      </group>
+    </dependencies>
+  </metadata>
+  <files>
+    <file src="bin\$config$\netcoreapp2.1\Arragro.ObjectHistory.Client.dll" target="lib\netcoreapp2.1\Arragro.ObjectHistory.Client.dll" />
+    <file src="bin\$config$\netcoreapp2.1\Arragro.ObjectHistory.Client.pdb" target="lib\netcoreapp2.1\Arragro.ObjectHistory.Client.pdb" />
+    <file src="bin\$config$\netcoreapp2.1\Arragro.ObjectHistory.Core.dll" target="lib\netcoreapp2.1\Arragro.ObjectHistory.Core.dll" />
+    <file src="bin\$config$\netcoreapp2.1\Arragro.ObjectHistory.Core.pdb" target="lib\netcoreapp2.1\Arragro.ObjectHistory.Core.pdb" />
+    <file src="bin\$config$\netcoreapp2.1\Arragro.ObjectHistory.RazorClassLib.dll" target="lib\netcoreapp2.1\Arragro.ObjectHistory.RazorClassLib.dll" />
+    <file src="bin\$config$\netcoreapp2.1\Arragro.ObjectHistory.RazorClassLib.pdb" target="lib\netcoreapp2.1\Arragro.ObjectHistory.RazorClassLib.pdb" />
+    <file src="bin\$config$\netcoreapp2.1\Arragro.ObjectHistory.RazorClassLib.Views.dll" target="lib\netcoreapp2.1\Arragro.ObjectHistory.RazorClassLib.Views.dll" />
+    <file src="bin\$config$\netcoreapp2.1\Arragro.ObjectHistory.RazorClassLib.Views.pdb" target="lib\netcoreapp2.1\Arragro.ObjectHistory.RazorClassLib.Views.pdb" />
+  </files>
+</package>
