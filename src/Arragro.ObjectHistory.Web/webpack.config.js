@@ -1,11 +1,9 @@
 ﻿const path = require('path');
 const glob = require('glob-all');
 const webpack = require('webpack');
-const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CompressionPlugin = require("compression-webpack-plugin");
 const TsConfigPathsPlugin = require('awesome-typescript-loader').TsConfigPathsPlugin;
-const PurifyCSSPlugin = require('purifycss-webpack');
 
 module.exports = (env) => {
     const devMode = env === null || env['run-prod'] === undefined || env['run-prod'] === null || env['run-prod'] === false;

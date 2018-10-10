@@ -27,7 +27,6 @@ namespace Arragro.ObjectHistory.Core.Helpers
                 {
                     return JsonConvert.SerializeObject(customObject);
                 }
-
             }
             catch (Exception ex)
             {
@@ -47,6 +46,5 @@ namespace Arragro.ObjectHistory.Core.Helpers
             }
             
         }
-
     }
 }

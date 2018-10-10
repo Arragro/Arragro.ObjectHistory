@@ -17,53 +17,41 @@ namespace Arragro.ObjectHistory.Client
             _objectHistoryService = new ObjectHistoryService(objectHistorySettings);
         }
 
-        public async Task SaveNewObjectHistoryAsync<T>(Func<string> getKeys, T newObject, string user)
+        private ObjectHistoryDetailRaw GetObjectHistoryDetailRaw<T>(Func<string> getKeys, string user)
         {
             var fullyQualifiedName = typeof(T).FullName;
 
             var key = getKeys();
             var partitionKey = $"{fullyQualifiedName}-{key}";
 
-            var trackedObject = new ObjectHistoryDetailRaw(partitionKey,
+            return new ObjectHistoryDetailRaw(partitionKey,
                                 string.Format("{0:D19}",
                                 DateTime.MaxValue.Ticks - DateTime.UtcNow.Ticks),
                                 _objectHistoryService.ApplicationName,
                                 DateTime.UtcNow,
                                 user,
                                 Guid.NewGuid(),
-                                true)
-            {
-                OldJson = null,
-                NewJson = _objectHistoryService.JsonHelper.GetJson(newObject, true)
-            };
+                                true);
+        }
+
+        public async Task SaveNewObjectHistoryAsync<T>(Func<string> getKeys, T newObject, string user)
+        {
+            var trackedObject = GetObjectHistoryDetailRaw<T>(getKeys, user);
+            trackedObject.OldJson = null;
+            trackedObject.NewJson = _objectHistoryService.JsonHelper.GetJson(newObject, true);
 
             var trackedObjectJson = _objectHistoryService.JsonHelper.GetJson(trackedObject);
 
             await _objectHistoryService.AzureStorageHelper.UploadJsonFileAsync(_objectHistoryService.ObjectContainer, trackedObject.Folder, ObjectHistoryService.ObjectHistoryRequestFileName, trackedObjectJson);
 
             await _objectHistoryService.AzureStorageHelper.SendQueueMessage(_objectHistoryService.Queue, String.Format("{0}/{1}", trackedObject.Folder, ObjectHistoryService.ObjectHistoryRequestFileName));
-
         }
 
         public async Task SaveObjectHistoryAsync<T>(Func<string> getKeys, T oldObject, T newObject, string user)
         {
-            var fullyQualifiedName = typeof(T).FullName;
-
-            var key = getKeys();
-            var partitionKey = $"{fullyQualifiedName}-{key}";
-
-            var trackedObject = new ObjectHistoryDetailRaw(partitionKey,
-                                string.Format("{0:D19}", 
-                                DateTime.MaxValue.Ticks - DateTime.UtcNow.Ticks),
-                                _objectHistoryService.ApplicationName,
-                                DateTime.UtcNow, 
-                                user, 
-                                Guid.NewGuid(),
-                                false)
-            {
-                OldJson = _objectHistoryService.JsonHelper.GetJson(oldObject, true),
-                NewJson = _objectHistoryService.JsonHelper.GetJson(newObject, true)
-            };
+            var trackedObject = GetObjectHistoryDetailRaw<T>(getKeys, user);
+            trackedObject.OldJson = _objectHistoryService.JsonHelper.GetJson(oldObject, true);
+            trackedObject.NewJson = _objectHistoryService.JsonHelper.GetJson(newObject, true);
 
             var trackedObjectJson = _objectHistoryService.JsonHelper.GetJson(trackedObject);
             

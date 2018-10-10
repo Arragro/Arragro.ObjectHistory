@@ -4,7 +4,7 @@
     "AzureWebJobsStorage": "UseDevelopmentStorage=true",
     "AzureWebJobsDashboard": "UseDevelopmentStorage=true"
   },
-  "ObjectHistoryClientSettings": {
+  "ObjectHistorySettings": {
     "ApplicationName": "ApplicationName",
     "StorageConnectionString": "UseDevelopmentStorage=true",
     "ObjectContainerName": "trackedobjects",

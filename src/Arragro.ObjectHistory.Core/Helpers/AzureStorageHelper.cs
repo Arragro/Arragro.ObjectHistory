@@ -2,8 +2,8 @@
 using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.WindowsAzure.Storage.Queue;
 using Microsoft.WindowsAzure.Storage.Table;
+using Newtonsoft.Json;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
@@ -47,8 +47,7 @@ namespace Arragro.ObjectHistory.Core.Helpers
         {
             try
             {
-
-                var cloudQueueMessage = new CloudQueueMessage(message);
+                var cloudQueueMessage = new CloudQueueMessage(JsonConvert.SerializeObject(new ObjectHistoryMessge { Message = message }));
                 await queue.AddMessageAsync(cloudQueueMessage);
             }
             catch (Exception ex)
@@ -76,7 +75,6 @@ namespace Arragro.ObjectHistory.Core.Helpers
             {
                 throw new Exception(String.Format("Somthing has gone wrong with the adding of the table record. Please review the inner exception. {0}", ex.InnerException));
             }
-
         }
 
         public async Task AddObjectHistoryGlobal(ObjectHistoryDetailBase objectHistoryDetails, CloudTable table)
@@ -98,7 +96,6 @@ namespace Arragro.ObjectHistory.Core.Helpers
             {
                 throw new Exception(String.Format("Somthing has gone wrong with the adding of the table record. Please review the inner exception. {0}", ex.InnerException));
             }
-
         }
 
         public async Task<Guid> GetLatestBlobFolderNameByPartitionKey(string partitionKey, CloudTable table)
@@ -117,7 +114,6 @@ namespace Arragro.ObjectHistory.Core.Helpers
             {
                 throw ex;
             }
-
         }
         public async Task<ObjectHistoryQueryResultContainer> GetObjectHistoryRecordsByObjectNamePartitionKey(string partitionKey, CloudTable table, TableContinuationToken token)
         {
@@ -136,7 +132,6 @@ namespace Arragro.ObjectHistory.Core.Helpers
             {
                 throw ex;
             }
-
         }
 
         public async Task<ObjectHistoryQueryResultContainer> GetObjectHistoryRecordsByApplicationNamePartitionKey(string partitionKey, CloudTable table, TableContinuationToken token)
@@ -156,7 +151,6 @@ namespace Arragro.ObjectHistory.Core.Helpers
             {
                 throw ex;
             }
-
         }
 
         public Task<string> DownloadBlob(CloudBlobContainer objectContainer, string folder, string filename)

@@ -33,7 +33,6 @@ namespace Arragro.ObjectHistory.RazorClassLib.Areas.ObjectHistory.Controllers
         [HttpPost("get-global-logs")]
         public async Task<IActionResult> GetGlobalLogs([FromBody] TableContinuationToken tableContinuationToken = null)
         {
-
             var entities = await _objectHistoryClient.GetObjectHistoryRecordsByApplicationNamePartitionKey(tableContinuationToken);
 
             return Ok(entities);
@@ -42,7 +41,6 @@ namespace Arragro.ObjectHistory.RazorClassLib.Areas.ObjectHistory.Controllers
         [HttpPost("get-object-logs")]
         public async Task<IActionResult> GetObjectLogs([FromBody] ObjectLogsPostParameters postParameters)
         {
-
             var entities = await _objectHistoryClient.GetObjectHistoryRecordsByObjectNamePartitionKey(postParameters.PartitionKey, postParameters.TableContinuationToken);
 
             return Ok(entities);
@@ -66,7 +64,6 @@ namespace Arragro.ObjectHistory.RazorClassLib.Areas.ObjectHistory.Controllers
             }
 
             return Ok();
-            
         }
     }
 }

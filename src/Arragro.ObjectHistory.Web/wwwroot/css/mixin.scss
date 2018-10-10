@@ -147,8 +147,7 @@ $scales: 1.4, 1.3, 1.3, 1.4, 1.5, 1.3, 1.4, 1.5, 1.4, 1.3;
     margin: 0;
     padding: 0;
     border: 0;
-    font-size: 100%;
-    font: inherit;
+    font: 100% inherit;
     vertical-align: baseline;
     height: 90vh;
     overflow: hidden;
@@ -159,7 +158,6 @@ $scales: 1.4, 1.3, 1.3, 1.4, 1.5, 1.3, 1.4, 1.5, 1.4, 1.3;
         position: relative;
         //padding-top: 3rem;
         font: 100% Arial, Sans Serif;
-        margin: 0;
         vertical-align: baseline;
         height: 95%;
         max-width: 1440px;
@@ -181,7 +179,6 @@ $scales: 1.4, 1.3, 1.3, 1.4, 1.5, 1.3, 1.4, 1.5, 1.4, 1.3;
     /*.starting-clouds {
         @include generate-clouds(null, true);
     }*/
-
     .infinite-clouds {
         @include generate-clouds(null, true);
         @include generate-clouds(infinite, false, 6);

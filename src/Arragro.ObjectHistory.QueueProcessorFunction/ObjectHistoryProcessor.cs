@@ -10,11 +10,11 @@ using System.Threading.Tasks;
 
 namespace Arragro.ObjectHistory.QueueProcessorFunction
 {
-    public class ObjectHistoryClient
+    public class ObjectHistoryProcessor
     {
         private readonly ObjectHistoryService _objectHistoryService;
 
-        public ObjectHistoryClient(ObjectHistorySettings configurationSettings)
+        public ObjectHistoryProcessor(ObjectHistorySettings configurationSettings)
         {
             _objectHistoryService = new ObjectHistoryService(configurationSettings);
         }
@@ -76,7 +76,6 @@ namespace Arragro.ObjectHistory.QueueProcessorFunction
             await _objectHistoryService.AzureStorageHelper.AddObjectHistoryGlobal(objectHistoryDetails, _objectHistoryService.GlobalTable);
 
             await blob.DeleteAsync();
-
         }
 
         private async Task CheckAndUpdateHistory(string partitionKey, CloudTable table, ObjectHistoryDetailRead objectHistoryDetail)
@@ -118,11 +117,8 @@ namespace Arragro.ObjectHistory.QueueProcessorFunction
                     };
 
                     var catchupTrackedObjectJson = _objectHistoryService.JsonHelper.GetJson(trackedObject);
-                    await _objectHistoryService.AzureStorageHelper.UploadJsonFileAsync(_objectHistoryService.ObjectContainer, trackedObject.Folder, ObjectHistoryService.ObjectHistoryFileName, catchupTrackedObjectJson);
-
-
+                    await _objectHistoryService.AzureStorageHelper.UploadJsonFileAsync(_objectHistoryService.ObjectContainer, trackedObject.Folder, ObjectHistoryService.ObjectHistoryFileName, catchupTrackedObjectJson);                    
                     await _objectHistoryService.AzureStorageHelper.AddObjectHistoryEntityRecord(trackedObject, _objectHistoryService.Table);
-
                     await _objectHistoryService.AzureStorageHelper.AddObjectHistoryGlobal(trackedObject, _objectHistoryService.GlobalTable);
                 }
             }
@@ -144,7 +140,6 @@ namespace Arragro.ObjectHistory.QueueProcessorFunction
             {
                 throw new Exception(String.Format("Something went wrong porcessing the json diff. Please review the exception. {0}", ex));
             }
-
         }
     }
 }
