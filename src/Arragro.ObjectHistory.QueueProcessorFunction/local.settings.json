@@ -1,0 +1,15 @@
+{
+  "IsEncrypted": false,
+  "Values": {
+    "AzureWebJobsStorage": "UseDevelopmentStorage=true",
+    "AzureWebJobsDashboard": "UseDevelopmentStorage=true"
+  },
+  "ObjectHistoryClientSettings": {
+    "ApplicationName": "ApplicationName",
+    "StorageConnectionString": "UseDevelopmentStorage=true",
+    "ObjectContainerName": "trackedobjects",
+    "MessageQueueName": "objectprocessor",
+    "ObjectHistoryTable": "ObjectHistory",
+    "GlobalHistoryTable": "GlobalHistory"
+  },
+}
