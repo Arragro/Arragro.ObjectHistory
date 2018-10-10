@@ -8,11 +8,13 @@ namespace Arragro.ObjectHistory.Client
 {
     public class ObjectHistoryClient
     {
+        private readonly ObjectHistorySettings _objectHistorySettings;
         private readonly ObjectHistoryService _objectHistoryService;
 
-        public ObjectHistoryClient(ObjectHistorySettings configurationSettings)
+        public ObjectHistoryClient(ObjectHistorySettings objectHistorySettings)
         {
-            _objectHistoryService = new ObjectHistoryService(configurationSettings);
+            _objectHistorySettings = objectHistorySettings;
+            _objectHistoryService = new ObjectHistoryService(objectHistorySettings);
         }
 
         public async Task SaveNewObjectHistoryAsync<T>(Func<string> getKeys, T newObject, string user)
@@ -86,9 +88,9 @@ namespace Arragro.ObjectHistory.Client
             return  await _objectHistoryService.AzureStorageHelper.GetObjectHistoryRecordsByObjectNamePartitionKey(partitionKey, _objectHistoryService.Table, continuationToken);
         }
 
-        public async Task<ObjectHistoryQueryResultContainer> GetObjectHistoryRecordsByApplicationNamePartitionKey(string partitionKey, TableContinuationToken continuationToken = null)
+        public async Task<ObjectHistoryQueryResultContainer> GetObjectHistoryRecordsByApplicationNamePartitionKey(TableContinuationToken continuationToken = null)
         {
-            return await _objectHistoryService.AzureStorageHelper.GetObjectHistoryRecordsByApplicationNamePartitionKey(partitionKey, _objectHistoryService.GlobalTable, continuationToken);
+            return await _objectHistoryService.AzureStorageHelper.GetObjectHistoryRecordsByApplicationNamePartitionKey(_objectHistorySettings.ApplicationName, _objectHistoryService.GlobalTable, continuationToken);
         }
 
         public async Task<string> GetObjectHistoryFile(string folder)

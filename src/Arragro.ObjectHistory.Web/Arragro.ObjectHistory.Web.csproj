@@ -22,7 +22,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Arragro.ObjectHistory.ObjectHistoryClientProvider\Arragro.ObjectHistory.Client.csproj" />
+    <ProjectReference Include="..\Arragro.ObjectHistory.Client\Arragro.ObjectHistory.Client.csproj" />
     <ProjectReference Include="..\Arragro.ObjectHistory.RazorClassLib\Arragro.ObjectHistory.RazorClassLib.csproj" />
   </ItemGroup>
 

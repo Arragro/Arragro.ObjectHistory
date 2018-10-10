@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio 15
 VisualStudioVersion = 15.0.27703.2026
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arragro.ObjectHistory.Client", "src\Arragro.ObjectHistory.ObjectHistoryClientProvider\Arragro.ObjectHistory.Client.csproj", "{C09509FC-50A7-46FC-AAD2-4894FCDAAE8B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arragro.ObjectHistory.Client", "src\Arragro.ObjectHistory.Client\Arragro.ObjectHistory.Client.csproj", "{C09509FC-50A7-46FC-AAD2-4894FCDAAE8B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arragro.ObjectHistory.Core", "src\Arragro.ObjectHistory.Core\Arragro.ObjectHistory.Core.csproj", "{0959FEC5-8867-4F1E-9BB3-60278315F9F2}"
 EndProject
@@ -19,6 +19,11 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{5871BB9B-4CCE-4223-84F6-8EE3AC63E918}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arragro.ObjectHistory.QueueProcessorFunction", "src\Arragro.ObjectHistory.QueueProcessorFunction\Arragro.ObjectHistory.QueueProcessorFunction.csproj", "{CBE70151-70C4-46E5-A52B-CC57D466AF1E}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{B43E8AD0-D8F9-4EFE-89CC-181EF5079DE8}"
+	ProjectSection(SolutionItems) = preProject
+		nuget-build.ps1 = nuget-build.ps1
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

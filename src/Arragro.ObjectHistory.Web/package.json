@@ -1,6 +1,6 @@
 {
   "name": "@arragro/object-history-web",
-  "version": "0.0.5-alpha",
+  "version": "0.0.7-alpha",
   "description": "Arragro Object History for web projects",
   "main": "dist/arragro-object-history-web.js",
   "scripts": {

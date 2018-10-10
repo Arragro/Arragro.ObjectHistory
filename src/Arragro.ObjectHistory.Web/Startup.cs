@@ -35,10 +35,7 @@ namespace Arragro.ObjectHistory.Web
             services.AddDbContext<DemoDbContext>(
                 //optionsBuilder => optionsBuilder.UseInMemoryDatabase("InMemoryDb"));
                 optionsBuilder => optionsBuilder.UseSqlServer("data source=localhost;initial catalog=ArragroObjectTracker;integrated security=True;MultipleActiveResultSets=True;App=EntityFramework;", sqlOptions => sqlOptions.EnableRetryOnFailure(3)));
-
-            var objectHistoryClientSettings = new ObjectHistorySettings();
-            Configuration.GetSection("ObjectHistoryClientSettings").Bind(objectHistoryClientSettings);
-
+            
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // This lambda determines whether user consent for non-essential cookies is needed for a given request.
@@ -46,8 +43,8 @@ namespace Arragro.ObjectHistory.Web
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-            services.Configure<ObjectHistorySettings>(Configuration.GetSection("ObjectHistoryClientSettings"));
-            services.AddArragroObjectHistoryClient(objectHistoryClientSettings);
+            services.AddArragroObjectHistoryClient(Configuration);
+
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
 
             services.AddScoped<ITrainingSessionRepository,

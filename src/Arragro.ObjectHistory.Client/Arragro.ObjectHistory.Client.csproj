@@ -1,16 +1,16 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <VersionPrefix>0.0.1</VersionPrefix>
     <NuspecFile>$(MSBuildThisFileDirectory)$(MSBuildProjectName).nuspec</NuspecFile>
-
-    <TargetFramework>netcoreapp2.1</TargetFramework>
-    <AssemblyName>Arragro.ObjectHistory.RazorClassLib</AssemblyName>
-    <PackageId>Arragro.ObjectHistory.RazorClassLib</PackageId>
-    <Title>Arragro ObjectHistory RazorClassLib</Title>
+    
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <AssemblyName>Arragro.ObjectHistory.Client</AssemblyName>
+    <PackageId>Arragro.ObjectHistory.Client</PackageId>
+    <Title>Arragro ObjectHistory Client</Title>
     <Copyright>Arragro 2018 (c) Arragro Ltd.</Copyright>
-    <Description>Arragro Object History client and razor front end.</Description>
-    <PackageTags>dotnet core netstandard object-history</PackageTags>
+    <Description>Arragro Object History client.</Description>
+    <PackageTags>dotnet netstandard object-history</PackageTags>
     <Authors>Mike Jewell,Reece Beardsall</Authors>
     <PackageIconUrl>http://cdn.arragro.com/public/images/arragro-icon.png</PackageIconUrl>
     <PackageLicenseUrl>http://opensource.org/licenses/MIT</PackageLicenseUrl>
@@ -20,26 +20,15 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.AspNetCore.Mvc" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.Configuration.Binder" Version="2.1.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="2.1.1" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Arragro.ObjectHistory.Client\Arragro.ObjectHistory.Client.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Content Update="Areas\ObjectHistory\Views\Home\IndexKnockout.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
-    <Content Update="Areas\ObjectHistory\Views\_ViewImports.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
-    <Content Update="Areas\ObjectHistory\Views\_ViewStart.cshtml">
-      <Pack>$(IncludeRazorContentInPack)</Pack>
-    </Content>
+    <ProjectReference Include="..\Arragro.ObjectHistory.Core\Arragro.ObjectHistory.Core.csproj" />
   </ItemGroup>
   
-
   <Target Name="SetNuspecProperties" BeforeTargets="GenerateNuspec">
     <PropertyGroup>
       <NuspecProperties>$(NuspecProperties);id=$(PackageId)</NuspecProperties>

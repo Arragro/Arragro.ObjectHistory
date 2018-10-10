@@ -17,12 +17,10 @@ namespace Arragro.ObjectHistory.RazorClassLib.Areas.ObjectHistory.Controllers
     public class HomeController : Controller
     {
         private readonly ObjectHistoryClient _objectHistoryClient;
-        private readonly IOptions<ObjectHistorySettings> _objectHistorySettings;
 
-        public HomeController(ObjectHistoryClient objectHistoryClient, IOptions<ObjectHistorySettings> myAppSettings)
+        public HomeController(ObjectHistoryClient objectHistoryClient)
         {
             _objectHistoryClient = objectHistoryClient;
-            _objectHistorySettings = myAppSettings;
         }
 
         [HttpGet("{id?}")]
@@ -36,7 +34,7 @@ namespace Arragro.ObjectHistory.RazorClassLib.Areas.ObjectHistory.Controllers
         public async Task<IActionResult> GetGlobalLogs([FromBody] TableContinuationToken tableContinuationToken = null)
         {
 
-            var entities = await _objectHistoryClient.GetObjectHistoryRecordsByApplicationNamePartitionKey(_objectHistorySettings.Value.ApplicationName, tableContinuationToken);
+            var entities = await _objectHistoryClient.GetObjectHistoryRecordsByApplicationNamePartitionKey(tableContinuationToken);
 
             return Ok(entities);
         }
