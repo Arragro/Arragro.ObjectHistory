@@ -1,7 +1,5 @@
 ﻿using Arragro.ObjectHistory.Core.Enums;
 using System;
-using System.Collections.Generic;
-using System.Text;
 
 namespace Arragro.ObjectHistory.Core.Models
 {
@@ -15,10 +13,11 @@ namespace Arragro.ObjectHistory.Core.Models
         public DateTime ModifiedDate { get; set; }
         public QueryResultType QueryResultType { get; set;}
 
-        public ObjectHistoryQueryResult(ObjectHistoryEntity objectHistoryEntity)
+        public ObjectHistoryQueryResult(string partitionKey, ObjectHistoryEntity objectHistoryEntity)
         {
             Folder = objectHistoryEntity.Folder;
             RowKey = objectHistoryEntity.RowKey;
+            ObjectName = partitionKey;
             ApplicationName = objectHistoryEntity.ApplicationName;
             ModifiedBy = objectHistoryEntity.User;
             ModifiedDate = objectHistoryEntity.OriginTimestamp;

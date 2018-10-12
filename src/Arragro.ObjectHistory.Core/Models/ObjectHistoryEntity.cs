@@ -10,6 +10,10 @@ namespace Arragro.ObjectHistory.Core.Models
         public DateTime OriginTimestamp { get; set; }
         public string User { get; set; }
         public string IsAdd { get; set; }
+        /// <summary>
+        /// Use this to help any validation you want to apply to the main controller I
+        /// </summary>
+        public string SecurityValidationToken { get; set; }
 
         public ObjectHistoryEntity() { }
 
@@ -28,6 +32,7 @@ namespace Arragro.ObjectHistory.Core.Models
             Folder = objectHistoryEntity.Folder;
             Timestamp = objectHistoryEntity.Timestamp;
             IsAdd = objectHistoryEntity.IsAdd;
+            SecurityValidationToken = objectHistoryEntity.SecurityValidationToken;
         }
     }
 }

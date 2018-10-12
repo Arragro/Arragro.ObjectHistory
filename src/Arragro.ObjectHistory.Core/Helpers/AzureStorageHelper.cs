@@ -56,7 +56,7 @@ namespace Arragro.ObjectHistory.Core.Helpers
             }
         }
 
-        public async Task AddObjectHistoryEntityRecord(ObjectHistoryDetailBase objectHistoryDetails, CloudTable table)
+        public async Task AddObjectHistoryEntityRecordAsync(ObjectHistoryDetailBase objectHistoryDetails, CloudTable table)
         {
             try
             {
@@ -77,7 +77,7 @@ namespace Arragro.ObjectHistory.Core.Helpers
             }
         }
 
-        public async Task AddObjectHistoryGlobal(ObjectHistoryDetailBase objectHistoryDetails, CloudTable table)
+        public async Task AddObjectHistoryGlobalAsync(ObjectHistoryDetailBase objectHistoryDetails, CloudTable table)
         {
             try
             {
@@ -98,23 +98,45 @@ namespace Arragro.ObjectHistory.Core.Helpers
             }
         }
 
-        public async Task<Guid> GetLatestBlobFolderNameByPartitionKey(string partitionKey, CloudTable table)
+        public async Task<ObjectHistoryEntity> GetLastObjectHistoryEntity(string partitionKey, CloudTable table)
+        {
+            var query = new TableQuery<ObjectHistoryEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
+
+            return (await table.ExecuteQuerySegmentedAsync(query.Take(1), null)).SingleOrDefault();
+        }
+
+        public async Task<Guid?> GetLatestBlobFolderNameByPartitionKeyAsync(string partitionKey, CloudTable table)
         {
             try
             {
-                var query = new TableQuery<ObjectHistoryEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
+                var objectHistoryEntity = await GetLastObjectHistoryEntity(partitionKey, table);
+                if (objectHistoryEntity == null)
+                    return null;
 
-                var queryResult = await table.ExecuteQuerySegmentedAsync(query.Take(10), null);
-
-                var folder = (queryResult.Results).Select(x => x.Folder).FirstOrDefault();
-
-                return folder;
+                return objectHistoryEntity.Folder;
             }
             catch (Exception ex)
             {
                 throw ex;
             }
         }
+
+        public async Task<ObjectHistoryEntity> GetObjectHistoryRecord(string partitionKey, string rowKey, CloudTable table)
+        {
+            try
+            {
+                var retrieveOperation = TableOperation.Retrieve<ObjectHistoryEntity>(partitionKey, rowKey);
+
+                var retrievedResult = await table.ExecuteAsync(retrieveOperation);
+
+                return retrievedResult.Result as ObjectHistoryEntity;
+            }
+            catch (Exception ex)
+            {
+                throw ex;
+            }
+        }
+
         public async Task<ObjectHistoryQueryResultContainer> GetObjectHistoryRecordsByObjectNamePartitionKey(string partitionKey, CloudTable table, TableContinuationToken token)
         {
             try

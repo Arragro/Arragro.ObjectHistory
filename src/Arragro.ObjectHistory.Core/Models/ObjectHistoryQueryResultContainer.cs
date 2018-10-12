@@ -18,7 +18,7 @@ namespace Arragro.ObjectHistory.Core.Models
             ContinuationToken = continuationToken;
             PartitionKey = partitionKey;
             //fixt
-            Results = entities.Select(x => new ObjectHistoryQueryResult(x));
+            Results = entities.Select(entity => new ObjectHistoryQueryResult(partitionKey, entity));
         }
 
         public ObjectHistoryQueryResultContainer(
@@ -29,7 +29,7 @@ namespace Arragro.ObjectHistory.Core.Models
             ContinuationToken = continuationToken;
             PartitionKey = partitionKey;
             //fixt
-            Results = entities.Select(x => new ObjectHistoryQueryResult(x));
+            Results = entities.Select(entity => new ObjectHistoryQueryResult(entity));
         }
     }
 }

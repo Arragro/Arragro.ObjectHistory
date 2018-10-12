@@ -7,6 +7,7 @@ namespace Arragro.ObjectHistory.Core.Models
         public ObjectHistoryDetailRead(string partitionKey, string rowKey, string applicationName, DateTime timeStamp, string user, Guid folder, bool isAdd = false)
             : base(partitionKey, rowKey, applicationName, timeStamp, user, folder, isAdd) { }
 
+        public ObjectHistorySettings ObjectHistorySettings { get; set; }
         public object NewJson { get; set; }
         public object OldJson { get; set; }
         public object Diff { get; set; }
@@ -17,20 +18,20 @@ namespace Arragro.ObjectHistory.Core.Models
             {
                 if (this.IsAdd)
                 {
-                    return new ObjectHistoryDetailRaw(this.PartitionKey, this.RowKey, this.ApplicationName, this.TimeStamp, this.User, this.Folder, this.IsAdd)
+                    return new ObjectHistoryDetailRaw(ObjectHistorySettings, PartitionKey, RowKey, ApplicationName, TimeStamp, User, Folder, SecurityValidationToken, IsAdd)
                     {
-                        NewJson = this.NewJson.ToString(),
+                        NewJson = NewJson.ToString(),
                         OldJson = null,
                         Diff = null
                     };
                 }
                 else
                 {
-                    return new ObjectHistoryDetailRaw(this.PartitionKey, this.RowKey, this.ApplicationName, this.TimeStamp, this.User, this.Folder, this.IsAdd)
+                    return new ObjectHistoryDetailRaw(ObjectHistorySettings, PartitionKey, RowKey, ApplicationName, TimeStamp, User, Folder, SecurityValidationToken, IsAdd)
                     {
-                        NewJson = this.NewJson.ToString(),
+                        NewJson = NewJson.ToString(),
                         OldJson = this.OldJson.ToString(),
-                        Diff = this.Diff.ToString()
+                        Diff = Diff.ToString()
                     };
                 }
             }

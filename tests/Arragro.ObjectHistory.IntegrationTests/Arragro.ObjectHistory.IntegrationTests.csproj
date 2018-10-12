@@ -12,7 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\src\Arragro.ObjectHistory.Web\Arragro.ObjectHistory.Web.csproj" />
+    <ProjectReference Include="..\..\src\Arragro.ObjectHistory.WebExample\Arragro.ObjectHistory.WebExample.csproj" />
   </ItemGroup>
 
   <ItemGroup>

@@ -1,6 +1,4 @@
-﻿using Arragro.ObjectHistory.Core.Helpers;
-using Newtonsoft.Json;
-using System;
+﻿using System;
 
 namespace Arragro.ObjectHistory.Core.Models
 {
@@ -13,8 +11,12 @@ namespace Arragro.ObjectHistory.Core.Models
         public Guid Folder { get; set; }
         public string User { get; set; }
         public bool IsAdd { get; set; }
+        /// <summary>
+        /// Use this to help any validation you want to apply to the main controller I
+        /// </summary>
+        public string SecurityValidationToken { get; set; }
 
-        public ObjectHistoryDetailBase(string partitionKey, string rowKey, string applicationName, DateTime timeStamp, string user, Guid folder, bool isAdd = false)
+        public ObjectHistoryDetailBase(string partitionKey, string rowKey, string applicationName, DateTime timeStamp, string user, Guid folder, bool isAdd = false, string securityValidationToken = null)
         {
             PartitionKey = partitionKey;
             RowKey = rowKey;
@@ -23,6 +25,7 @@ namespace Arragro.ObjectHistory.Core.Models
             User = user;
             Folder = folder;
             IsAdd = isAdd;
+            SecurityValidationToken = securityValidationToken;
         }
     }
 }
