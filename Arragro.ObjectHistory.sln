@@ -13,6 +13,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{5871BB9B
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{B43E8AD0-D8F9-4EFE-89CC-181EF5079DE8}"
 	ProjectSection(SolutionItems) = preProject
+		docker-compose.yml = docker-compose.yml
+		DOCKERFILE = DOCKERFILE
 		nuget-build.ps1 = nuget-build.ps1
 		README.md = README.md
 	EndProjectSection
