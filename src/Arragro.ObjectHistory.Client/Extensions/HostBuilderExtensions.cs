@@ -18,7 +18,7 @@ namespace Arragro.ObjectHistory.Client.Extensions
                 .AddTransient<IObjectLogsSecurityAttribute, TObjectLogsSecurityAttribute>()
                 .AddSingleton(objectHistorySettings)
                 .AddSingleton(new ObjectHistoryService(objectHistorySettings.AzureStorageConnectionString))
-                .AddSingleton<ObjectHistoryClient>();
+                .AddSingleton<IObjectHistoryClient, ObjectHistoryClient>();
         }
     }
 }

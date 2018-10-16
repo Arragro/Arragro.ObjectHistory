@@ -1,4 +1,5 @@
-﻿using Arragro.ObjectHistory.Core.Helpers;
+﻿using Arragro.ObjectHistory.Core;
+using Arragro.ObjectHistory.Core.Helpers;
 using Arragro.ObjectHistory.Core.Models;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.WindowsAzure.Storage.Table;
@@ -7,7 +8,7 @@ using System.Threading.Tasks;
 
 namespace Arragro.ObjectHistory.Client
 {
-    public class ObjectHistoryClient
+    public class ObjectHistoryClient : IObjectHistoryClient
     {
         private readonly ObjectHistoryClientSettings _objectHistorySettings;
         private readonly ObjectHistoryService _objectHistoryService;
