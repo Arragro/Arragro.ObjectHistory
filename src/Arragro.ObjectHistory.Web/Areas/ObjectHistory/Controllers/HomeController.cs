@@ -14,9 +14,9 @@ namespace Arragro.ObjectHistory.Web.Areas.ObjectHistory.Controllers
     [Route("arragro-object-history")]
     public class HomeController : Controller
     {
-        private readonly ObjectHistoryClient _objectHistoryClient;
+        private readonly IObjectHistoryClient _objectHistoryClient;
 
-        public HomeController(ObjectHistoryClient objectHistoryClient)
+        public HomeController(IObjectHistoryClient objectHistoryClient)
         {
             _objectHistoryClient = objectHistoryClient;
         }
