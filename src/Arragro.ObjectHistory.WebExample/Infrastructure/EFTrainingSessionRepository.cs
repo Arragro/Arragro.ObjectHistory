@@ -1,4 +1,5 @@
 ﻿using Arragro.ObjectHistory.Client;
+using Arragro.ObjectHistory.Core;
 using Arragro.ObjectHistory.WebExample.Core.Entities;
 using Arragro.ObjectHistory.WebExample.Core.Interfaces;
 using Microsoft.EntityFrameworkCore;
@@ -11,9 +12,9 @@ namespace Arragro.ObjectHistory.WebExample.Infrastructure
     public class EFTrainingSessionRepository : ITrainingSessionRepository
     {
         private readonly DemoDbContext _dbContext;
-        private readonly ObjectHistoryClient _objectHistoryClient;
+        private readonly IObjectHistoryClient _objectHistoryClient;
 
-        public EFTrainingSessionRepository(DemoDbContext dbContext, ObjectHistoryClient objectHistoryClient)
+        public EFTrainingSessionRepository(DemoDbContext dbContext, IObjectHistoryClient objectHistoryClient)
         {
             _dbContext = dbContext;
             _objectHistoryClient = objectHistoryClient;

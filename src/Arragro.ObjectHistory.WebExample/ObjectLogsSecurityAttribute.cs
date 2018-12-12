@@ -11,10 +11,10 @@ namespace Arragro.ObjectHistory.WebExample
 {
     public class ObjectLogsSecurityAttribute : ActionFilterAttribute, IObjectLogsSecurityAttribute
     {
-        private readonly ObjectHistoryClient _objectHistoryClient;
+        private readonly IObjectHistoryClient _objectHistoryClient;
 
         public ObjectLogsSecurityAttribute(
-            ObjectHistoryClient objectHistoryClient)
+            IObjectHistoryClient objectHistoryClient)
         {
             _objectHistoryClient = objectHistoryClient;
         }

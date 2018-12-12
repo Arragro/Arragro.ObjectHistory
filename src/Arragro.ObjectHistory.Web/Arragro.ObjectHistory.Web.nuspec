@@ -29,9 +29,7 @@
     <file src="bin\$config$\netcoreapp2.1\Arragro.ObjectHistory.Client.pdb" target="lib\netcoreapp2.1\Arragro.ObjectHistory.Client.pdb" />
     <file src="bin\$config$\netcoreapp2.1\Arragro.ObjectHistory.Core.dll" target="lib\netcoreapp2.1\Arragro.ObjectHistory.Core.dll" />
     <file src="bin\$config$\netcoreapp2.1\Arragro.ObjectHistory.Core.pdb" target="lib\netcoreapp2.1\Arragro.ObjectHistory.Core.pdb" />
-    <file src="bin\$config$\netcoreapp2.1\Arragro.ObjectHistory.RazorClassLib.dll" target="lib\netcoreapp2.1\Arragro.ObjectHistory.RazorClassLib.dll" />
-    <file src="bin\$config$\netcoreapp2.1\Arragro.ObjectHistory.RazorClassLib.pdb" target="lib\netcoreapp2.1\Arragro.ObjectHistory.RazorClassLib.pdb" />
-    <file src="bin\$config$\netcoreapp2.1\Arragro.ObjectHistory.RazorClassLib.Views.dll" target="lib\netcoreapp2.1\Arragro.ObjectHistory.RazorClassLib.Views.dll" />
-    <file src="bin\$config$\netcoreapp2.1\Arragro.ObjectHistory.RazorClassLib.Views.pdb" target="lib\netcoreapp2.1\Arragro.ObjectHistory.RazorClassLib.Views.pdb" />
+    <file src="bin\$config$\netcoreapp2.1\Arragro.ObjectHistory.Web.dll" target="lib\netcoreapp2.1\Arragro.ObjectHistory.Web.dll" />
+    <file src="bin\$config$\netcoreapp2.1\Arragro.ObjectHistory.Web.pdb" target="lib\netcoreapp2.1\Arragro.ObjectHistory.Web.pdb" />
   </files>
 </package>
