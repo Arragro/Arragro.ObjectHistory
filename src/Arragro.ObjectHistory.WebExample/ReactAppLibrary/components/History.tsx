@@ -71,35 +71,37 @@ class History extends React.Component<ComponentPropeties> {
 
         let output = []
 
-        for (let i = 0; i < resultContainer.results.length; i++) {
-            let item = resultContainer.results[i]
+        if (resultContainer.results !== undefined) {
 
-            const objectName = item.queryResultType === QueryResultType.Global ?
-                                <Link to={`/arragro-object-history/${item.objectName}`}>{item.objectName}</Link> :
-                                <Aux>{resultContainer.partitionKey}</Aux>
+            for (let i = 0; i < resultContainer.results.length; i++) {
+                let item = resultContainer.results[i]
 
-            output.push(<tr key={item.folder}>
-                <td>{objectName}</td>
-                <td>{item.modifiedBy}</td>
-                <td>{moment.utc(item.modifiedDate).local().format('DD/MM/YYYY h:mm:ss a')}</td>
-                <td>{this.getShowMoreDetails(item, i)}</td>
-            </tr>)
+                const objectName = item.queryResultType === QueryResultType.Global ?
+                    <Link to={`/arragro-object-history/${item.objectName}`}>{item.objectName}</Link> :
+                    <Aux>{resultContainer.partitionKey}</Aux>
 
-            if (item.expanded && item.historyDetail !== undefined) {
-                if (item.historyDetail.isAdd) {
-                    output.push(<tr key={`${item.folder}-details`}>
-                        <td colSpan={6}><pre>{JSON.stringify(item.historyDetail.newJson, null, '\t')}</pre></td>
-                    </tr>)
-                } else {
-                    output.push(<tr key={`${item.folder}-details`}>
-                        <td colSpan={6} dangerouslySetInnerHTML={{ __html: formatters.html.format(item.historyDetail.diff, item.historyDetail.oldJson) }}>
-                            {/* <pre>{JSON.stringify(item.historyDetail.diff, null, '\t')}</pre> */}
-                        </td>
-                    </tr>)
+                output.push(<tr key={item.folder}>
+                    <td>{objectName}</td>
+                    <td>{item.modifiedBy}</td>
+                    <td>{moment.utc(item.modifiedDate).local().format('DD/MM/YYYY h:mm:ss a')}</td>
+                    <td>{this.getShowMoreDetails(item, i)}</td>
+                </tr>)
+
+                if (item.expanded && item.historyDetail !== undefined) {
+                    if (item.historyDetail.isAdd) {
+                        output.push(<tr key={`${item.folder}-details`}>
+                            <td colSpan={6}><pre>{JSON.stringify(item.historyDetail.newJson, null, '\t')}</pre></td>
+                        </tr>)
+                    } else {
+                        output.push(<tr key={`${item.folder}-details`}>
+                            <td colSpan={6} dangerouslySetInnerHTML={{ __html: formatters.html.format(item.historyDetail.diff, item.historyDetail.oldJson) }}>
+                                {/* <pre>{JSON.stringify(item.historyDetail.diff, null, '\t')}</pre> */}
+                            </td>
+                        </tr>)
+                    }
                 }
             }
         }
-
         return output
     }
 

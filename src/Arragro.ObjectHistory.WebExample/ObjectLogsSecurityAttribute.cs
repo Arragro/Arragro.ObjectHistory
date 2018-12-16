@@ -4,6 +4,7 @@ using Arragro.ObjectHistory.Core.Models;
 using Arragro.ObjectHistory.Web.Areas.ObjectHistory.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
+using System;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -54,9 +55,17 @@ namespace Arragro.ObjectHistory.WebExample
                     if (type.IsAssignableFrom(context.ActionArguments[key].GetType()))
                     {
                         var partitionKey = (context.ActionArguments[key] as ObjectLogsPostParameters).PartitionKey;
-                        var objectHistoryDetailRaw = await _objectHistoryClient.GetObjectHistoryDetailRawAsync(partitionKey);
-                        if (!TestSecurityValidationToken(context, objectHistoryDetailRaw))
-                            return;
+
+                        try
+                        {
+                            var objectHistoryDetailRaw = await _objectHistoryClient.GetObjectHistoryDetailRawAsync(partitionKey);
+                            if (!TestSecurityValidationToken(context, objectHistoryDetailRaw))
+                                return;
+                        }
+                        catch (Exception ex)
+                        {
+                            return; 
+                        }
                     }
                 }
             }

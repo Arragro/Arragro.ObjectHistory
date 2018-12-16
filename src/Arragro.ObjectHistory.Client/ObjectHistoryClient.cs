@@ -108,6 +108,7 @@ namespace Arragro.ObjectHistory.Client
         public async Task<ObjectHistoryDetailRaw> GetObjectHistoryDetailRawAsync(string partitionKey)
         {
             var objectHistoryEntity = await _objectHistoryService.AzureStorageHelper.GetLastObjectHistoryEntity(partitionKey, _objectHistoryTable);
+
             var json = await _objectHistoryService.AzureStorageHelper.DownloadBlob(_cloudBlobContainer, objectHistoryEntity.Folder.ToString(), ObjectHistoryService.ObjectHistoryFileName);
             var read = _objectHistoryService.JsonHelper.GetObjectFromJson<ObjectHistoryDetailRead>(json);
 
