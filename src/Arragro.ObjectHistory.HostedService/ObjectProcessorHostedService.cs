@@ -1,4 +1,5 @@
 ﻿using Arragro.Core.HostedServices;
+using Arragro.ObjectHistory.Core.Helpers;
 using Arragro.ObjectHistory.Core.Models;
 using Azure.Storage.Queues.Models;
 using Microsoft.Extensions.DependencyInjection;
@@ -29,7 +30,7 @@ namespace Arragro.ObjectHistory.HostedService
             using (var scope = _serviceProvider.CreateScope())
             {
                 var objectHistoryProcessor = scope.ServiceProvider.GetRequiredService<ObjectHistoryProcessor>();
-                await objectHistoryProcessor.ProcessMessagesAsync(objectHistoryMessge.Message);
+                await objectHistoryProcessor.ProcessQueueMessageAsync(objectHistoryMessge.Message);
             }
         }
     }

@@ -88,7 +88,7 @@ namespace Arragro.ObjectHistory.Core.Helpers
             }
         }
 
-        public async Task<BlobClient> GetInputBlobAsync(string blobName)
+        public async Task<BlobClient> GetBlobAsync(string blobName)
         {
             var containerClient = await GetObjectHistoryOutputContainerAsync();
 

@@ -56,7 +56,7 @@ namespace Arragro.ObjectHistory.WebExample.Infrastructure
                 throw;
             }
 
-            await _objectHistoryClient.SaveNewObjectHistoryAsync<TrainingSession>(() => $"{session.Id}", session, "User1");         
+            await _objectHistoryClient.QueueObjectHistoryAsync<TrainingSession>(() => $"{session.Id}", session, "User1");         
         }
 
         public async Task UpdateAsync(TrainingSession session, TrainingSession unmodifiedSession)
@@ -73,7 +73,7 @@ namespace Arragro.ObjectHistory.WebExample.Infrastructure
             }
 
             session = await GetByIdNoTrackingAsync(session.Id);
-            await _objectHistoryClient.SaveObjectHistoryAsync<TrainingSession>(() => $"{session.Id}", unmodifiedSession, session, "User1");
+            await _objectHistoryClient.SaveObjectHistoryAsync<TrainingSession>(() => $"{session.Id}", session, "User1");
         }
     }
 }

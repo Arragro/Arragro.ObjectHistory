@@ -38,7 +38,10 @@ namespace Arragro.ObjectHistory.Core.Helpers
         {
             try
             {
-                return JsonConvert.DeserializeObject<T>(json);
+                return JsonConvert.DeserializeObject<T>(json, new JsonSerializerSettings
+                {
+                    ConstructorHandling = ConstructorHandling.AllowNonPublicDefaultConstructor
+                });
             }
             catch (Exception ex)
             {

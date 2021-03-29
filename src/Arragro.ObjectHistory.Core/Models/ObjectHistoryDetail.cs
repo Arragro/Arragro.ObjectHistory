@@ -17,7 +17,7 @@ namespace Arragro.ObjectHistory.Core.Models
         /// </summary>
         public string SecurityValidationToken { get; set; }
 
-        public ObjectHistoryDetailBase(string partitionKey, string rowKey, string applicationName, DateTime timeStamp, string user, Guid folder, bool isAdd = false, Guid? subFolder = null, string securityValidationToken = null)
+        public ObjectHistoryDetailBase(string partitionKey, string rowKey, string applicationName, DateTime timeStamp, string user, Guid folder, bool isAdd, Guid? subFolder, string securityValidationToken)
         {
             PartitionKey = partitionKey;
             RowKey = rowKey;
@@ -29,5 +29,7 @@ namespace Arragro.ObjectHistory.Core.Models
             IsAdd = isAdd;
             SecurityValidationToken = securityValidationToken;
         }
+
+        protected ObjectHistoryDetailBase() { }
     }
 }

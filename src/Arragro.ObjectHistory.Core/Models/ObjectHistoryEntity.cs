@@ -33,6 +33,11 @@ namespace Arragro.ObjectHistory.Core.Models
             IsAdd = objectHistoryTableEntity.IsAdd;
             SecurityValidationToken = objectHistoryTableEntity.SecurityValidationToken;
         }
+
+        public string GetBlobPath()
+        {
+            return SubFolder.HasValue ? $"{Folder}/{SubFolder}" : $"{Folder}";
+        }
     }
 
     public class ObjectHistoryTableEntity : TableEntity

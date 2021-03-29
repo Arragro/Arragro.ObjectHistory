@@ -1,14 +1,12 @@
-﻿using Arragro.ObjectHistory.Client;
-using Arragro.ObjectHistory.Core;
+﻿using Arragro.ObjectHistory.Core;
+using Arragro.ObjectHistory.Core.Helpers;
 using Arragro.ObjectHistory.Core.Models;
 using Azure.Storage.Queues;
-using Microsoft.Azure.Cosmos.Table;
 using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -63,13 +61,13 @@ namespace Arragro.ObjectHistory.IntegrationTests
                 if (queueMessage.Value == null)
                     break;
                 var objectHistoryMessge = JsonConvert.DeserializeObject<ObjectHistoryMessge>(queueMessage.Value.MessageText);
-                await objectHistoryProcessor.ProcessMessagesAsync(objectHistoryMessge.Message);
+                await objectHistoryProcessor.ProcessQueueMessageAsync(objectHistoryMessge.Message);
             } while (true);
         }
 
 
         [Fact]
-        public async Task test_create_read_history()
+        public async Task test_create_process_read_history()
         {
             var objectHistoryClient = _serviceProvider.GetRequiredService<IObjectHistoryClient>();
 
@@ -77,7 +75,7 @@ namespace Arragro.ObjectHistory.IntegrationTests
 
             foreach (var fakeData in FakeDataContext.FakeDatas)
             {
-                await objectHistoryClient.SaveNewObjectHistoryAsync<FakeData>(() => $"{fakeData.Id}", fakeData, "User1");
+                await objectHistoryClient.QueueObjectHistoryAsync<FakeData>(() => $"{fakeData.Id}", fakeData, "User1");
             }
 
             var queueClient = new QueueClient(AzureStorageConnectionString, _objectHistorySettings.ObjectQueueName);
@@ -106,9 +104,7 @@ namespace Arragro.ObjectHistory.IntegrationTests
 
             var modifyFakeObject = FakeDataContext.FakeDatas.ElementAt(0).Clone();
             modifyFakeObject.Data = "Test XX";
-            await objectHistoryClient.SaveObjectHistoryAsync<FakeData>(() => $"{FakeDataContext.FakeDatas.ElementAt(0).Id}", FakeDataContext.FakeDatas.ElementAt(0), modifyFakeObject, "User1");
-
-            await ProcessQueue(queueClient);
+            await objectHistoryClient.SaveObjectHistoryAsync<FakeData>(() => $"{FakeDataContext.FakeDatas.ElementAt(0).Id}", FakeDataContext.FakeDatas.ElementAt(0), "User1");
 
             global = await objectHistoryClient.GetObjectHistoryRecordsByApplicationNamePartitionKeyAsync();
             Assert.Equal(101, global.Results.Count());

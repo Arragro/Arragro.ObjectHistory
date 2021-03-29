@@ -4,10 +4,20 @@ namespace Arragro.ObjectHistory.Core.Models
 {
     public class ObjectHistoryDetailRead : ObjectHistoryDetailBase
     {
-        public ObjectHistoryDetailRead(string partitionKey, string rowKey, string applicationName, DateTime timeStamp, string user, Guid folder, bool isAdd = false)
-            : base(partitionKey, rowKey, applicationName, timeStamp, user, folder, isAdd) { }
+        public ObjectHistoryDetailRead(ObjectHistoryDetailRaw objectHistoryDetailRaw)
+            : base(objectHistoryDetailRaw.PartitionKey, objectHistoryDetailRaw.RowKey, objectHistoryDetailRaw.ApplicationName, objectHistoryDetailRaw.TimeStamp, 
+                   objectHistoryDetailRaw.User, objectHistoryDetailRaw.Folder, objectHistoryDetailRaw.IsAdd, objectHistoryDetailRaw.SubFolder, 
+                   objectHistoryDetailRaw.SecurityValidationToken)
+        {
+            ObjectHistorySettingsBase = objectHistoryDetailRaw.ObjectHistorySettingsBase;
+            NewJson = objectHistoryDetailRaw.NewJson;
+            OldJson = objectHistoryDetailRaw.OldJson;
+            Diff = objectHistoryDetailRaw.Diff;
+        }
 
-        public ObjectHistorySettings ObjectHistorySettings { get; set; }
+        protected ObjectHistoryDetailRead() : base() { }
+
+        public ObjectHistorySettingsBase ObjectHistorySettingsBase { get; set; }
         public object NewJson { get; set; }
         public object OldJson { get; set; }
         public object Diff { get; set; }
@@ -18,7 +28,7 @@ namespace Arragro.ObjectHistory.Core.Models
             {
                 if (this.IsAdd)
                 {
-                    return new ObjectHistoryDetailRaw(ObjectHistorySettings, PartitionKey, RowKey, ApplicationName, TimeStamp, User, Folder, SecurityValidationToken, IsAdd)
+                    return new ObjectHistoryDetailRaw(ObjectHistorySettingsBase, PartitionKey, RowKey, ApplicationName, TimeStamp, User, Folder, SecurityValidationToken, SubFolder, IsAdd)
                     {
                         NewJson = NewJson.ToString(),
                         OldJson = null,
@@ -27,7 +37,7 @@ namespace Arragro.ObjectHistory.Core.Models
                 }
                 else
                 {
-                    return new ObjectHistoryDetailRaw(ObjectHistorySettings, PartitionKey, RowKey, ApplicationName, TimeStamp, User, Folder, SecurityValidationToken, IsAdd)
+                    return new ObjectHistoryDetailRaw(ObjectHistorySettingsBase, PartitionKey, RowKey, ApplicationName, TimeStamp, User, Folder, SecurityValidationToken, SubFolder, IsAdd)
                     {
                         NewJson = NewJson.ToString(),
                         OldJson = this.OldJson.ToString(),

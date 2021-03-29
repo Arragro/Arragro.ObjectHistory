@@ -1,16 +1,12 @@
-﻿using Arragro.ObjectHistory.Client;
-using Arragro.ObjectHistory.Core.Extentions;
-using Arragro.ObjectHistory.Core.Helpers;
+﻿using Arragro.ObjectHistory.Core.Extentions;
 using Arragro.ObjectHistory.Core.Interfaces;
 using Arragro.ObjectHistory.Core.Models;
-using Azure.Storage.Blobs;
-using Azure.Storage.Queues.Models;
 using JsonDiffPatchDotNet;
 using Newtonsoft.Json.Linq;
 using System;
 using System.Threading.Tasks;
 
-namespace Arragro.ObjectHistory
+namespace Arragro.ObjectHistory.Core.Helpers
 {
     public class ObjectHistoryProcessor
     {
@@ -24,36 +20,36 @@ namespace Arragro.ObjectHistory
             _jsonHelper = new JsonHelper();
         }
 
-        public async Task ProcessMessagesAsync(string message)
+        public async Task ProcessQueueMessageAsync(string blobName)
         {
-            if (string.IsNullOrWhiteSpace(message))
-                throw new ArgumentNullException("message");
+            if (string.IsNullOrWhiteSpace(blobName))
+                throw new ArgumentNullException("blobName");
 
-            await ValidateAndProcessQueueMessage(message);
-        }
-
-        private async Task ValidateAndProcessQueueMessage(string blobName)
-        {
-            var blob = await _storageHelper.GetInputBlobAsync(blobName);
+            var blob = await _storageHelper.GetBlobAsync(blobName);
 
             var objectHistoryDetailsJson = await blob.DownloadTextAsync();
 
             var objectHistoryDetails = _jsonHelper.GetObjectFromJson<ObjectHistoryDetailRead>(objectHistoryDetailsJson);
 
+            await ProcessObjectHistoryDetailAsync(objectHistoryDetails);
+
+            await blob.DeleteAsync();
+        }
+
+        public async Task ProcessObjectHistoryDetailAsync(ObjectHistoryDetailRead objectHistoryDetails)
+        {
             if (!objectHistoryDetails.IsAdd)
             {
-                objectHistoryDetails.Diff = ProcessDiff(objectHistoryDetails.OldJson.ToString(), objectHistoryDetails.NewJson.ToString());
+                objectHistoryDetails.Diff = ProcessDiff(objectHistoryDetails.OldJson.ToString(), objectHistoryDetails.NewJson.ToString()).ToString();
             }
 
             var objectHistoryJson = _jsonHelper.GetJson(objectHistoryDetails);
 
-            await _storageHelper.UploadJsonFileAsync(objectHistoryDetails.Folder, objectHistoryDetails.SubFolder, "ObjectHistory.json", objectHistoryJson);
+            await _storageHelper.UploadJsonFileAsync(objectHistoryDetails.Folder, objectHistoryDetails.SubFolder, Constants.ObjectHistoryFileName, objectHistoryJson);
 
             await _storageHelper.AddObjectHistoryEntityRecordAsync(objectHistoryDetails);
 
             await _storageHelper.AddObjectHistoryGlobalAsync(objectHistoryDetails);
-
-            await blob.DeleteAsync();
         }
 
         private JToken ProcessDiff(string oldjson, string newjson)

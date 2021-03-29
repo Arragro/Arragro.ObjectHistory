@@ -6,43 +6,19 @@ namespace Arragro.ObjectHistory.Core.Models
 {
     public class ObjectHistoryDetailRaw : ObjectHistoryDetailBase
     {
-        internal ObjectHistoryDetailRaw(ObjectHistorySettings objectHistorySettings, string partitionKey, string rowKey, string applicationName, DateTime timeStamp, string user, Guid folder, string securityValidationToken, bool isAdd = false)
-            : base(partitionKey, rowKey, applicationName, timeStamp, user, folder, isAdd)
+        internal ObjectHistoryDetailRaw(ObjectHistorySettingsBase objectHistorySettingsBase, string partitionKey, string rowKey, string applicationName, DateTime timeStamp, string user, Guid folder, string securityValidationToken, Guid? subFolder, bool isAdd = false)
+            : base(partitionKey, rowKey, applicationName, timeStamp, user, folder, isAdd, subFolder, securityValidationToken)
         {
-            ObjectHistorySettings = objectHistorySettings;
+            ObjectHistorySettingsBase = objectHistorySettingsBase;
+        } 
+
+        public ObjectHistoryDetailRaw(ObjectHistorySettingsBase objectHistorySettingsBase, string partitionKey, string applicationName, string user, Guid? folder = null, string securityValidationToken = null, bool isAdd = false)
+            : base(partitionKey, string.Format("{0:D19}", DateTime.MaxValue.Ticks - DateTime.UtcNow.Ticks), applicationName, DateTime.UtcNow, user, folder.HasValue ? folder.Value : Guid.NewGuid(), isAdd, folder.HasValue ? Guid.NewGuid() : (Guid?)null, securityValidationToken)
+        {
+            ObjectHistorySettingsBase = objectHistorySettingsBase;
         }
 
-        public ObjectHistoryDetailRaw(ObjectHistorySettings objectHistorySettings, string partitionKey, string applicationName, DateTime timeStamp, string user, bool isAdd = false)
-            : base(partitionKey, string.Format("{0:D19}", DateTime.MaxValue.Ticks - timeStamp.Ticks), applicationName, timeStamp, user, Guid.NewGuid(), isAdd)
-        {
-            ObjectHistorySettings = objectHistorySettings;
-        }
-
-        public ObjectHistoryDetailRaw(ObjectHistorySettings objectHistorySettings, string partitionKey, string applicationName, string user, string securityValidationToken, bool isAdd = false)
-            : base(partitionKey, string.Format("{0:D19}", DateTime.MaxValue.Ticks - DateTime.UtcNow.Ticks), applicationName, DateTime.UtcNow, user, Guid.NewGuid(), isAdd, null, securityValidationToken)
-        {
-            ObjectHistorySettings = objectHistorySettings;
-        }
-
-        public ObjectHistoryDetailRaw(ObjectHistorySettings objectHistorySettings, string partitionKey, string applicationName, string user, bool isAdd = false)
-            : base(partitionKey, string.Format("{0:D19}", DateTime.MaxValue.Ticks - DateTime.UtcNow.Ticks), applicationName, DateTime.UtcNow, user, Guid.NewGuid(), isAdd)
-        {
-            ObjectHistorySettings = objectHistorySettings;
-        }
-
-        public ObjectHistoryDetailRaw(ObjectHistorySettings objectHistorySettings, string partitionKey, string applicationName, string user, string securityValidationToken, Guid folder, bool isAdd = false)
-            : base(partitionKey, string.Format("{0:D19}", DateTime.MaxValue.Ticks - DateTime.UtcNow.Ticks), applicationName, DateTime.UtcNow, user, folder, isAdd, Guid.NewGuid(), securityValidationToken)
-        {
-            ObjectHistorySettings = objectHistorySettings;
-        }
-
-        public ObjectHistoryDetailRaw(ObjectHistorySettings objectHistorySettings, string partitionKey, string applicationName, string user, Guid folder, bool isAdd = false)
-            : base(partitionKey, string.Format("{0:D19}", DateTime.MaxValue.Ticks - DateTime.UtcNow.Ticks), applicationName, DateTime.UtcNow, user, folder, isAdd, Guid.NewGuid())
-        {
-            ObjectHistorySettings = objectHistorySettings;
-        }
-
-        public ObjectHistorySettings ObjectHistorySettings { get; set; }
+        public ObjectHistorySettingsBase ObjectHistorySettingsBase { get; set; }
         [JsonConverter(typeof(RawJsonConverter))]
         public string NewJson { get; set; }
         [JsonConverter(typeof(RawJsonConverter))]

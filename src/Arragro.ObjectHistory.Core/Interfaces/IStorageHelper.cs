@@ -11,7 +11,7 @@ namespace Arragro.ObjectHistory.Core.Interfaces
         Task AddObjectHistoryGlobalAsync(ObjectHistoryDetailBase objectHistoryDetails);
         Task<string> DownloadBlob(Guid folder, Guid? subFolder, string filename);
         Task<ObjectHistoryEntity> GetLastObjectHistoryEntity(string partitionKey);
-        Task<BlobClient> GetInputBlobAsync(string blobName);
+        Task<BlobClient> GetBlobAsync(string blobName);
         Task<Guid?> GetLatestBlobFolderNameByPartitionKeyAsync(string partitionKey);
         Task<ObjectHistoryEntity> GetObjectHistoryRecord(string partitionKey, string rowKey);
         Task<ObjectHistoryQueryResultContainer> GetObjectHistoryRecordsByApplicationNamePartitionKey(string partitionKey, PagingToken pagingToken);
