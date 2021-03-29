@@ -15,6 +15,7 @@ namespace Arragro.ObjectHistory.WebExample.Controllers
             _sessionRepository = sessionRepository;
         }
 
+        // Not used by app, but url /session/index/{id} provides a knockout example...
         public async Task<IActionResult> Index(int? id)
         {
             if (!id.HasValue)
@@ -39,6 +40,9 @@ namespace Arragro.ObjectHistory.WebExample.Controllers
             return View(viewModel);
         }
 
+        // Returns the react page and loads the react client for a session or history
+        // /session/{id}
+        // /arragro-object-history/{id}
         public ActionResult SpaIndex()
         {
             return View();

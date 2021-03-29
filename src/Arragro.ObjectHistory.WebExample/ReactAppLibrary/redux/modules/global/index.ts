@@ -1,8 +1,7 @@
 ﻿import { Services } from './services'
-import { objectHistory, ObjectHistoryAction } from './reducer'
+import { objectHistory } from './reducer'
 
 export {
     Services,
-    objectHistory,
-    ObjectHistoryAction
+    objectHistory
 }

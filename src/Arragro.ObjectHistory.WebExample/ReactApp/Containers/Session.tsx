@@ -1,26 +1,14 @@
 import * as React from 'react'
 import { Link } from 'react-router-dom'
-import { RouteComponentProps } from 'react-router'
-import { Formik, Form } from 'formik'
+import { useParams } from 'react-router'
+import { Formik, Form, FormikHelpers } from 'formik'
 import * as Yup from 'yup'
-import 'moment'
+import * as dayjs from 'dayjs'
 
 import { utils } from '../../ReactAppLibrary'
 import TextBox from '../FormikControls/TextBox'
 
 const { HttpUtils } = utils
-
-declare var require: any
-let moment = require('moment')
-
-export interface ISessionPageProps {
-    id: string
-}
-
-export interface ISessionPageState {
-    sessionDrillContainer?: ISessionDrillContainer
-}
-
 export interface IDrillData {
     id: string
     name: string
@@ -43,22 +31,16 @@ export interface IDrillForm {
     duration: number
 }
 
-type ComponentPropeties = RouteComponentProps<ISessionPageProps>
+const SessionPage = () => {
+    const params = useParams<{ id: string }>()
 
-export default class SessionPage extends React.Component<ComponentPropeties, ISessionPageState> {
+    const [sessionDrillContainer, setSessionDrillContainer] = React.useState<ISessionDrillContainer | null>(null)
 
-    constructor (props: ComponentPropeties) {
-        super(props)
-
-        this.state = {}
-
-        utils.HttpUtils.get<ISessionDrillContainer>(`/api/drills/forsession/${this.props.match.params.id}`)
+    React.useEffect(() => {
+        utils.HttpUtils.get<ISessionDrillContainer>(`/api/drills/forsession/${params.id}`)
             .then((response) => {
                 if (response.ok) {
-                    this.setState({
-                        ...this.state,
-                        sessionDrillContainer: response.data
-                    })
+                    setSessionDrillContainer(response.data)
                 } else {
                     alert('Something went wrong getting drill data')
                 }
@@ -66,12 +48,10 @@ export default class SessionPage extends React.Component<ComponentPropeties, ISe
             .catch(ex => {
                 console.log(ex)
             })
-    }
+    }, [])
 
-    getDrills = () => {
-        const { sessionDrillContainer } = this.state
-
-        if (sessionDrillContainer === undefined) {
+    const getDrills = () => {
+        if (sessionDrillContainer === null) {
             return null
         }
 
@@ -94,8 +74,15 @@ export default class SessionPage extends React.Component<ComponentPropeties, ISe
         return output
     }
 
-    submitForm = (drill: IDrillForm, setSubmitting: (isSubmitting: boolean) => void, resetForm: (nextValues: IDrillForm) => void) => {
-        const { sessionDrillContainer } = this.state
+    const getInitialValues = (): IDrillForm => {
+        return {
+            name: '',
+            description: '',
+            duration: 10
+        }
+    }
+
+    const submitForm = (drill: IDrillForm, formikHelpers: FormikHelpers<IDrillForm>) => {
         const drillPostData = {
             sessionId: sessionDrillContainer!.id,
             ...drill
@@ -103,12 +90,10 @@ export default class SessionPage extends React.Component<ComponentPropeties, ISe
         HttpUtils.post<IDrillForm, ISessionDrillContainer>('/api/drills/create', drillPostData)
             .then((response) => {
                 if (response.ok) {
-                    this.setState({
-                        ...this.state,
-                        sessionDrillContainer: response.data
-                    }, () => resetForm(this.getInitialValues()))
+                    setSessionDrillContainer(response.data)
+                    formikHelpers.resetForm({ values: getInitialValues() })
                 } else {
-                    setSubmitting(false)
+                    formikHelpers.setSubmitting(false)
                     alert('Something went wrong posting drill data')
                 }
             })
@@ -117,100 +102,90 @@ export default class SessionPage extends React.Component<ComponentPropeties, ISe
             })
     }
 
-    render () {
-        const { sessionDrillContainer } = this.state
 
-        if (sessionDrillContainer === undefined) {
-            return null
-        }
+    if (sessionDrillContainer === null) {
+        return null
+    }
 
-        return <utils.Aux>
-            <h2>Training Session: {sessionDrillContainer.name} - <Link to={`/arragro-object-history/${sessionDrillContainer.objectHistoryKey}`}>History</Link></h2>
-            <div className='small'>{moment.utc(sessionDrillContainer.dateCreated).local().format('DD/MM/YYYY h:mm:ss a')}</div>
-            <div className='row'>
-                <div className='col-md-9'>
-                    <h3>Drill Count: {sessionDrillContainer.drills.length}</h3>
-                    <div>
-                        {this.getDrills()}
-                    </div>
+    return <>
+        <h2>Training Session: {sessionDrillContainer.name} - <Link to={`/arragro-object-history/${sessionDrillContainer.objectHistoryKey}`}>History</Link></h2>
+        <div className='small'>{dayjs.utc(sessionDrillContainer.dateCreated).local().format('DD/MM/YYYY h:mm:ss a')}</div>
+        <div className='row'>
+            <div className='col-md-9'>
+                <h3>Drill Count: {sessionDrillContainer.drills.length}</h3>
+                <div>
+                    {getDrills()}
                 </div>
-                <div className='col-md-3'>
-                    <div className='panel panel-primary'>
-                        <div className='panel-heading'>
-                            Add New Drill
-                        </div>
-                        <div className='panel-body'>
-                            <Formik
-                                initialValues={this.getInitialValues()}
-                                onSubmit={(values: IDrillForm, { setSubmitting, resetForm }) => {
-                                    this.submitForm(values, setSubmitting, resetForm)
-                                }}
-                                validationSchema={Yup.object().shape({
-                                    name: Yup.string()
-                                        .required('Please supply Name')
-                                        .max(20, 'There is a 20 character limit to this field.'),
-                                    description: Yup.string()
-                                        .required('Please supply Description')
-                                        .max(50, 'There is a 50 character limit to this field.'),
-                                    duration: Yup.number()
-                                        .required('Please supply Duration')
-                                })}
-                                render={({ submitCount, handleBlur, handleChange, values, errors, isSubmitting }) => (
-                                    <Form className={submitCount > 0 ? 'was-validated' : ''}>
-                                        <TextBox
-                                            type='text'
-                                            label='Name'
-                                            id='name'
-                                            submitCount={submitCount}
-                                            value={values.name}
-                                            error={errors.name}
-                                            handleChange={handleChange}
-                                            handleBlur={handleBlur}
-                                        />
+            </div>
+            <div className='col-md-3'>
+                <div className='panel panel-primary'>
+                    <div className='panel-heading'>
+                        Add New Drill
+                    </div>
+                    <div className='panel-body'>
+                        <Formik
+                            initialValues={getInitialValues()}
+                            onSubmit={(values, formikHelpers) => {
+                                submitForm(values, formikHelpers)
+                            }}
+                            validationSchema={Yup.object().shape({
+                                name: Yup.string()
+                                    .required('Please supply Name')
+                                    .max(20, 'There is a 20 character limit to this field.'),
+                                description: Yup.string()
+                                    .required('Please supply Description')
+                                    .max(50, 'There is a 50 character limit to this field.'),
+                                duration: Yup.number()
+                                    .required('Please supply Duration')
+                            })}>
+                            {({ submitCount, handleBlur, handleChange, values, errors, isSubmitting }) => (
+                                <Form className={submitCount > 0 ? 'was-validated' : ''}>
+                                    <TextBox
+                                        type='text'
+                                        label='Name'
+                                        id='name'
+                                        submitCount={submitCount}
+                                        value={values.name}
+                                        error={errors.name}
+                                        handleChange={handleChange}
+                                        handleBlur={handleBlur}
+                                    />
 
-                                        <TextBox
-                                            type='text'
-                                            label='Description'
-                                            id='description'
-                                            submitCount={submitCount}
-                                            value={values.description}
-                                            error={errors.description}
-                                            handleChange={handleChange}
-                                            handleBlur={handleBlur}
-                                        />
+                                    <TextBox
+                                        type='text'
+                                        label='Description'
+                                        id='description'
+                                        submitCount={submitCount}
+                                        value={values.description}
+                                        error={errors.description}
+                                        handleChange={handleChange}
+                                        handleBlur={handleBlur}
+                                    />
 
-                                        <TextBox
-                                            type='number'
-                                            label='Duration'
-                                            id='duration'
-                                            submitCount={submitCount}
-                                            value={values.duration.toString()}
-                                            error={errors.duration}
-                                            handleChange={handleChange}
-                                            handleBlur={handleBlur}
-                                        />
-                                        <button type='submit' className='btn btn-primary' disabled={isSubmitting}>Add Drill</button>
-                                    </Form>
-                                )}
-                            >
-                            </Formik>
-                        </div>
+                                    <TextBox
+                                        type='number'
+                                        label='Duration'
+                                        id='duration'
+                                        submitCount={submitCount}
+                                        value={values.duration.toString()}
+                                        error={errors.duration}
+                                        handleChange={handleChange}
+                                        handleBlur={handleBlur}
+                                    />
+                                    <button type='submit' className='btn btn-primary' disabled={isSubmitting}>Add Drill</button>
+                                </Form>
+                            )}
+                        </Formik>
                     </div>
                 </div>
             </div>
-            <div className='row'>
-                <div className='col-md-12'>
-                    <a href='/'>Return home</a>
-                </div>
+        </div>
+        <div className='row'>
+            <div className='col-md-12'>
+                <a href='/'>Return home</a>
             </div>
-        </utils.Aux>
-    }
-
-    private getInitialValues = (): IDrillForm => {
-        return {
-            name: '',
-            description: '',
-            duration: 10
-        }
-    }
+        </div>
+    </>
 }
+
+export default SessionPage

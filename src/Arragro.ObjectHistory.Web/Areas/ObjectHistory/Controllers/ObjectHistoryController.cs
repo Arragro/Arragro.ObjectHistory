@@ -1,9 +1,9 @@
-﻿using Arragro.ObjectHistory.Client;
-using Arragro.ObjectHistory.Core;
+﻿using Arragro.ObjectHistory.Core;
+using Arragro.ObjectHistory.Core.Models;
 using Arragro.ObjectHistory.Web.Areas.ObjectHistory.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.WindowsAzure.Storage.Table;
+using Microsoft.Azure.Cosmos.Table;
 using System.Threading.Tasks;
 
 namespace Arragro.ObjectHistory.Web.Areas.ObjectHistory.Controllers
@@ -12,11 +12,11 @@ namespace Arragro.ObjectHistory.Web.Areas.ObjectHistory.Controllers
     [Area("ObjectHistory")]
     [IgnoreAntiforgeryToken]
     [Route("arragro-object-history")]
-    public class HomeController : Controller
+    public class ObjectHistoryController : Controller
     {
         private readonly IObjectHistoryClient _objectHistoryClient;
 
-        public HomeController(IObjectHistoryClient objectHistoryClient)
+        public ObjectHistoryController(IObjectHistoryClient objectHistoryClient)
         {
             _objectHistoryClient = objectHistoryClient;
         }
@@ -31,7 +31,7 @@ namespace Arragro.ObjectHistory.Web.Areas.ObjectHistory.Controllers
         [Authorize(Policy = "ArragroObjectHistoryGlobalLogPolicy")]
         public async Task<IActionResult> GetGlobalLogs([FromBody] TableContinuationToken tableContinuationToken = null)
         {
-            var entities = await _objectHistoryClient.GetObjectHistoryRecordsByApplicationNamePartitionKeyAsync(tableContinuationToken);
+            var entities = await _objectHistoryClient.GetObjectHistoryRecordsByApplicationNamePartitionKeyAsync(new PagingToken(tableContinuationToken));
 
             return Ok(entities);
         }
@@ -40,7 +40,7 @@ namespace Arragro.ObjectHistory.Web.Areas.ObjectHistory.Controllers
         [ServiceFilter(typeof(IObjectLogsSecurityAttribute))]
         public async Task<IActionResult> GetObjectLogs([FromBody] ObjectLogsPostParameters postParameters)
         {
-            var entities = await _objectHistoryClient.GetObjectHistoryRecordsByObjectNamePartitionKeyAsync(postParameters.PartitionKey, postParameters.TableContinuationToken);
+            var entities = await _objectHistoryClient.GetObjectHistoryRecordsByObjectNamePartitionKeyAsync(postParameters.PartitionKey, new PagingToken(postParameters.TableContinuationToken));
 
             return Ok(entities);
         }

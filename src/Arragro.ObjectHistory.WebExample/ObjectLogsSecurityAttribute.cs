@@ -23,7 +23,8 @@ namespace Arragro.ObjectHistory.WebExample
         private bool TestSecurityValidationToken(ActionExecutingContext context, ObjectHistoryDetailRaw objectHistoryDetailRaw)
         {
             // Some test logic goes here against record.SecurityValidationToken
-            if (objectHistoryDetailRaw.SecurityValidationToken != null)
+            if (objectHistoryDetailRaw != null &&
+                objectHistoryDetailRaw.SecurityValidationToken != null)
             {
                 context.HttpContext.Response.StatusCode = (int)HttpStatusCode.Forbidden;
                 context.HttpContext.Response.Headers.Clear();

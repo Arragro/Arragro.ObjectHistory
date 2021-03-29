@@ -19,6 +19,7 @@ namespace Arragro.ObjectHistory.WebExample.Controllers
             _sessionRepository = sessionRepository;
         }
 
+        // Standard MVC View
         public async Task<IActionResult> Index()
         {
             var sessionList = await _sessionRepository.ListAsync();

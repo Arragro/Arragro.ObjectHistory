@@ -1,6 +1,9 @@
 ﻿
+using Arragro.ObjectHistory.Core.Extentions;
 using Arragro.ObjectHistory.Core.Helpers;
 using Arragro.ObjectHistory.Core.Models;
+using Azure.Storage.Blobs;
+using Azure.Storage.Queues.Models;
 using JsonDiffPatchDotNet;
 using Microsoft.WindowsAzure.Storage.Blob;
 using Microsoft.WindowsAzure.Storage.Queue;
@@ -27,24 +30,24 @@ namespace Arragro.ObjectHistory.AzureFunctions
             await ValidateAndProcessQueueMessage(message);
         }
 
-        private async Task<CloudQueueMessage> GetQueueMessageAsync()
+        private async Task<QueueMessage> GetQueueMessageAsync()
         {
-            return await _objectHistoryService.Queue.GetMessageAsync();
+            return await _objectHistoryService.QueueClient.ReceiveMessageAsync();
         }
 
-        private async Task<CloudBlockBlob> GetObjectHistoryBlobAsync(CloudBlobContainer container, string blobName)
+        private async Task<BlobClient> GetObjectHistoryBlobAsync(BlobContainerClient blobContainerClient, string blobName)
         {
             try
             {
-                var blob = container.GetBlockBlobReference(blobName);
+                var blobClient = blobContainerClient.GetBlobClient(blobName);
 
-                if (!(await blob.ExistsAsync()))
+                if (!(await blobClient.ExistsAsync()))
                     throw new Exception("Blob file {0} in queue does not exist in the container.");
 
-                if (!blob.Name.EndsWith(".json"))
+                if (!blobClient.Name.EndsWith(".json"))
                     throw new Exception("Blob file extension for {0} is not .json ");
 
-                return blob;
+                return blobClient;
             }
             catch (Exception)
             {
@@ -54,7 +57,7 @@ namespace Arragro.ObjectHistory.AzureFunctions
 
         private async Task ValidateAndProcessQueueMessage(string blobName)
         {
-            var blob = await GetObjectHistoryBlobAsync(_objectHistoryService.ObjectContainer, blobName);
+            var blob = await GetObjectHistoryBlobAsync(_objectHistoryService.BlobContainerClient, blobName);
 
             var objectHistoryDetailsJson = await blob.DownloadTextAsync();
             var objectHistoryDetails = _objectHistoryService.JsonHelper.GetObjectFromJson<ObjectHistoryDetailRead>(objectHistoryDetailsJson);

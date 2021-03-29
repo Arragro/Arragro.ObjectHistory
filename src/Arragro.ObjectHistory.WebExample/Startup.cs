@@ -3,7 +3,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Arragro.Core.EntityFrameworkCore.Extensions;
+using Arragro.Core.HostedServices;
 using Arragro.ObjectHistory.Client.Extensions;
+using Arragro.ObjectHistory.Core.Models;
+using Arragro.ObjectHistory.HostedService;
 using Arragro.ObjectHistory.Web;
 using Arragro.ObjectHistory.WebExample.Core.Entities;
 using Arragro.ObjectHistory.WebExample.Core.Interfaces;
@@ -12,11 +15,10 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.SpaServices.Webpack;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace Arragro.ObjectHistory.WebExample
 {
@@ -64,15 +66,26 @@ namespace Arragro.ObjectHistory.WebExample
             });
 
             ConfigureObjectHistoryAuthenticationAndPolicies(services);
-            services.AddArragroObjectHistoryClient<ObjectLogsSecurityAttribute>(Configuration);
+            var objectHistorySettings = new ObjectHistorySettings();
+            Configuration.GetSection("ObjectHistorySettings").Bind(objectHistorySettings);
+            services.AddArragroObjectHistoryClient<ObjectLogsSecurityAttribute>(objectHistorySettings);
 
-            services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+            services.AddMvc()
+                .AddRazorRuntimeCompilation()
+                .AddNewtonsoftJson();
+
+            services
+                .AddScoped<ObjectHistoryProcessor>()
+                .AddQueueJob<ObjectProcessorHostedService>(
+                    objectHistorySettings.AzureStorageConnectionString,
+                    objectHistorySettings.ObjectQueueName
+                 );
 
             services.AddScoped<ITrainingSessionRepository, EFTrainingSessionRepository>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
         {
             if (env.IsDevelopment())
             {
@@ -80,10 +93,10 @@ namespace Arragro.ObjectHistory.WebExample
                 var repository = app.ApplicationServices.GetService<ITrainingSessionRepository>();
                 CreateAndMigrateDatabase(demoDbContext, repository);
 
-                app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
-                {
-                    HotModuleReplacement = true
-                });
+                // app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
+                // {
+                //     HotModuleReplacement = true
+                // });
 
                 app.UseDeveloperExceptionPage();
             }
@@ -96,15 +109,17 @@ namespace Arragro.ObjectHistory.WebExample
             app.UseHttpsRedirection();
             app.UseStaticFiles();
             app.UseCookiePolicy();
+            app.UseRouting();
+            app.UseAuthorization();
 
-            app.UseMvc(routes =>
+            app.UseEndpoints(endpoints =>
             {
-                routes.MapRoute(
-                    name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                endpoints.MapControllerRoute(
+                    name: "default-spa",
+                    pattern: "{controller=Home}/{action=Index}/{id?}");
 
-                routes.MapSpaFallbackRoute("spa-fallback", new { controller = "Session", action = "SpaIndex" });
-            });
+                endpoints.MapFallbackToController("SpaIndex", "Session");
+            });;
         }
 
         public void CreateAndMigrateDatabase(

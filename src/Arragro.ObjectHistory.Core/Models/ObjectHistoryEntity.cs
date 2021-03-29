@@ -1,13 +1,17 @@
-﻿using Microsoft.WindowsAzure.Storage.Table;
+﻿using Microsoft.Azure.Cosmos.Table;
 using System;
 
 namespace Arragro.ObjectHistory.Core.Models
 {
-    public class ObjectHistoryEntity: TableEntity
+    public class ObjectHistoryEntity
     {
+        public string PartitionKey { get; set; }
+        public string RowKey { get; set; }
+
         public string ApplicationName { get; set; }
         public Guid Folder { get; set; }
-        public DateTime OriginTimestamp { get; set; }
+        public Guid? SubFolder { get; set; }
+        public DateTimeOffset Timestamp { get; set; }
         public string User { get; set; }
         public string IsAdd { get; set; }
         /// <summary>
@@ -17,22 +21,36 @@ namespace Arragro.ObjectHistory.Core.Models
 
         public ObjectHistoryEntity() { }
 
-        public ObjectHistoryEntity(string partitionKey, string rowKey)
+        public ObjectHistoryEntity(ObjectHistoryTableEntity objectHistoryTableEntity)
         {
-            this.PartitionKey = partitionKey;
-            this.RowKey = rowKey;
+            PartitionKey = objectHistoryTableEntity.PartitionKey;
+            RowKey = objectHistoryTableEntity.RowKey;
+            ApplicationName = objectHistoryTableEntity.ApplicationName;
+            Folder = objectHistoryTableEntity.Folder;
+            SubFolder = objectHistoryTableEntity.SubFolder;
+            Timestamp = objectHistoryTableEntity.Timestamp;
+            User = objectHistoryTableEntity.User;
+            IsAdd = objectHistoryTableEntity.IsAdd;
+            SecurityValidationToken = objectHistoryTableEntity.SecurityValidationToken;
         }
+    }
 
-        public ObjectHistoryEntity(ObjectHistoryEntity objectHistoryEntity)
+    public class ObjectHistoryTableEntity : TableEntity
+    {
+        public string ApplicationName { get; set; }
+        public Guid Folder { get; set; }
+        public Guid? SubFolder { get; set; }
+        public string User { get; set; }
+        public string IsAdd { get; set; }
+        /// <summary>
+        /// Use this to help any validation you want to apply to the main controller I
+        /// </summary>
+        public string SecurityValidationToken { get; set; }
+
+        public ObjectHistoryTableEntity() { }
+
+        public ObjectHistoryTableEntity(string partitionKey, string rowKey) : base(partitionKey, rowKey)
         {
-            PartitionKey = objectHistoryEntity.PartitionKey;
-            RowKey = objectHistoryEntity.RowKey;
-            User = objectHistoryEntity.User;
-            OriginTimestamp = objectHistoryEntity.OriginTimestamp;
-            Folder = objectHistoryEntity.Folder;
-            Timestamp = objectHistoryEntity.Timestamp;
-            IsAdd = objectHistoryEntity.IsAdd;
-            SecurityValidationToken = objectHistoryEntity.SecurityValidationToken;
         }
     }
 }

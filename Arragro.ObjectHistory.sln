@@ -1,13 +1,11 @@
 ﻿
 Microsoft Visual Studio Solution File, Format Version 12.00
-# Visual Studio 15
-VisualStudioVersion = 15.0.27703.2026
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31112.23
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arragro.ObjectHistory.Client", "src\Arragro.ObjectHistory.Client\Arragro.ObjectHistory.Client.csproj", "{C09509FC-50A7-46FC-AAD2-4894FCDAAE8B}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arragro.ObjectHistory.Core", "src\Arragro.ObjectHistory.Core\Arragro.ObjectHistory.Core.csproj", "{0959FEC5-8867-4F1E-9BB3-60278315F9F2}"
-EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arragro.ObjectHistory.IntegrationTests", "tests\Arragro.ObjectHistory.IntegrationTests\Arragro.ObjectHistory.IntegrationTests.csproj", "{0E38C0F3-4D51-469E-9A17-BA81DCF16F08}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{5871BB9B-4CCE-4223-84F6-8EE3AC63E918}"
 EndProject
@@ -19,11 +17,13 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "build", "build", "{B43E8AD0
 		README.md = README.md
 	EndProjectSection
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arragro.ObjectHistory.AzureFunctions", "src\Arragro.ObjectHistory.AzureFunctions\Arragro.ObjectHistory.AzureFunctions.csproj", "{DC113DD0-704F-4CF6-A54C-292BCC558220}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arragro.ObjectHistory.WebExample", "src\Arragro.ObjectHistory.WebExample\Arragro.ObjectHistory.WebExample.csproj", "{8C299D55-C5A8-4EF7-AAB0-38189CFA8DD5}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arragro.ObjectHistory.Web", "src\Arragro.ObjectHistory.Web\Arragro.ObjectHistory.Web.csproj", "{24F62FD5-5367-48A0-B336-BB4E4768F853}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arragro.ObjectHistory.HostedService", "src\Arragro.ObjectHistory.HostedService\Arragro.ObjectHistory.HostedService.csproj", "{562B9571-04B4-4136-B2F3-B16D0E8805ED}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Arragro.ObjectHistory.IntegrationTests", "tests\Arragro.ObjectHistory.IntegrationTests\Arragro.ObjectHistory.IntegrationTests.csproj", "{53BAD752-64BD-42A8-9977-3CE35EC00037}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,14 +39,6 @@ Global
 		{0959FEC5-8867-4F1E-9BB3-60278315F9F2}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{0959FEC5-8867-4F1E-9BB3-60278315F9F2}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{0959FEC5-8867-4F1E-9BB3-60278315F9F2}.Release|Any CPU.Build.0 = Release|Any CPU
-		{0E38C0F3-4D51-469E-9A17-BA81DCF16F08}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{0E38C0F3-4D51-469E-9A17-BA81DCF16F08}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{0E38C0F3-4D51-469E-9A17-BA81DCF16F08}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{0E38C0F3-4D51-469E-9A17-BA81DCF16F08}.Release|Any CPU.Build.0 = Release|Any CPU
-		{DC113DD0-704F-4CF6-A54C-292BCC558220}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{DC113DD0-704F-4CF6-A54C-292BCC558220}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{DC113DD0-704F-4CF6-A54C-292BCC558220}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{DC113DD0-704F-4CF6-A54C-292BCC558220}.Release|Any CPU.Build.0 = Release|Any CPU
 		{8C299D55-C5A8-4EF7-AAB0-38189CFA8DD5}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{8C299D55-C5A8-4EF7-AAB0-38189CFA8DD5}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8C299D55-C5A8-4EF7-AAB0-38189CFA8DD5}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -55,12 +47,20 @@ Global
 		{24F62FD5-5367-48A0-B336-BB4E4768F853}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{24F62FD5-5367-48A0-B336-BB4E4768F853}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{24F62FD5-5367-48A0-B336-BB4E4768F853}.Release|Any CPU.Build.0 = Release|Any CPU
+		{562B9571-04B4-4136-B2F3-B16D0E8805ED}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{562B9571-04B4-4136-B2F3-B16D0E8805ED}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{562B9571-04B4-4136-B2F3-B16D0E8805ED}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{562B9571-04B4-4136-B2F3-B16D0E8805ED}.Release|Any CPU.Build.0 = Release|Any CPU
+		{53BAD752-64BD-42A8-9977-3CE35EC00037}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{53BAD752-64BD-42A8-9977-3CE35EC00037}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{53BAD752-64BD-42A8-9977-3CE35EC00037}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{53BAD752-64BD-42A8-9977-3CE35EC00037}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(NestedProjects) = preSolution
-		{0E38C0F3-4D51-469E-9A17-BA81DCF16F08} = {5871BB9B-4CCE-4223-84F6-8EE3AC63E918}
+		{53BAD752-64BD-42A8-9977-3CE35EC00037} = {5871BB9B-4CCE-4223-84F6-8EE3AC63E918}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D79B9168-1D29-440C-B873-FCBCF6E5E4C0}

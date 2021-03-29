@@ -1,5 +1,7 @@
 ﻿using Arragro.ObjectHistory.Core;
 using Arragro.ObjectHistory.Core.Helpers;
+using Arragro.ObjectHistory.Core.Interfaces;
+using Arragro.ObjectHistory.Core.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -8,17 +10,17 @@ namespace Arragro.ObjectHistory.Client.Extensions
     public static class ServicesConfiguration
     {
         public static IServiceCollection AddArragroObjectHistoryClient<TObjectLogsSecurityAttribute>(
-            this IServiceCollection services, 
-            IConfiguration configuration)
+            this IServiceCollection services,
+            ObjectHistorySettings objectHistorySettings)
             where TObjectLogsSecurityAttribute : class, IObjectLogsSecurityAttribute
         {
-            var objectHistorySettings = new ObjectHistoryClientSettings();
-            configuration.GetSection("ObjectHistoryClientSettings").Bind(objectHistorySettings);
-            return services
+            services
                 .AddTransient<IObjectLogsSecurityAttribute, TObjectLogsSecurityAttribute>()
                 .AddSingleton(objectHistorySettings)
-                .AddSingleton(new ObjectHistoryService(objectHistorySettings.AzureStorageConnectionString))
+                .AddSingleton<IStorageHelper, AzureStorageHelper>()
                 .AddSingleton<IObjectHistoryClient, ObjectHistoryClient>();
+
+            return services;
         }
     }
 }

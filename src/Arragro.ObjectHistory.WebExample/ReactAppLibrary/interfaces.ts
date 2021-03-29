@@ -32,9 +32,9 @@ export interface IObjectHistoryDetailRaw {
 }
 
 export interface IObjectHistoryQueryResult {
+    partitionKey: string
     rowKey: string
     folder: string
-    objectName: string
     applicationName: string
     queryResultType: QueryResultType
     modifiedBy: string

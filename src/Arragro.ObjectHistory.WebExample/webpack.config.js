@@ -1,12 +1,11 @@
 ﻿const path = require('path');
-const glob = require('glob-all');
 const webpack = require('webpack');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 const CompressionPlugin = require("compression-webpack-plugin");
-const TsConfigPathsPlugin = require('awesome-typescript-loader').TsConfigPathsPlugin;
 
-module.exports = (env) => {
-    const devMode = env === null || env['run-prod'] === undefined || env['run-prod'] === null || env['run-prod'] === false;
+module.exports = (env, argv) => {
+    const mode = argv === undefined ? undefined : argv.mode;
+    const devMode = mode === null || mode === undefined || mode === 'development';
 
     let config = {
         mode: devMode ? 'development' : 'production',
@@ -16,10 +15,7 @@ module.exports = (env) => {
                 react: path.resolve(__dirname, './node_modules/react'),
                 React: path.resolve(__dirname, './node_modules/react')
             },
-            extensions: ['.js', '.jsx', '.ts', '.tsx'],
-            plugins: [
-                new TsConfigPathsPlugin(/* { tsconfig, compiler } */)
-            ]
+            extensions: ['.js', '.jsx', '.ts', '.tsx']
         },
         devServer: {
             hot: true
@@ -31,19 +27,42 @@ module.exports = (env) => {
                     include: /ReactApp/,
                     exclude: [
                         /node_modules/,
-                        path.resolve(__dirname, "../Arragro.ObjectHistory.Web.ReactAppLibrary/node_modules"),
+                        path.resolve(__dirname, "./node_modules"),
                         /obj/
-                    ],
-                    loader: 'awesome-typescript-loader',
-                    query: {
-                        useBabel: true,
-                        useCache: devMode
+                    ],        
+                    use: {
+                        loader: 'babel-loader',
+                        options: {
+                            cacheDirectory: true,
+                            babelrc: false,
+                            presets: [
+                                [
+                                    '@babel/preset-env',
+                                    { 
+                                        targets: { 
+                                            browsers: 'last 2 versions'
+                                        },
+                                        modules: false
+                                    }, // or whatever your project requires
+                                ],
+                                '@babel/preset-typescript',
+                                '@babel/preset-react',
+                            ],
+                            plugins: [
+                                // plugin-proposal-decorators is only needed if you're using experimental decorators in TypeScript
+                                // ['@babel/plugin-proposal-decorators', { legacy: true }],
+                                
+                                ["@babel/plugin-transform-runtime", { "regenerator": true }],
+                                ['@babel/plugin-proposal-class-properties', { loose: true }],
+                                'lodash',
+                                'syntax-dynamic-import',
+                            ],
+                        },
                     }
                 },
                 {
                     test: /\.(sa|sc|c)ss$/,
                     use: [
-                        'css-hot-loader',
                         MiniCssExtractPlugin.loader,
                         {
                             loader: 'css-loader',
@@ -52,18 +71,32 @@ module.exports = (env) => {
                                 sourceMap: true
                             }
                         },
-                        'postcss-loader',
                         {
                             loader: 'sass-loader',
                             options: {
                                 sourceMap: true
                             }
-                        }
+                        },
+                        {
+                            loader: 'postcss-loader',
+                            options: {
+                              postcssOptions: {
+                                plugins: [
+                                  [
+                                    "autoprefixer",
+                                    {
+                                      // Options
+                                    },
+                                  ],
+                                ],
+                              },
+                            },
+                        },
                     ],
                 },
-                { test: /\.(png|woff|woff2|eot|ttf|svg)$/, loader: 'url-loader?limit=100000' },
-                { test: /\.woff(\?\S*)?(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: 'url-loader?limit=10000&mimetype=application/font-woff' },
-                { test: /\.(ttf|eot|svg)(\?\S*)(\?v=[0-9]\.[0-9]\.[0-9])?$/, loader: 'file-loader' }
+                { test: /\.(png|woff|woff2|eot|ttf|svg)$/, use: ['url-loader?limit=100000'] },
+                { test: /\.woff(\?\S*)?(\?v=[0-9]\.[0-9]\.[0-9])?$/, use: ['url-loader?limit=10000&mimetype=application/font-woff'] },
+                { test: /\.(ttf|eot|svg)(\?\S*)(\?v=[0-9]\.[0-9]\.[0-9])?$/, use: ['file-loader'] }
             ]
         },
         entry: {
@@ -93,10 +126,7 @@ module.exports = (env) => {
             }
         },
         plugins: [
-            new MiniCssExtractPlugin({
-                filename: "main.css",
-                chunkFilename: "vendor.css"
-            }),
+            new MiniCssExtractPlugin(),
             // new PurifyCSSPlugin({
             //     // Give paths to parse for rules. These should be absolute!
             //     paths: glob.sync([
@@ -111,14 +141,12 @@ module.exports = (env) => {
             //         ]
             //     }
             // }),
-            require('autoprefixer'),
-            new webpack.optimize.OccurrenceOrderPlugin()
+            require('autoprefixer')
         ].concat(
             devMode ? [
             ] : [
                     new CompressionPlugin({
-                        asset: "[path].gz[query]",
-                        //include: /\/wwwroot/,
+                        include: '/wwwroot/dist',
                         algorithm: "gzip",
                         test: /\.js$|\.css$|\.svg$/,
                         threshold: 10240,

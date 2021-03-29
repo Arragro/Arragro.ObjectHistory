@@ -90,8 +90,8 @@
                 url: '/api/drills/forsession/@Model.Id',
                 dataType: 'json',
                 success: function(data) {
-                    if (data instanceof Array) {
-                        viewModel.drills(data);
+                    if (data.drills instanceof Array) {
+                        viewModel.drills(data.drills);
                     }
                 }
             });

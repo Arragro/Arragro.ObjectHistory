@@ -9,7 +9,7 @@
     <PackageReference Include="Microsoft.NET.Sdk.Functions" Version="1.0.24" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Arragro.ObjectHistory.Core\Arragro.ObjectHistory.Core.csproj" />
+    <ProjectReference Include="..\Arragro.ObjectHistory.Client\Arragro.ObjectHistory.Client.csproj" />
   </ItemGroup>
   <ItemGroup>
     <None Update="host.json">

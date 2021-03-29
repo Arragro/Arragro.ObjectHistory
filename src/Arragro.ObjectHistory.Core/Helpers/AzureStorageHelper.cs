@@ -1,75 +1,48 @@
-﻿using Arragro.ObjectHistory.Core.Models;
-using Microsoft.WindowsAzure.Storage.Blob;
-using Microsoft.WindowsAzure.Storage.Queue;
-using Microsoft.WindowsAzure.Storage.Table;
-using Newtonsoft.Json;
+﻿using Arragro.ObjectHistory.Core.Interfaces;
+using Arragro.ObjectHistory.Core.Models;
+using Microsoft.Azure.Cosmos.Table;
 using System;
-using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace Arragro.ObjectHistory.Core.Helpers
 {
-    public class AzureStorageHelper
+    public class AzureStorageHelper : QueueAndBlobStorageHelper, IStorageHelper
     {
-        public async Task UploadJsonFileAsync(CloudBlobContainer objectContainer, Guid folder, string fileName, string objectHistoryJson)
+        public AzureStorageHelper(ObjectHistorySettings objectHistorySettings) : base(objectHistorySettings)
+        {
+        }
+
+        private async Task<CloudTable> GetObjectHistoryTableAsync()
+        {
+            var tableClient = CloudStorageAccount.Parse(_objectHistorySettings.AzureStorageConnectionString).CreateCloudTableClient();
+            var table = tableClient.GetTableReference(_objectHistorySettings.ObjectHistoryTable);
+            await table.CreateIfNotExistsAsync();
+            return table;
+        }
+
+        private async Task<CloudTable> GetGlobalHistoryTableAsync()
+        {
+            var tableClient = CloudStorageAccount.Parse(_objectHistorySettings.AzureStorageConnectionString).CreateCloudTableClient();
+            var table = tableClient.GetTableReference(_objectHistorySettings.GlobalHistoryTable);
+            await table.CreateIfNotExistsAsync();
+            return table;
+        }
+
+        public async Task AddObjectHistoryEntityRecordAsync(ObjectHistoryDetailBase objectHistoryDetails)
         {
             try
             {
-                var options = new BlobRequestOptions()
-                {
-                    ServerTimeout = TimeSpan.FromMinutes(10)
-                };
-
-                CloudBlockBlob cloudBlockBlob = objectContainer.GetBlockBlobReference($"{folder}/{fileName}");
-
-                using (var ms = new MemoryStream())
-                {
-                    LoadStreamWithJson(ms, objectHistoryJson);
-                    await cloudBlockBlob.UploadFromStreamAsync(ms);
-                }
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        private void LoadStreamWithJson(Stream ms, string file)
-        {
-            StreamWriter writer = new StreamWriter(ms);
-            writer.Write(file);
-            writer.Flush();
-            ms.Position = 0;
-        }
-
-        public async Task SendQueueMessage(CloudQueue queue, string message)
-        {
-            try
-            {
-                var cloudQueueMessage = new CloudQueueMessage(JsonConvert.SerializeObject(new ObjectHistoryMessge { Message = message }));
-                await queue.AddMessageAsync(cloudQueueMessage);
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public async Task AddObjectHistoryEntityRecordAsync(ObjectHistoryDetailBase objectHistoryDetails, CloudTable table)
-        {
-            try
-            {
-                var objectHistoryEntity = new ObjectHistoryEntity(objectHistoryDetails.PartitionKey, objectHistoryDetails.RowKey)
+                var cloudTable = await GetObjectHistoryTableAsync();
+                var objectHistoryEntity = new ObjectHistoryTableEntity(objectHistoryDetails.PartitionKey, objectHistoryDetails.RowKey)
                 {
                     ApplicationName = objectHistoryDetails.ApplicationName,
-                    OriginTimestamp = objectHistoryDetails.TimeStamp,
                     User = objectHistoryDetails.User,
                     Folder = objectHistoryDetails.Folder
                 };
 
                 var insertOperation = TableOperation.Insert(objectHistoryEntity);
-                await table.ExecuteAsync(insertOperation);
+                await cloudTable.ExecuteAsync(insertOperation);
             }
             catch (Exception ex)
             {
@@ -77,20 +50,20 @@ namespace Arragro.ObjectHistory.Core.Helpers
             }
         }
 
-        public async Task AddObjectHistoryGlobalAsync(ObjectHistoryDetailBase objectHistoryDetails, CloudTable table)
+        public async Task AddObjectHistoryGlobalAsync(ObjectHistoryDetailBase objectHistoryDetails)
         {
             try
             {
-                var objectHistoryEntity = new ObjectHistoryGlobalEntity(objectHistoryDetails.ApplicationName, objectHistoryDetails.RowKey)
+                var cloudTable = await GetGlobalHistoryTableAsync();
+                var objectHistoryEntity = new ObjectHistoryGlobalTableEntity(objectHistoryDetails.ApplicationName, objectHistoryDetails.RowKey)
                 {
-                    OriginTimestamp = objectHistoryDetails.TimeStamp,
                     User = objectHistoryDetails.User,
                     ObjectName = objectHistoryDetails.PartitionKey,
                     Folder = objectHistoryDetails.Folder
                 };
 
                 var insertOperation = TableOperation.Insert(objectHistoryEntity);
-                await table.ExecuteAsync(insertOperation);
+                await cloudTable.ExecuteAsync(insertOperation);
             }
             catch (Exception ex)
             {
@@ -98,18 +71,25 @@ namespace Arragro.ObjectHistory.Core.Helpers
             }
         }
 
-        public async Task<ObjectHistoryEntity> GetLastObjectHistoryEntity(string partitionKey, CloudTable table)
+        public async Task<ObjectHistoryEntity> GetLastObjectHistoryEntity(string partitionKey)
         {
-            var query = new TableQuery<ObjectHistoryEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
+            var cloudTable = await GetObjectHistoryTableAsync();
+            var query = new TableQuery<ObjectHistoryTableEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
+            query = query.Take(1);
+            query.TakeCount = 1;
 
-            return (await table.ExecuteQuerySegmentedAsync(query.Take(1), null)).SingleOrDefault();
+            var result = await cloudTable.ExecuteQuerySegmentedAsync(query, null);
+            var objectHistoryTableEntity = result.FirstOrDefault();
+            if (objectHistoryTableEntity == null)
+                return null;
+            return new ObjectHistoryEntity(objectHistoryTableEntity);
         }
 
-        public async Task<Guid?> GetLatestBlobFolderNameByPartitionKeyAsync(string partitionKey, CloudTable table)
+        public async Task<Guid?> GetLatestBlobFolderNameByPartitionKeyAsync(string partitionKey)
         {
             try
             {
-                var objectHistoryEntity = await GetLastObjectHistoryEntity(partitionKey, table);
+                var objectHistoryEntity = await GetLastObjectHistoryEntity(partitionKey);
                 if (objectHistoryEntity == null)
                     return null;
 
@@ -121,15 +101,16 @@ namespace Arragro.ObjectHistory.Core.Helpers
             }
         }
 
-        public async Task<ObjectHistoryEntity> GetObjectHistoryRecord(string partitionKey, string rowKey, CloudTable table)
+        public async Task<ObjectHistoryEntity> GetObjectHistoryRecord(string partitionKey, string rowKey)
         {
             try
             {
-                var retrieveOperation = TableOperation.Retrieve<ObjectHistoryEntity>(partitionKey, rowKey);
+                var cloudTable = await GetObjectHistoryTableAsync();
+                var retrieveOperation = TableOperation.Retrieve<ObjectHistoryTableEntity>(partitionKey, rowKey);
 
-                var retrievedResult = await table.ExecuteAsync(retrieveOperation);
+                var retrievedResult = await cloudTable.ExecuteAsync(retrieveOperation);
 
-                return retrievedResult.Result as ObjectHistoryEntity;
+                return new ObjectHistoryEntity(retrievedResult.Result as ObjectHistoryTableEntity);
             }
             catch (Exception ex)
             {
@@ -137,16 +118,17 @@ namespace Arragro.ObjectHistory.Core.Helpers
             }
         }
 
-        public async Task<ObjectHistoryQueryResultContainer> GetObjectHistoryRecordsByObjectNamePartitionKey(string partitionKey, CloudTable table, TableContinuationToken token)
+        public async Task<ObjectHistoryQueryResultContainer> GetObjectHistoryRecordsByObjectNamePartitionKey(string partitionKey, PagingToken pagingToken)
         {
             try
             {
-                var query = new TableQuery<ObjectHistoryEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
+                var query = new TableQuery<ObjectHistoryTableEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
 
-                var queryResult = await table.ExecuteQuerySegmentedAsync(query.Take(10), token);
-                token = queryResult.ContinuationToken;
+                var cloudTable = await GetObjectHistoryTableAsync();
+                var queryResult = await cloudTable.ExecuteQuerySegmentedAsync(query.Take(10), pagingToken.TableContinuationToken);
+                var tableContinuationToken = queryResult.ContinuationToken;
 
-                var entityResults = new ObjectHistoryQueryResultContainer(queryResult.Results, token, partitionKey);
+                var entityResults = new ObjectHistoryQueryResultContainer(queryResult.Results.Select(x => new ObjectHistoryEntity(x)), tableContinuationToken, partitionKey);
 
                 return entityResults;
             }
@@ -156,37 +138,19 @@ namespace Arragro.ObjectHistory.Core.Helpers
             }
         }
 
-        public async Task<ObjectHistoryQueryResultContainer> GetObjectHistoryRecordsByApplicationNamePartitionKey(string partitionKey, CloudTable table, TableContinuationToken token)
+        public async Task<ObjectHistoryQueryResultContainer> GetObjectHistoryRecordsByApplicationNamePartitionKey(string partitionKey, PagingToken pagingToken)
         {
             try
             {
-                var query = new TableQuery<ObjectHistoryGlobalEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
+                var query = new TableQuery<ObjectHistoryGlobalTableEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
 
-                var queryResult = await table.ExecuteQuerySegmentedAsync(query.Take(10), token);
-                token = queryResult.ContinuationToken;
+                var cloudTable = await GetGlobalHistoryTableAsync();
+                var queryResult = await cloudTable.ExecuteQuerySegmentedAsync(query.Take(10), pagingToken.TableContinuationToken);
+                var tableContinuationToken = queryResult.ContinuationToken;
 
-                var entityResults = new ObjectHistoryQueryResultContainer(queryResult.Results, token, partitionKey);
+                var entityResults = new ObjectHistoryQueryResultContainer(queryResult.Results.Select(x => new ObjectHistoryGlobalEntity(x)), tableContinuationToken, partitionKey);
 
                 return entityResults;
-            }
-            catch (Exception ex)
-            {
-                throw ex;
-            }
-        }
-
-        public Task<string> DownloadBlob(CloudBlobContainer objectContainer, string folder, string filename)
-        {
-            try
-            {
-                var options = new BlobRequestOptions()
-                {
-                    ServerTimeout = TimeSpan.FromMinutes(10)
-                };
-
-                CloudBlockBlob cloudBlockBlob = objectContainer.GetBlockBlobReference($"{folder}/{filename}");
-
-                return cloudBlockBlob.DownloadTextAsync();
             }
             catch (Exception ex)
             {

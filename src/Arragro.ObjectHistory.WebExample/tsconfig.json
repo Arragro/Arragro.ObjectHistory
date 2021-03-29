@@ -4,7 +4,7 @@
         "keyofStringsOnly": true, 
         "target": "es5",
         "jsx": "react",
-        "module": "es6",
+        "module": "esNext",
         "moduleResolution": "node",
         "experimentalDecorators": true,
         "declaration": false,
@@ -15,5 +15,5 @@
         "outDir": "./dist/",
         "lib": ["es6", "es7", "dom"]
     },
-    "exclude": ["dist", "build", "node_modules", "../Arragro.ObjectHistory.Web.ReactAppLibrary/node_modules", "App"]
+    "exclude": ["dist", "build", "node_modules"]
 }

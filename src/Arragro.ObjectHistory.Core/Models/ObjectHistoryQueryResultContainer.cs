@@ -1,4 +1,4 @@
-﻿using Microsoft.WindowsAzure.Storage.Table;
+﻿using Microsoft.Azure.Cosmos.Table;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -18,7 +18,7 @@ namespace Arragro.ObjectHistory.Core.Models
             ContinuationToken = continuationToken;
             PartitionKey = partitionKey;
             //fixt
-            Results = entities.Select(entity => new ObjectHistoryQueryResult(partitionKey, entity));
+            Results = entities.Select(entity => new ObjectHistoryQueryResult(entity));
         }
 
         public ObjectHistoryQueryResultContainer(

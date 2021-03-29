@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker">
+
+    <PropertyGroup>
+        <TargetFramework>net5.0</TargetFramework>
+        <GenerateErrorForMissingTargetingPacks>false</GenerateErrorForMissingTargetingPacks>
+        <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
+        <LangVersion>preview</LangVersion>
+        <UserSecretsId>dotnet-Arragro.ObjectHistory.HostedService-71B3F294-23E1-41D3-85A0-840EAF447F78</UserSecretsId>
+    </PropertyGroup>
+    
+    <ItemGroup>
+        <ProjectReference Include="..\Arragro.ObjectHistory.Client\Arragro.ObjectHistory.Client.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <PackageReference Include="Arragro.Core.HostedServices" Version="5.0.0-alpha-20210226.3" />
+        <PackageReference Include="AspNetCore.HealthChecks.AzureStorage" Version="5.0.1" />
+        <PackageReference Include="AspNetCore.HealthChecks.CosmosDb" Version="5.0.3" />
+        <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="5.0.1" />
+        <PackageReference Include="JsonDiffPatch.Net" Version="2.3.0" />
+        <PackageReference Include="Microsoft.AspNetCore.Diagnostics.HealthChecks" Version="2.2.0" />
+        <PackageReference Include="Microsoft.Extensions.Hosting" Version="5.0.0" />
+        <PackageReference Include="Serilog.AspNetCore" Version="3.4.0" />
+        <PackageReference Include="Serilog.Enrichers.Environment" Version="2.1.3" />
+        <PackageReference Include="Serilog.Settings.Configuration" Version="3.1.0" />
+        <PackageReference Include="Serilog.Sinks.Console" Version="4.0.0-dev-00834" />
+        <PackageReference Include="Serilog.Sinks.Http" Version="7.2.0" />
+        <PackageReference Include="Serilog.Sinks.Seq" Version="5.0.0" />
+    </ItemGroup>
+</Project>

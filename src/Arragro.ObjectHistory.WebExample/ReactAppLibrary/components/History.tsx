@@ -1,73 +1,71 @@
 import * as React from 'react'
-import { connect } from 'react-redux'
-import { withRouter, RouteComponentProps } from 'react-router'
-import { Dispatch } from 'redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { useParams } from 'react-router'
 import { formatters } from 'jsondiffpatch'
 import { Link } from 'react-router-dom'
-import 'moment'
 
 import { Services } from '../redux/modules/global'
 import { StoreState } from '../redux/state'
-import { Aux } from '../utils'
 import { ITableContinuationToken, IObjectHistoryQueryResultContainer, IObjectHistoryQueryResult } from '../interfaces'
 import { QueryResultType } from '../enums'
+import * as dayjs from 'dayjs'
+import { usePrevious } from '../utils/helpers'
 
-declare var require: any
-let moment = require('moment')
-
-export interface IHistoryPageProps {
-    objectName?: string
-}
-
-type ComponentPropeties = Services.ObjectHistoryConnectedState & Services.ObjectHistoryConnectedDispatch & RouteComponentProps<IHistoryPageProps>
-
-class History extends React.Component<ComponentPropeties> {
-    constructor (props: ComponentPropeties) {
-        super(props)
-
-        this.onGetMoreRecordsClick = this.onGetMoreRecordsClick.bind(this)
-        this.onShowDetailsClick = this.onShowDetailsClick.bind(this)
+const History = (props: { objectName?: string }) => {
+    
+    let objectName = ''
+    if (props.objectName) {
+        objectName = props.objectName
+    } else {
+        const params = useParams<{ objectName: string }>()
+        objectName = params.objectName
     }
 
-    handleUrlParams (objectName: string | undefined) {
+    const dispatch = useDispatch()
+    const objectHistory = useSelector((storeState: StoreState) => storeState.objectHistory)
+    const objectHistoryDispatchService = Services.dispatchServices(dispatch)
+    const prevObjectName = usePrevious(objectName)
+
+    const handleUrlParams = (objectName: string | undefined) => {
         if (objectName !== undefined) {
             console.log(objectName)
-            this.props.getObjectRecord({ partitionKey: objectName })
+            objectHistoryDispatchService.getObjectRecord({ partitionKey: objectName })
         } else {
-            this.props.get()
+            objectHistoryDispatchService.get()
         }
     }
 
-    componentDidMount () {
-        this.handleUrlParams(this.props.match.params.objectName)
-    }
+    React.useEffect(() => {
+        handleUrlParams(objectName)
+    }, [])
 
-    componentWillReceiveProps (nextProps: ComponentPropeties) {
-        if (nextProps.match.params.objectName !== this.props.match.params.objectName) {
-            this.handleUrlParams(nextProps.match.params.objectName)
-        }
-    }
+    React.useEffect(() => {
+        if (prevObjectName &&
+            prevObjectName !== objectName)
+            handleUrlParams(objectName)
 
-    onShowDetailsClick = (index: number, history: IObjectHistoryQueryResult) => {
+    }, [objectName])
+
+    const onShowDetailsClick = (index: number, history: IObjectHistoryQueryResult) => {
         if (!history.expanded) {
             if (history.historyDetail === undefined) {
-                this.props.getDetails(index, history.objectName, history.rowKey)
+                objectHistoryDispatchService.getDetails(index, history.partitionKey, history.rowKey)
             }
-            this.props.showDetailsExpand(index)
+            objectHistoryDispatchService.showDetailsExpand(index)
         } else {
-            this.props.showDetailsHide(index)
+            objectHistoryDispatchService.showDetailsHide(index)
         }
     }
 
-    getShowMoreDetails = (history: IObjectHistoryQueryResult, index: number) => {
+    const getShowMoreDetails = (history: IObjectHistoryQueryResult, index: number) => {
         if (history.expanded) {
-            return <a onClick={() => this.onShowDetailsClick(index, history)}>Hide Details</a>
+            return <a onClick={() => onShowDetailsClick(index, history)}>Hide Details</a>
         } else {
-            return <a onClick={() => this.onShowDetailsClick(index, history)}>Show Details</a>
+            return <a onClick={() => onShowDetailsClick(index, history)}>Show Details</a>
         }
     }
 
-    getRows = (resultContainer: IObjectHistoryQueryResultContainer) => {
+    const getRows = (resultContainer: IObjectHistoryQueryResultContainer) => {
 
         let output = []
 
@@ -77,14 +75,14 @@ class History extends React.Component<ComponentPropeties> {
                 let item = resultContainer.results[i]
 
                 const objectName = item.queryResultType === QueryResultType.Global ?
-                    <Link to={`/arragro-object-history/${item.objectName}`}>{item.objectName}</Link> :
-                    <Aux>{resultContainer.partitionKey}</Aux>
+                    <Link to={`/arragro-object-history/${item.partitionKey}`}>{item.partitionKey}</Link> :
+                    <>{resultContainer.partitionKey}</>
 
                 output.push(<tr key={item.folder}>
                     <td>{objectName}</td>
                     <td>{item.modifiedBy}</td>
-                    <td>{moment.utc(item.modifiedDate).local().format('DD/MM/YYYY h:mm:ss a')}</td>
-                    <td>{this.getShowMoreDetails(item, i)}</td>
+                    <td>{dayjs(item.modifiedDate).utc().local().format('DD/MM/YYYY h:mm:ss a')}</td>
+                    <td>{getShowMoreDetails(item, i)}</td>
                 </tr>)
 
                 if (item.expanded && item.historyDetail !== undefined) {
@@ -105,54 +103,44 @@ class History extends React.Component<ComponentPropeties> {
         return output
     }
 
-    onGetMoreRecordsClick = (tableContinuationToken: ITableContinuationToken) => {
-        this.props.getFromToken(tableContinuationToken)
+    const onGetMoreRecordsClick = (tableContinuationToken: ITableContinuationToken) => {
+        objectHistoryDispatchService.getFromToken(tableContinuationToken)
     }
 
-    getMoreRecords = (tableContinuationToken?: ITableContinuationToken | null) => {
+    const getMoreRecords = (tableContinuationToken?: ITableContinuationToken | null) => {
         if (tableContinuationToken === undefined || tableContinuationToken === null) {
             return null
         }
 
-        return <button className='btn btn-primary' onClick={() => this.onGetMoreRecordsClick(tableContinuationToken)}>Get More Records</button>
+        return <button className='btn btn-primary' onClick={() => onGetMoreRecordsClick(tableContinuationToken)}>Get More Records</button>
     }
 
-    render () {
-        const { objectHistory } = this.props
-
-        if (objectHistory.resultContainer === undefined ||
-            objectHistory.loading) {
-            return null
-        }
-
-        return <Aux>
-            <table className='table'>
-                <thead>
-                    <tr>
-                        <th>Object Name</th>
-                        <th>Modified By</th>
-                        <th>Modified Date</th>
-                        <th></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {this.getRows(objectHistory.resultContainer)}
-                </tbody>
-            </table>
-
-            {this.getMoreRecords(objectHistory.resultContainer.continuationToken)}
-        </Aux>
+    if (objectHistory.resultContainer === undefined ||
+        objectHistory.loading) {
+        return null
     }
+
+    if (objectHistory.resultContainer.results && 
+        objectHistory.resultContainer.results.length === 0)
+        return <h3>There is no history for this object</h3>
+
+    return <>
+        <table className='table'>
+            <thead>
+                <tr>
+                    <th>Object Name</th>
+                    <th>Modified By</th>
+                    <th>Modified Date</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                {getRows(objectHistory.resultContainer)}
+            </tbody>
+        </table>
+
+        {getMoreRecords(objectHistory.resultContainer.continuationToken)}
+    </>
 }
 
-const mapStateToProps = (state: StoreState, ownProps: IHistoryPageProps): Services.ObjectHistoryConnectedState => {
-    return {
-        objectHistory: state.objectHistory
-    }
-}
-
-const mapDispatchToProps = (dispatch: Dispatch): Services.ObjectHistoryConnectedDispatch => {
-    return Services.dispatchServices(dispatch)
-}
-
-export default withRouter(connect(mapStateToProps, mapDispatchToProps)(History))
+export default History

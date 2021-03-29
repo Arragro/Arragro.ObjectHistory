@@ -1,21 +1,42 @@
-﻿using Microsoft.WindowsAzure.Storage.Table;
+﻿using Microsoft.Azure.Cosmos.Table;
 using System;
 
 namespace Arragro.ObjectHistory.Core.Models
 {
-    public class ObjectHistoryGlobalEntity : TableEntity
+    public class ObjectHistoryGlobalEntity
     {
+        public string PartitionKey { get; set; }
+        public string RowKey { get; set; }
+
+        public string User { get; set; }
+        public string ObjectName { get; set; }
+        public Guid Folder { get; set; }
+        public Guid? SubFolder { get; set; }
+        public DateTimeOffset Timestamp { get; set; }
+
         public ObjectHistoryGlobalEntity() { }
-        public ObjectHistoryGlobalEntity(string partitionKey, string rowKey)
+        public ObjectHistoryGlobalEntity(ObjectHistoryGlobalTableEntity objectHistoryGlobalTableEntity) 
         {
-            this.PartitionKey = partitionKey;
-            this.RowKey = rowKey;
+            PartitionKey = objectHistoryGlobalTableEntity.PartitionKey;
+            RowKey = objectHistoryGlobalTableEntity.RowKey;
+            User = objectHistoryGlobalTableEntity.User;
+            ObjectName = objectHistoryGlobalTableEntity.ObjectName;
+            Folder = objectHistoryGlobalTableEntity.Folder;
+            SubFolder = objectHistoryGlobalTableEntity.SubFolder;
+            Timestamp = objectHistoryGlobalTableEntity.Timestamp;
+        }
+    }
+
+    public class ObjectHistoryGlobalTableEntity : TableEntity
+    {
+        public ObjectHistoryGlobalTableEntity() { }
+        public ObjectHistoryGlobalTableEntity(string partitionKey, string rowKey) : base (partitionKey, rowKey)
+        {
         }
 
         public string User { get; set; }
         public string ObjectName { get; set; }
         public Guid Folder { get; set; }
-        public DateTime OriginTimestamp { get; set; }
-
+        public Guid? SubFolder { get; set; }
     }
 }

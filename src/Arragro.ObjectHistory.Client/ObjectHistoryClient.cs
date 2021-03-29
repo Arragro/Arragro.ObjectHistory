@@ -1,8 +1,7 @@
 ﻿using Arragro.ObjectHistory.Core;
 using Arragro.ObjectHistory.Core.Helpers;
+using Arragro.ObjectHistory.Core.Interfaces;
 using Arragro.ObjectHistory.Core.Models;
-using Microsoft.WindowsAzure.Storage.Blob;
-using Microsoft.WindowsAzure.Storage.Table;
 using System;
 using System.Threading.Tasks;
 
@@ -10,23 +9,17 @@ namespace Arragro.ObjectHistory.Client
 {
     public class ObjectHistoryClient : IObjectHistoryClient
     {
-        private readonly ObjectHistoryClientSettings _objectHistorySettings;
-        private readonly ObjectHistoryService _objectHistoryService;
-
-        private readonly CloudTable _objectHistoryTable;
-        private readonly CloudTable _globalHistoryTable;
-        private readonly CloudBlobContainer _cloudBlobContainer;
+        private readonly ObjectHistorySettings _objectHistorySettings;
+        private readonly IStorageHelper _storageHelper;
+        private readonly JsonHelper _jsonHelper;
 
         public ObjectHistoryClient(
-            ObjectHistoryClientSettings objectHistorySettings, 
-            ObjectHistoryService objectHistoryService)
+            ObjectHistorySettings objectHistorySettings, 
+            IStorageHelper storageHelper)
         {
             _objectHistorySettings = objectHistorySettings;
-            _objectHistoryService = objectHistoryService;
-
-            _objectHistoryTable = _objectHistoryService.GetObjectHistoryTableAsync(_objectHistorySettings.ObjectHistoryTable).Result;
-            _globalHistoryTable = _objectHistoryService.GetGlobalHistoryTableAsync(_objectHistorySettings.GlobalHistoryTable).Result;
-            _cloudBlobContainer = _objectHistoryService.GetObjectHistoryContainerAsync(_objectHistorySettings.ObjectContainerName).Result;
+            _storageHelper = storageHelper;
+            _jsonHelper = new JsonHelper();
         }
 
         private ObjectHistoryDetailRaw GetObjectHistoryDetailRaw<T>(Func<string> getKeys, string user, bool isAdd)
@@ -48,69 +41,56 @@ namespace Arragro.ObjectHistory.Client
         {
             var trackedObject = GetObjectHistoryDetailRaw<T>(getKeys, user, true);
             trackedObject.OldJson = null;
-            trackedObject.NewJson = _objectHistoryService.JsonHelper.GetJson(newObject, true);
+            trackedObject.NewJson = _jsonHelper.GetJson(newObject, true);
 
-            var trackedObjectJson = _objectHistoryService.JsonHelper.GetJson(trackedObject);
+            var trackedObjectJson = _jsonHelper.GetJson(trackedObject);
 
-            await _objectHistoryService.AzureStorageHelper.UploadJsonFileAsync(_objectHistoryService.ObjectContainer, trackedObject.Folder, ObjectHistoryService.ObjectHistoryRequestFileName, trackedObjectJson);
+            await _storageHelper.UploadJsonFileAsync(trackedObject.Folder, trackedObject.SubFolder,  Constants.ObjectHistoryRequestFileName, trackedObjectJson);
 
-            await _objectHistoryService.AzureStorageHelper.SendQueueMessage(_objectHistoryService.Queue, String.Format("{0}/{1}", trackedObject.Folder, ObjectHistoryService.ObjectHistoryRequestFileName));
+            await _storageHelper.SendQueueMessage(trackedObject.SubFolder.HasValue ? $"{trackedObject.Folder}/{trackedObject.SubFolder}/{Constants.ObjectHistoryRequestFileName}" : $"{trackedObject.Folder}/{Constants.ObjectHistoryRequestFileName}");
+
         }
 
         public async Task SaveObjectHistoryAsync<T>(Func<string> getKeys, T oldObject, T newObject, string user)
         {
             var trackedObject = GetObjectHistoryDetailRaw<T>(getKeys, user, false);
-            trackedObject.OldJson = _objectHistoryService.JsonHelper.GetJson(oldObject, true);
-            trackedObject.NewJson = _objectHistoryService.JsonHelper.GetJson(newObject, true);
+            trackedObject.OldJson = _jsonHelper.GetJson(oldObject, true);
+            trackedObject.NewJson = _jsonHelper.GetJson(newObject, true);
 
-            var trackedObjectJson = _objectHistoryService.JsonHelper.GetJson(trackedObject);
+            var trackedObjectJson = _jsonHelper.GetJson(trackedObject);
             
-            await _objectHistoryService.AzureStorageHelper.UploadJsonFileAsync(_objectHistoryService.ObjectContainer, trackedObject.Folder, ObjectHistoryService.ObjectHistoryRequestFileName, trackedObjectJson);
+            await _storageHelper.UploadJsonFileAsync(trackedObject.Folder, trackedObject.SubFolder, Constants.ObjectHistoryRequestFileName, trackedObjectJson);
             
-            await _objectHistoryService.AzureStorageHelper.SendQueueMessage(_objectHistoryService.Queue, String.Format("{0}/{1}",trackedObject.Folder, ObjectHistoryService.ObjectHistoryRequestFileName));
+            await _storageHelper.SendQueueMessage(trackedObject.SubFolder.HasValue ? $"{trackedObject.Folder}/{trackedObject.SubFolder}/{Constants.ObjectHistoryRequestFileName}" : $"{trackedObject.Folder}/{Constants.ObjectHistoryRequestFileName}");
         }
         
-        public async Task<string> GetObjectHistoryRecordsOfSuppliedTypeAndIdAsync<T>(Func<string> getKeys, TableContinuationToken continuationToken = null)
+        public async Task<ObjectHistoryQueryResultContainer> GetObjectHistoryRecordsByObjectNamePartitionKeyAsync(string partitionKey, PagingToken pagingToken = null)
         {
-            var fullyQualifiedName = typeof(T).FullName;
-            var key = getKeys();
-            var partitionKey = $"{fullyQualifiedName}-{key}";
-
-            var entities = _objectHistoryService.JsonHelper.GetJson( await _objectHistoryService.AzureStorageHelper.GetObjectHistoryRecordsByObjectNamePartitionKey(partitionKey, _objectHistoryTable, null));
-
-            return entities;
+            return  await _storageHelper.GetObjectHistoryRecordsByObjectNamePartitionKey(partitionKey, pagingToken == null ? new PagingToken(null) : pagingToken);
         }
 
-        public async Task<ObjectHistoryQueryResultContainer> GetObjectHistoryRecordsByObjectNamePartitionKeyAsync(string partitionKey, TableContinuationToken continuationToken = null)
+        public async Task<ObjectHistoryQueryResultContainer> GetObjectHistoryRecordsByApplicationNamePartitionKeyAsync(PagingToken pagingToken = null)
         {
-            return  await _objectHistoryService.AzureStorageHelper.GetObjectHistoryRecordsByObjectNamePartitionKey(partitionKey, _objectHistoryTable, continuationToken);
-        }
-
-        public async Task<ObjectHistoryQueryResultContainer> GetObjectHistoryRecordsByApplicationNamePartitionKeyAsync(TableContinuationToken continuationToken = null)
-        {
-            return await _objectHistoryService.AzureStorageHelper.GetObjectHistoryRecordsByApplicationNamePartitionKey(_objectHistorySettings.ApplicationName, _globalHistoryTable, continuationToken);
-        }
-
-        public async Task<string> GetObjectHistoryFileAsync(string folder)
-        {
-            return await _objectHistoryService.AzureStorageHelper.DownloadBlob(_objectHistoryService.ObjectContainer, folder, ObjectHistoryService.ObjectHistoryFileName);
+            return await _storageHelper.GetObjectHistoryRecordsByApplicationNamePartitionKey(_objectHistorySettings.ApplicationName, pagingToken == null ? new PagingToken(null) : pagingToken);
         }
 
         public async Task<ObjectHistoryDetailRaw> GetObjectHistoryDetailRawAsync(string partitionKey, string rowKey)
         {
-            var objectHistoryEntity = await _objectHistoryService.AzureStorageHelper.GetObjectHistoryRecord(partitionKey, rowKey, _objectHistoryTable);
-            var json = await _objectHistoryService.AzureStorageHelper.DownloadBlob(_cloudBlobContainer, objectHistoryEntity.Folder.ToString(), ObjectHistoryService.ObjectHistoryFileName);
-            var read = _objectHistoryService.JsonHelper.GetObjectFromJson<ObjectHistoryDetailRead>(json);
+            var objectHistoryEntity = await _storageHelper.GetObjectHistoryRecord(partitionKey, rowKey);
+            var json = await _storageHelper.DownloadBlob(objectHistoryEntity.Folder, objectHistoryEntity.SubFolder, Constants.ObjectHistoryFileName);
+            var read = _jsonHelper.GetObjectFromJson<ObjectHistoryDetailRead>(json);
 
             return read.GetObjectHistoryDetailRaw();
         }
 
         public async Task<ObjectHistoryDetailRaw> GetObjectHistoryDetailRawAsync(string partitionKey)
         {
-            var objectHistoryEntity = await _objectHistoryService.AzureStorageHelper.GetLastObjectHistoryEntity(partitionKey, _objectHistoryTable);
+            var objectHistoryEntity = await _storageHelper.GetLastObjectHistoryEntity(partitionKey);
+            if (objectHistoryEntity == null)
+                return null;
 
-            var json = await _objectHistoryService.AzureStorageHelper.DownloadBlob(_cloudBlobContainer, objectHistoryEntity.Folder.ToString(), ObjectHistoryService.ObjectHistoryFileName);
-            var read = _objectHistoryService.JsonHelper.GetObjectFromJson<ObjectHistoryDetailRead>(json);
+            var json = await _storageHelper.DownloadBlob(objectHistoryEntity.Folder, objectHistoryEntity.SubFolder, Constants.ObjectHistoryFileName);
+            var read = _jsonHelper.GetObjectFromJson<ObjectHistoryDetailRead>(json);
 
             return read.GetObjectHistoryDetailRaw();
         }

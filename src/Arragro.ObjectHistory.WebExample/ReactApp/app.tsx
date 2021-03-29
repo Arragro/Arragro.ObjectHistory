@@ -1,15 +1,19 @@
 import * as React from 'react'
-import { Switch, Route } from 'react-router-dom'
+import { Switch, Route, BrowserRouter } from 'react-router-dom'
 
 import { Containers as LibraryContainers } from '../ReactAppLibrary'
 import * as Containers from './Containers'
 
+import * as dayjs from 'dayjs'
+import * as utc from 'dayjs/plugin/utc'
+
+dayjs.extend(utc)
 export interface IAppProps {
     logoUrl?: string,
     applicationName?: string
 }
 
-export const App: React.StatelessComponent<IAppProps> = (props) => {
+export const App = (props: IAppProps) => {
     let { logoUrl, applicationName } = props
     if (!logoUrl) {
         logoUrl = '/public/images/svg/ArragroLogo.svg'
@@ -18,10 +22,10 @@ export const App: React.StatelessComponent<IAppProps> = (props) => {
         applicationName = 'Arragro Object History'
     }
 
-    return <React.Fragment>
+    return <BrowserRouter>
         <Switch>
             <Route path='/session/:id' component={ Containers.Session } />
             <Route path='/arragro-object-history/:objectName?' component={ LibraryContainers.Home } />
         </Switch>
-    </React.Fragment>
+    </BrowserRouter>
 }

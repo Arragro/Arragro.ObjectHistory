@@ -2,12 +2,11 @@
 import * as ReactDOM from 'react-dom'
 import { Provider } from 'react-redux'
 import { IntlProvider } from 'react-intl'
-import { ConnectedRouter } from 'react-router-redux'
-import { AppContainer } from 'react-hot-loader'
 import { configureStore, Redux, utils, Components } from '../ReactAppLibrary'
 import { App } from './app'
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css'
 import '../ReactAppLibrary/scss/site.scss'
+import { Router } from 'react-router'
 
 const { History } = utils
 // prepare store
@@ -16,28 +15,24 @@ const store = configureStore(History, true, initialState)
 
 const renderComponent = (Component: any, el: HTMLElement) => {
     ReactDOM.render(
-        <AppContainer>
             <Provider store={store}>
-                <IntlProvider>
+                <IntlProvider locale='en'>
                     {Component}
                 </IntlProvider>
-            </Provider>
-        </AppContainer>,
+            </Provider>,
         el
     )
 }
 
 const render = (Component: any, el: HTMLElement) => {
     ReactDOM.render(
-        <AppContainer>
-            <Provider store={store}>
-                <IntlProvider>
-                    <ConnectedRouter history={History}>
-                        <Component />
-                    </ConnectedRouter>
-                </IntlProvider>
-            </Provider>
-        </AppContainer>,
+        <Provider store={store}>
+            <IntlProvider locale='en'>
+                <Router history={History}>
+                    <Component />
+                </Router>
+            </IntlProvider>
+        </Provider>,
         el
     )
 }
@@ -54,13 +49,4 @@ if (rootElKnownPartitionKey !== null) {
 
 if (rootEl !== null) {
     render(App, rootEl)
-
-    if (module.hot) {
-        module.hot.accept([
-            './index.tsx'
-        ], () => {
-            const app = require('./index.tsx').default
-            render(app, rootEl)
-        })
-    }
 }
