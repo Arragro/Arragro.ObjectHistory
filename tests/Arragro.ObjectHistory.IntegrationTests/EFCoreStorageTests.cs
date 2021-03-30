@@ -10,31 +10,78 @@ using Microsoft.Extensions.DependencyInjection;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using Xunit;
 
+[assembly: CollectionBehavior(DisableTestParallelization = true)]
 namespace Arragro.ObjectHistory.IntegrationTests
 {
-    public class AzureStorageTests : IDisposable
+    public class EFCoreStorageTests : IDisposable
     {
         protected readonly IServiceProvider _serviceProvider;
         protected readonly ObjectHistorySettings _objectHistorySettings;
         protected const string AzureStorageConnectionString = "DefaultEndpointsProtocol=http;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;BlobEndpoint=http://127.0.0.1:10000/devstoreaccount1;QueueEndpoint=http://127.0.0.1:10001/devstoreaccount1;TableEndpoint=http://127.0.0.1:10002/devstoreaccount1;";
-        
-        public AzureStorageTests()
+
+        private static string fileName = $"{Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location)}\\arragro-object-history.db";
+        private static string sqliteConnectionString = $"Data Source={fileName};";
+
+        public EFCoreStorageTests(StorageType storageType)
         {
-            DockerExtentions.StartDockerServicesAsync(new List<Func<DockerClient, Task<ContainerListResponse>>>
+            switch(storageType)
             {
-                AzuriteMicrosoft.StartAzuriteMicrosoft,
-                AzuriteTables.StartAzuriteTables
-            }).Wait();
+                case StorageType.SqlServer:
+                    DockerExtentions.StartDockerServicesAsync(new List<Func<DockerClient, Task<ContainerListResponse>>>
+                    {
+                        AzuriteMicrosoft.StartAzuriteMicrosoft,
+                        SqlServer.StartSqlServer
+                    }).Wait();
+                    break;
+                case StorageType.Postgres:
+                    DockerExtentions.StartDockerServicesAsync(new List<Func<DockerClient, Task<ContainerListResponse>>>
+                    {
+                        AzuriteMicrosoft.StartAzuriteMicrosoft,
+                        Postgres.StartPostgres
+                    }).Wait();
+                    break;
+                case StorageType.Sqlite:
+                    DockerExtentions.StartDockerServicesAsync(new List<Func<DockerClient, Task<ContainerListResponse>>>
+                    {
+                        AzuriteMicrosoft.StartAzuriteMicrosoft
+                    }).Wait();
+                    break;
+
+            }
+
+            if (File.Exists(fileName))
+                File.Delete(fileName);
+
+            var postgresConnectionString = "host=localhost;port=5432;database=arragro-object-history;user id=postgres;password=password1;";
+            var sqlServerConnectionString = "Server=127.0.0.1,1435;Database=arragro-object-history;User Id=sa;Password=P@ssword123;";
+
+            var connectionString = "";
+            switch (storageType)
+            {
+                case StorageType.SqlServer:
+                    connectionString = sqlServerConnectionString;
+                    break;
+                case StorageType.Postgres:
+                    connectionString = postgresConnectionString;
+                    break;
+                case StorageType.Sqlite:
+                    connectionString = sqliteConnectionString;
+                    break;
+            }
 
             var serviceCollection = new ServiceCollection();
 
             _objectHistorySettings = new ObjectHistorySettings(
                 AzureStorageConnectionString,
-                "Arragro.ObjectHistory.IntegrationTests");
+                connectionString,
+                "Arragro.ObjectHistory.IntegrationTests",
+                storageType);
 
             serviceCollection.AddSingleton(_objectHistorySettings)
                 .AddArragroObjectHistoryClient<FakeObjectLogsSecurityAttribute>(_objectHistorySettings);
@@ -44,11 +91,13 @@ namespace Arragro.ObjectHistory.IntegrationTests
 
         public void Dispose()
         {
+            if (File.Exists(fileName))
+                File.Delete(fileName);
+
             DockerExtentions.RemoveDockerServicesAsync(true).Wait();
         }
 
-        [Fact]
-        public async Task test_create_process_read_history()
+        protected async Task CreateProcessAndRead()
         {
             var objectHistoryClient = _serviceProvider.GetRequiredService<IObjectHistoryClient>();
             var objectHistoryProcessor = _serviceProvider.GetRequiredService<ObjectHistoryProcessor>();
@@ -71,7 +120,8 @@ namespace Arragro.ObjectHistory.IntegrationTests
 
             await Utils.ProcessQueue(queueClient, objectHistoryProcessor);
 
-            var global = await objectHistoryClient.GetObjectHistoryRecordsByApplicationNamePartitionKeyAsync();
+            var pagingToken = new PagingToken(1, 100);
+            var global = await objectHistoryClient.GetObjectHistoryRecordsByApplicationNamePartitionKeyAsync(pagingToken);
             Assert.Equal(100, global.Results.Count());
 
             ObjectHistoryQueryResultContainer entities;
@@ -114,10 +164,53 @@ namespace Arragro.ObjectHistory.IntegrationTests
             fakeDataContext.FakeDatas.Remove(removeFakeData);
             var deletedFakeData = await objectHistoryClient.GetLatestObjectHistoryDeletedDetailRawAsync($"{typeof(FakeData).FullName}-{removeFakeDataId}");
             Assert.NotNull(deletedFakeData);
-            await objectHistoryClient.DeletedObjectHistoryDeletedByPartitionKey($"{typeof(FakeData).FullName}-{removeFakeDataId}");
+            using (var scope = _serviceProvider.CreateScope())
+            {
+                var tempObjectHistoryClient = scope.ServiceProvider.GetRequiredService<IObjectHistoryClient>();
+                await tempObjectHistoryClient.DeletedObjectHistoryDeletedByPartitionKey($"{typeof(FakeData).FullName}-{removeFakeDataId}");
+            }
             var deletedFakeDataTest = await objectHistoryClient.GetLatestObjectHistoryDeletedDetailRawAsync($"{typeof(FakeData).FullName}-{removeFakeDataId}");
             Assert.Null(deletedFakeDataTest);
             fakeDataContext.FakeDatas = fakeDataContext.FakeDatas.Prepend(JsonConvert.DeserializeObject<FakeData>(deletedFakeData.NewJson)).ToList();
+        }
+    }
+
+    public class EFCoreStorageSqliteTests : EFCoreStorageTests
+    {
+        public EFCoreStorageSqliteTests() : base(StorageType.Sqlite)
+        {
+        }
+
+        [Fact]
+        public async Task test_create_process_read_history()
+        {
+            await CreateProcessAndRead();
+        }
+    }
+
+    public class EFCoreStorageSqlServerTests : EFCoreStorageTests
+    {
+        public EFCoreStorageSqlServerTests() : base(StorageType.SqlServer)
+        {
+        }
+
+        [Fact]
+        public async Task test_create_process_read_history()
+        {
+            await CreateProcessAndRead();
+        }
+    }
+
+    public class EFCoreStoragePostgresTests : EFCoreStorageTests
+    {
+        public EFCoreStoragePostgresTests() : base(StorageType.Postgres)
+        {
+        }
+
+        [Fact]
+        public async Task test_create_process_read_history()
+        {
+            await CreateProcessAndRead();
         }
     }
 }

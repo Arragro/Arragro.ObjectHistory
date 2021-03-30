@@ -6,7 +6,7 @@ import { Link } from 'react-router-dom'
 
 import { Services } from '../redux/modules/global'
 import { StoreState } from '../redux/state'
-import { ITableContinuationToken, IObjectHistoryQueryResultContainer, IObjectHistoryQueryResult } from '../interfaces'
+import { IObjectHistoryQueryResultContainer, IObjectHistoryQueryResult, IPagingToken } from '../interfaces'
 import { QueryResultType } from '../enums'
 import * as dayjs from 'dayjs'
 import { usePrevious } from '../utils/helpers'
@@ -103,16 +103,16 @@ const History = (props: { objectName?: string }) => {
         return output
     }
 
-    const onGetMoreRecordsClick = (tableContinuationToken: ITableContinuationToken) => {
-        objectHistoryDispatchService.getFromToken(tableContinuationToken)
+    const onGetMoreRecordsClick = (pagingToken: IPagingToken) => {
+        objectHistoryDispatchService.getFromToken(pagingToken)
     }
 
-    const getMoreRecords = (tableContinuationToken?: ITableContinuationToken | null) => {
-        if (tableContinuationToken === undefined || tableContinuationToken === null) {
+    const getMoreRecords = (pagingToken?: IPagingToken | null) => {
+        if (pagingToken === undefined || pagingToken === null) {
             return null
         }
 
-        return <button className='btn btn-primary' onClick={() => onGetMoreRecordsClick(tableContinuationToken)}>Get More Records</button>
+        return <button className='btn btn-primary' onClick={() => onGetMoreRecordsClick(pagingToken)}>Get More Records</button>
     }
 
     if (objectHistory.resultContainer === undefined ||
@@ -139,7 +139,7 @@ const History = (props: { objectName?: string }) => {
             </tbody>
         </table>
 
-        {getMoreRecords(objectHistory.resultContainer.continuationToken)}
+        {getMoreRecords(objectHistory.resultContainer.pagingToken)}
     </>
 }
 

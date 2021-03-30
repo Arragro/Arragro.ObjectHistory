@@ -6,5 +6,6 @@
         //public const string ObjectContainerName = "objectprocessor";
         public const string ObjectHistoryRequestFileName = "objecthistoryrequest.json";
         public const string ObjectHistoryFileName = "ObjectHistory.json";
+        public const string ObjectHistoryDeletedFileName = "ObjectHistoryDeleted.json";
     }
 }

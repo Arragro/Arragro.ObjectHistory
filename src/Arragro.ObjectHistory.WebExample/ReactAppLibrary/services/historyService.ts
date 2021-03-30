@@ -1,6 +1,6 @@
 import { HttpUtils } from '../utils'
 import { IFetchResult,
-         ITableContinuationToken,
+         IPagingToken,
          IObjectHistoryQueryResultContainer,
          IObjectLogsPostParameters,
          IObjectHistoryDetailRaw
@@ -8,8 +8,8 @@ import { IFetchResult,
 
 export class HistoryService {
 
-    getGlobalLogs = (tableContinuationToken?: ITableContinuationToken): Promise<IFetchResult<IObjectHistoryQueryResultContainer>> => {
-        return HttpUtils.post('/arragro-object-history/get-global-logs', tableContinuationToken === undefined ? {} : tableContinuationToken)
+    getGlobalLogs = (pagingToken?: IPagingToken): Promise<IFetchResult<IObjectHistoryQueryResultContainer>> => {
+        return HttpUtils.post('/arragro-object-history/get-global-logs', pagingToken === undefined ? {} : pagingToken)
     }
 
     getObjectLogs = (objectLogsPostParameters: IObjectLogsPostParameters): Promise<IFetchResult<IObjectHistoryQueryResultContainer>> => {

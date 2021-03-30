@@ -61,7 +61,7 @@ namespace Arragro.ObjectHistory.Core.Helpers
             }
         }
 
-        public async Task SendQueueMessage(string message)
+        public async Task SendQueueMessageAsync(string message)
         {
             try
             {
@@ -74,7 +74,7 @@ namespace Arragro.ObjectHistory.Core.Helpers
             }
         }
 
-        public async Task<string> DownloadBlob(Guid folder, Guid? subFolder, string filename)
+        public async Task<string> DownloadBlobAsync(Guid folder, Guid? subFolder, string filename)
         {
             try
             {

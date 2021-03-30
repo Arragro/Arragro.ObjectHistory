@@ -18,6 +18,12 @@ export interface ITableContinuationToken {
     targetLocation?: StorageLocation
 }
 
+export interface IPagingToken {
+    tableContinuationToken: ITableContinuationToken
+    page: number
+    pageSize: number
+}
+
 export interface IObjectHistoryDetailRaw {
     partitionKey: string
     rowKey: string
@@ -47,7 +53,7 @@ export interface IObjectHistoryQueryResult {
 export interface IObjectHistoryQueryResultContainer {
     partitionKey: string
     results: Array<IObjectHistoryQueryResult>
-    continuationToken?: ITableContinuationToken | null
+    pagingToken?: IPagingToken | null
 }
 
 export interface IObjectLogsPostParameters {

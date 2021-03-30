@@ -52,6 +52,15 @@ namespace Arragro.ObjectHistory.Core.Helpers
             await _storageHelper.AddObjectHistoryGlobalAsync(objectHistoryDetails);
         }
 
+        public async Task ProcessObjectHistoryDeletedDetailAsync(ObjectHistoryDetailRead objectHistoryDetails)
+        {
+            var objectHistoryJson = _jsonHelper.GetJson(objectHistoryDetails);
+
+            await _storageHelper.UploadJsonFileAsync(objectHistoryDetails.Folder, objectHistoryDetails.SubFolder, Constants.ObjectHistoryDeletedFileName, objectHistoryJson);
+
+            await _storageHelper.AddObjectHistoryDeletedEntityRecordAsync(objectHistoryDetails);
+        }
+
         private JToken ProcessDiff(string oldjson, string newjson)
         {
             try

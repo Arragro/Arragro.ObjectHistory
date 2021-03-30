@@ -1,4 +1,5 @@
 ﻿using Arragro.Core.HostedServices;
+using Arragro.ObjectHistory.AzureStorage;
 using Arragro.ObjectHistory.Core.Helpers;
 using Arragro.ObjectHistory.Core.Interfaces;
 using Arragro.ObjectHistory.Core.Models;

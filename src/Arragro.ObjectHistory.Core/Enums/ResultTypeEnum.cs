@@ -3,6 +3,7 @@
     public enum QueryResultType
     {
         Global,
-        Object
+        Object,
+        Deleted
     }
 }

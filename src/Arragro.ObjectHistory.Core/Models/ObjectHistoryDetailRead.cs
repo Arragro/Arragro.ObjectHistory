@@ -40,8 +40,8 @@ namespace Arragro.ObjectHistory.Core.Models
                     return new ObjectHistoryDetailRaw(ObjectHistorySettingsBase, PartitionKey, RowKey, ApplicationName, TimeStamp, User, Folder, SecurityValidationToken, SubFolder, IsAdd)
                     {
                         NewJson = NewJson.ToString(),
-                        OldJson = this.OldJson.ToString(),
-                        Diff = Diff.ToString()
+                        OldJson = OldJson != null ? OldJson.ToString() : null,
+                        Diff = Diff != null ? Diff.ToString() : null
                     };
                 }
             }

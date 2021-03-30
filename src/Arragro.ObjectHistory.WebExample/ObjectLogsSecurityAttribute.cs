@@ -59,7 +59,7 @@ namespace Arragro.ObjectHistory.WebExample
 
                         try
                         {
-                            var objectHistoryDetailRaw = await _objectHistoryClient.GetObjectHistoryDetailRawAsync(partitionKey);
+                            var objectHistoryDetailRaw = await _objectHistoryClient.GetLatestObjectHistoryDetailRawAsync(partitionKey);
                             if (!TestSecurityValidationToken(context, objectHistoryDetailRaw))
                                 return;
                         }

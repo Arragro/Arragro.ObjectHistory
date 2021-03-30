@@ -3,7 +3,6 @@ using Arragro.ObjectHistory.Core.Models;
 using Arragro.ObjectHistory.Web.Areas.ObjectHistory.Models;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Azure.Cosmos.Table;
 using System.Threading.Tasks;
 
 namespace Arragro.ObjectHistory.Web.Areas.ObjectHistory.Controllers
@@ -29,9 +28,9 @@ namespace Arragro.ObjectHistory.Web.Areas.ObjectHistory.Controllers
 
         [HttpPost("get-global-logs")]
         [Authorize(Policy = "ArragroObjectHistoryGlobalLogPolicy")]
-        public async Task<IActionResult> GetGlobalLogs([FromBody] TableContinuationToken tableContinuationToken = null)
+        public async Task<IActionResult> GetGlobalLogs([FromBody] PagingToken pagingToken = null)
         {
-            var entities = await _objectHistoryClient.GetObjectHistoryRecordsByApplicationNamePartitionKeyAsync(new PagingToken(tableContinuationToken));
+            var entities = await _objectHistoryClient.GetObjectHistoryRecordsByApplicationNamePartitionKeyAsync(pagingToken);
 
             return Ok(entities);
         }
@@ -40,7 +39,7 @@ namespace Arragro.ObjectHistory.Web.Areas.ObjectHistory.Controllers
         [ServiceFilter(typeof(IObjectLogsSecurityAttribute))]
         public async Task<IActionResult> GetObjectLogs([FromBody] ObjectLogsPostParameters postParameters)
         {
-            var entities = await _objectHistoryClient.GetObjectHistoryRecordsByObjectNamePartitionKeyAsync(postParameters.PartitionKey, new PagingToken(postParameters.TableContinuationToken));
+            var entities = await _objectHistoryClient.GetObjectHistoryRecordsByObjectNamePartitionKeyAsync(postParameters.PartitionKey, postParameters.PagingToken);
 
             return Ok(entities);
         }

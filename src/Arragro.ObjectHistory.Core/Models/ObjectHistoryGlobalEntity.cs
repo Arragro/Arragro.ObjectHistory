@@ -1,5 +1,4 @@
-﻿using Microsoft.Azure.Cosmos.Table;
-using System;
+﻿using System;
 
 namespace Arragro.ObjectHistory.Core.Models
 {
@@ -15,28 +14,23 @@ namespace Arragro.ObjectHistory.Core.Models
         public DateTimeOffset Timestamp { get; set; }
 
         public ObjectHistoryGlobalEntity() { }
-        public ObjectHistoryGlobalEntity(ObjectHistoryGlobalTableEntity objectHistoryGlobalTableEntity) 
-        {
-            PartitionKey = objectHistoryGlobalTableEntity.PartitionKey;
-            RowKey = objectHistoryGlobalTableEntity.RowKey;
-            User = objectHistoryGlobalTableEntity.User;
-            ObjectName = objectHistoryGlobalTableEntity.ObjectName;
-            Folder = objectHistoryGlobalTableEntity.Folder;
-            SubFolder = objectHistoryGlobalTableEntity.SubFolder;
-            Timestamp = objectHistoryGlobalTableEntity.Timestamp;
-        }
-    }
 
-    public class ObjectHistoryGlobalTableEntity : TableEntity
-    {
-        public ObjectHistoryGlobalTableEntity() { }
-        public ObjectHistoryGlobalTableEntity(string partitionKey, string rowKey) : base (partitionKey, rowKey)
+        public ObjectHistoryGlobalEntity(
+            string partitionKey,
+            string rowKey,
+            string user,
+            string objectName,
+            Guid folder,
+            Guid? subFolder,
+            DateTimeOffset timestamp)
         {
+            PartitionKey = partitionKey;
+            RowKey = rowKey;
+            User = user;
+            ObjectName = objectName;
+            Folder = folder;
+            SubFolder = subFolder;
+            Timestamp = timestamp;
         }
-
-        public string User { get; set; }
-        public string ObjectName { get; set; }
-        public Guid Folder { get; set; }
-        public Guid? SubFolder { get; set; }
     }
 }

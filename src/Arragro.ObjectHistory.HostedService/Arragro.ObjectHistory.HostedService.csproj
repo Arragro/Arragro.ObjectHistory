@@ -9,6 +9,7 @@
     </PropertyGroup>
     
     <ItemGroup>
+        <ProjectReference Include="..\Arragro.ObjectHistory.AzureStorage\Arragro.ObjectHistory.AzureStorage.csproj" />
         <ProjectReference Include="..\Arragro.ObjectHistory.Client\Arragro.ObjectHistory.Client.csproj" />
     </ItemGroup>
 

@@ -2,7 +2,7 @@
 
 namespace Arragro.ObjectHistory.Core.Models
 {
-    public class ObjectHistoryEntity
+    public class ObjectHistoryDeletedEntity
     {
         public string PartitionKey { get; set; }
         public string RowKey { get; set; }
@@ -12,15 +12,14 @@ namespace Arragro.ObjectHistory.Core.Models
         public Guid? SubFolder { get; set; }
         public DateTimeOffset Timestamp { get; set; }
         public string User { get; set; }
-        public bool IsAdd { get; set; }
         /// <summary>
         /// Use this to help any validation you want to apply to the main controller I
         /// </summary>
         public string SecurityValidationToken { get; set; }
 
-        public ObjectHistoryEntity() { }
+        public ObjectHistoryDeletedEntity() { }
 
-        public ObjectHistoryEntity(
+        public ObjectHistoryDeletedEntity(
             string partitionKey,
             string rowKey,
             string applicationName,
@@ -28,7 +27,6 @@ namespace Arragro.ObjectHistory.Core.Models
             Guid? subFolder,
             DateTimeOffset timestamp,
             string user,
-            bool isAdd,
             string securityValidationToken)
         {
             PartitionKey = partitionKey;
@@ -38,7 +36,6 @@ namespace Arragro.ObjectHistory.Core.Models
             SubFolder = subFolder;
             Timestamp = timestamp;
             User = user;
-            IsAdd = isAdd;
             SecurityValidationToken = securityValidationToken;
         }
 

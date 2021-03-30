@@ -20,9 +20,21 @@ namespace Arragro.ObjectHistory.Core.Models
             PartitionKey = objectHistoryEntity.PartitionKey;
             ApplicationName = objectHistoryEntity.ApplicationName;
             ModifiedBy = objectHistoryEntity.User;
+            ModifiedDate = objectHistoryEntity.Timestamp;
             QueryResultType = QueryResultType.Object;
         }
-        
+
+        public ObjectHistoryQueryResult(ObjectHistoryDeletedEntity objectHistoryEntity)
+        {
+            Folder = objectHistoryEntity.Folder;
+            RowKey = objectHistoryEntity.RowKey;
+            PartitionKey = objectHistoryEntity.PartitionKey;
+            ApplicationName = objectHistoryEntity.ApplicationName;
+            ModifiedBy = objectHistoryEntity.User;
+            ModifiedDate = objectHistoryEntity.Timestamp;
+            QueryResultType = QueryResultType.Deleted;
+        }
+
         public ObjectHistoryQueryResult(ObjectHistoryGlobalEntity objectHistoryGlobalEntity)
         {
             Folder = objectHistoryGlobalEntity.Folder;

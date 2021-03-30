@@ -33,22 +33,13 @@ namespace Arragro.ObjectHistory.Client
             var key = getKeys();
             var partitionKey = $"{fullyQualifiedName}-{key}";
 
-            if (folder.HasValue)
-                return new ObjectHistoryDetailRaw(
-                                    _objectHistorySettings.ToObjectHistorySettingsBase(),
-                                    partitionKey,
-                                    _objectHistorySettings.ApplicationName,
-                                    user,
-                                    folder: folder.Value,
-                                    isAdd: isAdd);
-            else
-                return new ObjectHistoryDetailRaw(
-                                    _objectHistorySettings.ToObjectHistorySettingsBase(),
-                                    partitionKey,
-                                    _objectHistorySettings.ApplicationName,
-                                    user,
-                                    folder: null,
-                                    isAdd: isAdd);
+            return new ObjectHistoryDetailRaw(
+                                _objectHistorySettings.ToObjectHistorySettingsBase(),
+                                partitionKey,
+                                _objectHistorySettings.ApplicationName,
+                                user,
+                                folder: folder,
+                                isAdd: isAdd);
         }
 
         private async Task QueueObjectHistoryAsync(ObjectHistoryDetailRaw objectHistoryDetailRaw)
@@ -57,7 +48,14 @@ namespace Arragro.ObjectHistory.Client
 
             await _storageHelper.UploadJsonFileAsync(objectHistoryDetailRaw.Folder, objectHistoryDetailRaw.SubFolder, Constants.ObjectHistoryRequestFileName, trackedObjectJson);
 
-            await _storageHelper.SendQueueMessage(objectHistoryDetailRaw.SubFolder.HasValue ? $"{objectHistoryDetailRaw.Folder}/{objectHistoryDetailRaw.SubFolder}/{Constants.ObjectHistoryRequestFileName}" : $"{objectHistoryDetailRaw.Folder}/{Constants.ObjectHistoryRequestFileName}");
+            await _storageHelper.SendQueueMessageAsync(objectHistoryDetailRaw.SubFolder.HasValue ? $"{objectHistoryDetailRaw.Folder}/{objectHistoryDetailRaw.SubFolder}/{Constants.ObjectHistoryRequestFileName}" : $"{objectHistoryDetailRaw.Folder}/{Constants.ObjectHistoryRequestFileName}");
+        }
+
+        private PagingToken BuildPagingToken(PagingToken pagingToken)
+        {
+            if (_objectHistorySettings.StorageType == StorageType.AzureStorage)
+                return pagingToken == null ? new PagingToken(null) : pagingToken;
+            return pagingToken == null ? new PagingToken(1, 10) : pagingToken;
         }
 
         public async Task QueueObjectHistoryAsync<T>(Func<string> getKeys, T newObject, string user, Guid? folder = null)
@@ -79,7 +77,7 @@ namespace Arragro.ObjectHistory.Client
         public async Task SaveObjectHistoryAsync<T>(Func<string> getKeys, T newObject, string user, Guid? folder = null)
         {
             var objectHistoryDetailRaw = GetObjectHistoryDetailRaw<T>(getKeys, user, false, folder);
-            var current = await _storageHelper.GetLastObjectHistoryEntity($"{typeof(T).FullName}-{getKeys()}");
+            var current = await _storageHelper.GetLastObjectHistoryEntityAsync($"{typeof(T).FullName}-{getKeys()}");
             if (current != null)
             {
                 var blobClient = await _storageHelper.GetBlobAsync($"{current.GetBlobPath()}/{Constants.ObjectHistoryFileName}");
@@ -99,36 +97,65 @@ namespace Arragro.ObjectHistory.Client
             await _objectHistoryProcessor.ProcessObjectHistoryDetailAsync(new ObjectHistoryDetailRead( objectHistoryDetailRaw));
         }
 
+        public async Task SaveObjectHistoryDeletedAsync<T>(Func<string> getKeys, T newObject, string user, Guid? folder = null)
+        {
+            var objectHistoryDetailRaw = GetObjectHistoryDetailRaw<T>(getKeys, user, false, folder);
+            objectHistoryDetailRaw.NewJson = _jsonHelper.GetJson(newObject, true);
+
+            await _objectHistoryProcessor.ProcessObjectHistoryDeletedDetailAsync(new ObjectHistoryDetailRead(objectHistoryDetailRaw));
+        }
+
+        public async Task<ObjectHistoryQueryResultContainer> GetObjectHistoryDeletedRecordsKeyAsync(PagingToken pagingToken = null)
+        {
+            return await _storageHelper.GetObjectHistoryDeletedRecordsAsync(BuildPagingToken(pagingToken));
+        }
+
         public async Task<ObjectHistoryQueryResultContainer> GetObjectHistoryRecordsByObjectNamePartitionKeyAsync(string partitionKey, PagingToken pagingToken = null)
         {
-            return  await _storageHelper.GetObjectHistoryRecordsByObjectNamePartitionKey(partitionKey, pagingToken == null ? new PagingToken(null) : pagingToken);
+            return  await _storageHelper.GetObjectHistoryRecordsByObjectNamePartitionKeyAsync(partitionKey, BuildPagingToken(pagingToken));
         }
 
         public async Task<ObjectHistoryQueryResultContainer> GetObjectHistoryRecordsByApplicationNamePartitionKeyAsync(PagingToken pagingToken = null)
         {
-            return await _storageHelper.GetObjectHistoryRecordsByApplicationNamePartitionKey(_objectHistorySettings.ApplicationName, pagingToken == null ? new PagingToken(null) : pagingToken);
+            return await _storageHelper.GetObjectHistoryRecordsByApplicationNamePartitionKeyAsync(_objectHistorySettings.ApplicationName, BuildPagingToken(pagingToken));
         }
 
         public async Task<ObjectHistoryDetailRaw> GetObjectHistoryDetailRawAsync(string partitionKey, string rowKey)
         {
-            var objectHistoryEntity = await _storageHelper.GetObjectHistoryRecord(partitionKey, rowKey);
-            var json = await _storageHelper.DownloadBlob(objectHistoryEntity.Folder, objectHistoryEntity.SubFolder, Constants.ObjectHistoryFileName);
+            var objectHistoryEntity = await _storageHelper.GetObjectHistoryRecordAsync(partitionKey, rowKey);
+            var json = await _storageHelper.DownloadBlobAsync(objectHistoryEntity.Folder, objectHistoryEntity.SubFolder, Constants.ObjectHistoryFileName);
             var read = _jsonHelper.GetObjectFromJson<ObjectHistoryDetailRead>(json);
 
             return read.GetObjectHistoryDetailRaw();
         }
 
-        public async Task<ObjectHistoryDetailRaw> GetObjectHistoryDetailRawAsync(string partitionKey)
+        public async Task<ObjectHistoryDetailRaw> GetLatestObjectHistoryDetailRawAsync(string partitionKey)
         {
-            var objectHistoryEntity = await _storageHelper.GetLastObjectHistoryEntity(partitionKey);
+            var objectHistoryEntity = await _storageHelper.GetLastObjectHistoryEntityAsync(partitionKey);
             if (objectHistoryEntity == null)
                 return null;
 
-            var json = await _storageHelper.DownloadBlob(objectHistoryEntity.Folder, objectHistoryEntity.SubFolder, Constants.ObjectHistoryFileName);
+            var json = await _storageHelper.DownloadBlobAsync(objectHistoryEntity.Folder, objectHistoryEntity.SubFolder, Constants.ObjectHistoryFileName);
             var read = _jsonHelper.GetObjectFromJson<ObjectHistoryDetailRead>(json);
 
             return read.GetObjectHistoryDetailRaw();
         }
 
+        public async Task<ObjectHistoryDetailRaw> GetLatestObjectHistoryDeletedDetailRawAsync(string partitionKey)
+        {
+            var objectHistoryEntity = await _storageHelper.GetLastObjectHistoryDeletedEntityAsync(partitionKey);
+            if (objectHistoryEntity == null)
+                return null;
+
+            var json = await _storageHelper.DownloadBlobAsync(objectHistoryEntity.Folder, objectHistoryEntity.SubFolder, Constants.ObjectHistoryDeletedFileName);
+            var read = _jsonHelper.GetObjectFromJson<ObjectHistoryDetailRead>(json);
+
+            return read.GetObjectHistoryDetailRaw();
+        }
+
+        public async Task DeletedObjectHistoryDeletedByPartitionKey(string partitionKey)
+        {
+            await _storageHelper.DeleteObjectHistoryDeletedByPartitionKey(partitionKey);
+        }
     }
 }
