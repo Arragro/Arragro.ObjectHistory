@@ -47,7 +47,7 @@ namespace Arragro.ObjectHistory.IntegrationTests
             DockerExtentions.RemoveDockerServicesAsync(true).Wait();
         }
 
-        [Fact]
+        //[Fact]
         public async Task test_create_process_read_history()
         {
             var objectHistoryClient = _serviceProvider.GetRequiredService<IObjectHistoryClient>();
