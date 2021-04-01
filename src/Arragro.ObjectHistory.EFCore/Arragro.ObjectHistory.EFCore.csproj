@@ -2,7 +2,27 @@
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
+    <AssemblyName>Arragro.ObjectHistory.EFCore</AssemblyName>
+    <PackageId>Arragro.ObjectHistory.EFCore</PackageId>
+    <Title>Arragro ObjectHistory EF Core</Title>
+    <Copyright>Arragro 2018 (c) Arragro Ltd.</Copyright>
+    <Description>Arragro Object History Azure Storage.</Description>
+    <PackageTags>dotnet netstandard object-history ef-core</PackageTags>
+    <Authors>Mike Jewell,Reece Beardsall</Authors>
+    <PackageIconUrl>http://cdn.arragro.com/public/images/arragro-icon.png</PackageIconUrl>
+    <License>http://opensource.org/licenses/MIT</License>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/Arragro/Arragro.ObjectHistory</RepositoryUrl>
+    <PackageProjectUrl>https://github.com/Arragro/Arragro.ObjectHistory</PackageProjectUrl>
+    <PackageIcon>arragro-icon.png</PackageIcon>
+    <OutputType>Library</OutputType>
+    <IsPackable>true</IsPackable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../../arragro-icon.png" Pack="true" Visible="false" PackagePath="" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Arragro.Core.EntityFrameworkCore" Version="5.0.0-alpha-20210226.3" />
