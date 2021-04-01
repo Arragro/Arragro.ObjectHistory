@@ -2,8 +2,11 @@ $version = "5.0.0-alpha-202010401.1"
 $ErrorActionPreference = "Stop"
 
 $paths = @(
-	".\src\Arragro.ObjectHistory.Web",
-	".\src\Arragro.ObjectHistory.Client"
+    ".\src\Arragro.ObjectHistory.AzureStorage",
+    ".\src\Arragro.ObjectHistory.EFCore",
+    ".\src\Arragro.ObjectHistory.Client",
+    ".\src\Arragro.ObjectHistory.Web",
+    ".\src\Arragro.ObjectHistory.Core"
 )
 
 function executeSomething {
@@ -33,5 +36,5 @@ dotnet clean
 foreach ($path in $paths) {
 	dotnet pack $path -c Debug /p:Version=$version --include-symbols --include-source
 	$projectName = $path.Replace(".\src\", "").Replace(".\providers\", "")
-	executeSomething(dotnet nuget push $path\bin\Debug\$($projectName).$version.nupkg -s https://registry.arragro.com/repository/nuget-hosted/)
+	#executeSomething(dotnet nuget push $path\bin\Debug\$($projectName).$version.nupkg -s https://registry.arragro.com/repository/nuget-hosted/)
 }
