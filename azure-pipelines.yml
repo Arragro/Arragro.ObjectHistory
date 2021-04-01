@@ -74,6 +74,7 @@ stages:
           $paths = @(
             ".\src\Arragro.ObjectHistory.AzureStorage",
             ".\src\Arragro.ObjectHistory.EFCore",
+            ".\src\Arragro.ObjectHistory.Core",
             ".\src\Arragro.ObjectHistory.Client",
             ".\src\Arragro.ObjectHistory.Web"
           )
