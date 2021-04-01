@@ -46,6 +46,9 @@ namespace Arragro.ObjectHistory.EFCore.Migrations.Postgres
                     b.Property<string>("User")
                         .HasColumnType("text");
 
+                    b.Property<int>("Version")
+                        .HasColumnType("integer");
+
                     b.HasKey("PartitionKey", "RowKey");
 
                     b.HasIndex("RowKey");
@@ -82,6 +85,9 @@ namespace Arragro.ObjectHistory.EFCore.Migrations.Postgres
                     b.Property<string>("User")
                         .HasColumnType("text");
 
+                    b.Property<int>("Version")
+                        .HasColumnType("integer");
+
                     b.HasKey("PartitionKey", "RowKey");
 
                     b.HasIndex("RowKey");
@@ -117,6 +123,9 @@ namespace Arragro.ObjectHistory.EFCore.Migrations.Postgres
 
                     b.Property<string>("User")
                         .HasColumnType("text");
+
+                    b.Property<int>("Version")
+                        .HasColumnType("integer");
 
                     b.HasKey("PartitionKey", "RowKey");
 

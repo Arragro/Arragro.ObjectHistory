@@ -1,7 +1,7 @@
 ﻿using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
-namespace Arragro.ObjectHistory.EFCore.Migrations.SqlServer
+namespace Arragro.ObjectHistory.EFCore.Migrations.Postgres
 {
     public partial class Initial : Migration
     {
@@ -15,14 +15,15 @@ namespace Arragro.ObjectHistory.EFCore.Migrations.SqlServer
                 schema: "object_history",
                 columns: table => new
                 {
-                    PartitionKey = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    PartitionKey = table.Column<string>(type: "text", nullable: false),
                     RowKey = table.Column<long>(type: "bigint", nullable: false),
-                    ApplicationName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Folder = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    SubFolder = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    User = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Timestamp = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    SecurityValidationToken = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Version = table.Column<int>(type: "integer", nullable: false),
+                    ApplicationName = table.Column<string>(type: "text", nullable: true),
+                    Folder = table.Column<Guid>(type: "uuid", nullable: false),
+                    SubFolder = table.Column<Guid>(type: "uuid", nullable: true),
+                    User = table.Column<string>(type: "text", nullable: true),
+                    Timestamp = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    SecurityValidationToken = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -34,15 +35,16 @@ namespace Arragro.ObjectHistory.EFCore.Migrations.SqlServer
                 schema: "object_history",
                 columns: table => new
                 {
-                    PartitionKey = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    PartitionKey = table.Column<string>(type: "text", nullable: false),
                     RowKey = table.Column<long>(type: "bigint", nullable: false),
-                    User = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ObjectName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Folder = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    SubFolder = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    IsAdd = table.Column<bool>(type: "bit", nullable: false),
-                    Timestamp = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    SecurityValidationToken = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Version = table.Column<int>(type: "integer", nullable: false),
+                    User = table.Column<string>(type: "text", nullable: true),
+                    ObjectName = table.Column<string>(type: "text", nullable: true),
+                    Folder = table.Column<Guid>(type: "uuid", nullable: false),
+                    SubFolder = table.Column<Guid>(type: "uuid", nullable: true),
+                    IsAdd = table.Column<bool>(type: "boolean", nullable: false),
+                    Timestamp = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    SecurityValidationToken = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -54,15 +56,16 @@ namespace Arragro.ObjectHistory.EFCore.Migrations.SqlServer
                 schema: "object_history",
                 columns: table => new
                 {
-                    PartitionKey = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    PartitionKey = table.Column<string>(type: "text", nullable: false),
                     RowKey = table.Column<long>(type: "bigint", nullable: false),
-                    ApplicationName = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    Folder = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    SubFolder = table.Column<Guid>(type: "uniqueidentifier", nullable: true),
-                    User = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    IsAdd = table.Column<bool>(type: "bit", nullable: false),
-                    Timestamp = table.Column<DateTimeOffset>(type: "datetimeoffset", nullable: false),
-                    SecurityValidationToken = table.Column<string>(type: "nvarchar(max)", nullable: true)
+                    Version = table.Column<int>(type: "integer", nullable: false),
+                    ApplicationName = table.Column<string>(type: "text", nullable: true),
+                    Folder = table.Column<Guid>(type: "uuid", nullable: false),
+                    SubFolder = table.Column<Guid>(type: "uuid", nullable: true),
+                    User = table.Column<string>(type: "text", nullable: true),
+                    IsAdd = table.Column<bool>(type: "boolean", nullable: false),
+                    Timestamp = table.Column<DateTimeOffset>(type: "timestamp with time zone", nullable: false),
+                    SecurityValidationToken = table.Column<string>(type: "text", nullable: true)
                 },
                 constraints: table =>
                 {

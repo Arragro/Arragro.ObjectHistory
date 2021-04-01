@@ -1,10 +1,8 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <VersionPrefix>0.0.1</VersionPrefix>
-    <NuspecFile>$(MSBuildThisFileDirectory)$(MSBuildProjectName).nuspec</NuspecFile>
-    
+  <PropertyGroup>    
     <TargetFramework>net5.0</TargetFramework>
+    <TreatWarningsAsErrors>true</TreatWarningsAsErrors>
     <AssemblyName>Arragro.ObjectHistory.Client</AssemblyName>
     <PackageId>Arragro.ObjectHistory.Client</PackageId>
     <Title>Arragro ObjectHistory Client</Title>
@@ -13,11 +11,18 @@
     <PackageTags>dotnet netstandard object-history</PackageTags>
     <Authors>Mike Jewell,Reece Beardsall</Authors>
     <PackageIconUrl>http://cdn.arragro.com/public/images/arragro-icon.png</PackageIconUrl>
-    <PackageLicenseUrl>http://opensource.org/licenses/MIT</PackageLicenseUrl>
+    <License>http://opensource.org/licenses/MIT</License>
     <RepositoryType>git</RepositoryType>
     <RepositoryUrl>https://github.com/Arragro/Arragro.ObjectHistory</RepositoryUrl>
     <PackageProjectUrl>https://github.com/Arragro/Arragro.ObjectHistory</PackageProjectUrl>
+    <PackageIcon>arragro-icon.png</PackageIcon>
+    <OutputType>Library</OutputType>
+    <IsPackable>true</IsPackable>
   </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="../../arragro-icon.png" Pack="true" Visible="false" PackagePath="" />
+  </ItemGroup>
 
   <ItemGroup>
     <PackageReference Include="Microsoft.Extensions.Configuration" Version="5.0.0" />
@@ -30,23 +35,5 @@
     <ProjectReference Include="..\Arragro.ObjectHistory.Core\Arragro.ObjectHistory.Core.csproj" />
     <ProjectReference Include="..\Arragro.ObjectHistory.EFCore\Arragro.ObjectHistory.EFCore.csproj" />
   </ItemGroup>
-  
-  <Target Name="SetNuspecProperties" BeforeTargets="GenerateNuspec">
-    <PropertyGroup>
-      <NuspecProperties>$(NuspecProperties);id=$(PackageId)</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);Version=$(Version)</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);config=$(Configuration)</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);title=$(Title)</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);authors=$(Authors)</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);owners=$(Authors)</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);projectUrl=$(PackageProjectUrl)</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);iconUrl=$(PackageIconUrl)</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);description=$(Description)</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);copyright=$(Copyright)</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);tags=$(PackageTags)</NuspecProperties>
-      <NuspecProperties>$(NuspecProperties);repository=$(RepositoryUrl)</NuspecProperties>
-    </PropertyGroup>
-    <Message Importance="high" Text="NuspecProperties: $(NuspecProperties)" />
-  </Target>
 
 </Project>

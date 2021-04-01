@@ -1,13 +1,17 @@
 ﻿const path = require('path');
 const webpack = require('webpack');
+const TsconfigPathsPlugin = require('tsconfig-paths-webpack-plugin');
 const MiniCssExtractPlugin = require("mini-css-extract-plugin");
-const TsConfigPathsPlugin = require('awesome-typescript-loader').TsConfigPathsPlugin;
+const rimraf = require('rimraf');
 const { dependencies } = require('./package.json');
 
-const libraryName = 'arragro-object-history-web';
+const libraryName = 'arragro-object-history';
 
-module.exports = (env) => {
-    const devMode = env === null || env['run-prod'] === undefined || env['run-prod'] === null || env['run-prod'] === false;
+rimraf.sync(path.join(__dirname, 'dist'));
+
+module.exports = (env, argv) => {
+    const mode = argv === undefined ? undefined : argv.mode;
+    const devMode = mode === null || mode === undefined || mode === 'development';
 
     let config = {
         mode: devMode ? 'development' : 'production',
@@ -19,40 +23,56 @@ module.exports = (env) => {
             },
             extensions: ['.js', '.jsx', '.ts', '.tsx'],
             plugins: [
-                new TsConfigPathsPlugin(/* { tsconfig, compiler } */)
+                new TsconfigPathsPlugin({
+                    configFile: path.resolve(__dirname, './tsconfig.lib.json'),
+                    logLevel: 'info',
+                    extensions: ['.ts', '.tsx']
+                 })
             ]
         },
         module: {
             rules: [
                 {
                     test: /\.ts(x?)$/,
-                    include: /ReactAppLib/,
+                    include: /ReactApp/,
                     exclude: [
                         /node_modules/,
+                        path.resolve(__dirname, "./node_modules"),
                         /obj/
-                    ],
-                    loader: 'awesome-typescript-loader',
-                    query: {
-                        useBabel: true,
-                        "babelOptions": {
-                            "babelrc": false, /* Important line */
-                            "presets": [
-                                "react",
+                    ],        
+                    use: {
+                        loader: 'babel-loader',
+                        options: {
+                            cacheDirectory: true,
+                            babelrc: false,
+                            presets: [
                                 [
-                                  "es2015",
-                                  {
-                                   "modules": false
-                                  }
-                                ]
-                            ]
+                                    '@babel/preset-env',
+                                    { 
+                                        targets: { 
+                                            browsers: 'last 2 versions'
+                                        },
+                                        modules: false
+                                    }, // or whatever your project requires
+                                ],
+                                '@babel/preset-typescript',
+                                '@babel/preset-react',
+                            ],
+                            plugins: [
+                                // plugin-proposal-decorators is only needed if you're using experimental decorators in TypeScript
+                                // ['@babel/plugin-proposal-decorators', { legacy: true }],
+                                
+                                ["@babel/plugin-transform-runtime", { "regenerator": true }],
+                                ['@babel/plugin-proposal-class-properties', { loose: true }],
+                                'lodash',
+                                'syntax-dynamic-import',
+                            ],
                         },
-                        configFileName: 'tsconfig.lib.json'
                     }
                 },
                 {
                     test: /\.(sa|sc|c)ss$/,
                     use: [
-                        'css-hot-loader',
                         MiniCssExtractPlugin.loader,
                         {
                             loader: 'css-loader',
@@ -61,13 +81,27 @@ module.exports = (env) => {
                                 sourceMap: true
                             }
                         },
-                        'postcss-loader',
                         {
                             loader: 'sass-loader',
                             options: {
                                 sourceMap: true
                             }
-                        }
+                        },
+                        {
+                            loader: 'postcss-loader',
+                            options: {
+                              postcssOptions: {
+                                plugins: [
+                                  [
+                                    "autoprefixer",
+                                    {
+                                      // Options
+                                    },
+                                  ],
+                                ],
+                              },
+                            },
+                        },
                     ],
                 },
                 // { test: /\.(png|woff|woff2|eot|ttf|svg)$/, loader: 'url-loader?limit=100000' },
@@ -107,10 +141,7 @@ module.exports = (env) => {
         //     }
         // },
         plugins: [
-            new MiniCssExtractPlugin({
-                filename: "main.css",
-                chunkFilename: "vendor.css"
-            }),
+            new MiniCssExtractPlugin(),
             // new PurifyCSSPlugin({
             //     // Give paths to parse for rules. These should be absolute!
             //     paths: glob.sync([
@@ -126,7 +157,7 @@ module.exports = (env) => {
             //     }
             // }),
             require('autoprefixer'),
-            new webpack.optimize.OccurrenceOrderPlugin()
+            // new webpack.optimize.OccurrenceOrderPlugin()
             // new webpack.optimize.CommonsChunkPlugin({ name: 'vendor', filename: 'vendor.bundle.js' }), // Moves vendor content out of other bundles
             // new BundleAnalyzerPlugin()
         ]

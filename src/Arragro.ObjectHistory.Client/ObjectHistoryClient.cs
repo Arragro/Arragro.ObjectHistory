@@ -58,26 +58,10 @@ namespace Arragro.ObjectHistory.Client
             return pagingToken == null ? new PagingToken(1, 10) : pagingToken;
         }
 
-        public async Task QueueObjectHistoryAsync<T>(Func<string> getKeys, T newObject, string user, Guid? folder = null)
+        private async Task<ObjectHistoryDetailRaw> BuildObjectHistoryDataRawAsync<T>(Func<string> getKeys, T newObject, string user, Guid? folder)
         {
-            var objectHistoryDetailRaw = GetObjectHistoryDetailRaw<T>(getKeys, user, true, folder);
-            objectHistoryDetailRaw.OldJson = null;
-            objectHistoryDetailRaw.NewJson = _jsonHelper.GetJson(newObject, true);
-            await QueueObjectHistoryAsync(objectHistoryDetailRaw);
-        }
-
-        public async Task QueueObjectHistoryAsync<T>(Func<string> getKeys, T oldObject, T newObject, string user, Guid? folder = null)
-        {
-            var objectHistoryDetailRaw = GetObjectHistoryDetailRaw<T>(getKeys, user, false, folder);
-            objectHistoryDetailRaw.OldJson = _jsonHelper.GetJson(oldObject, true);
-            objectHistoryDetailRaw.NewJson = _jsonHelper.GetJson(newObject, true);
-            await QueueObjectHistoryAsync(objectHistoryDetailRaw);
-        }
-
-        public async Task SaveObjectHistoryAsync<T>(Func<string> getKeys, T newObject, string user, Guid? folder = null)
-        {
-            var objectHistoryDetailRaw = GetObjectHistoryDetailRaw<T>(getKeys, user, false, folder);
-            var current = await _storageHelper.GetLastObjectHistoryEntityAsync($"{typeof(T).FullName}-{getKeys()}");
+            var current = await _storageHelper.GetLatestObjectHistoryEntityAsync($"{typeof(T).FullName}-{getKeys()}");
+            var objectHistoryDetailRaw = GetObjectHistoryDetailRaw<T>(getKeys, user, current == null, folder);
             if (current != null)
             {
                 var blobClient = await _storageHelper.GetBlobAsync($"{current.GetBlobPath()}/{Constants.ObjectHistoryFileName}");
@@ -86,14 +70,35 @@ namespace Arragro.ObjectHistory.Client
                     var objectHistoryDetailsJson = await blobClient.DownloadTextAsync();
                     var objectHistoryDetails = _jsonHelper.GetObjectFromJson<ObjectHistoryDetailRead>(objectHistoryDetailsJson);
                     objectHistoryDetailRaw.OldJson = objectHistoryDetails.NewJson.ToString();
+                    objectHistoryDetailRaw.Version = current.Version + 1;
                 }
                 else
+                {
+                    objectHistoryDetailRaw.IsAdd = true;
                     objectHistoryDetailRaw.OldJson = null;
+                    objectHistoryDetailRaw.Version = 1;
+                }
             }
             else
+            {
+                objectHistoryDetailRaw.IsAdd = true;
                 objectHistoryDetailRaw.OldJson = null;
+                objectHistoryDetailRaw.Version = 1;
+            }
             objectHistoryDetailRaw.NewJson = _jsonHelper.GetJson(newObject, true);
 
+            return objectHistoryDetailRaw;
+        }
+
+        public async Task QueueObjectHistoryAsync<T>(Func<string> getKeys, T newObject, string user, Guid? folder = null)
+        {
+            var objectHistoryDetailRaw = await BuildObjectHistoryDataRawAsync(getKeys, newObject, user, folder);
+            await QueueObjectHistoryAsync(objectHistoryDetailRaw);
+        }
+
+        public async Task SaveObjectHistoryAsync<T>(Func<string> getKeys, T newObject, string user, Guid? folder = null)
+        {
+            var objectHistoryDetailRaw = await BuildObjectHistoryDataRawAsync(getKeys, newObject, user, folder);
             await _objectHistoryProcessor.ProcessObjectHistoryDetailAsync(new ObjectHistoryDetailRead( objectHistoryDetailRaw));
         }
 
@@ -131,7 +136,7 @@ namespace Arragro.ObjectHistory.Client
 
         public async Task<ObjectHistoryDetailRaw> GetLatestObjectHistoryDetailRawAsync(string partitionKey)
         {
-            var objectHistoryEntity = await _storageHelper.GetLastObjectHistoryEntityAsync(partitionKey);
+            var objectHistoryEntity = await _storageHelper.GetLatestObjectHistoryEntityAsync(partitionKey);
             if (objectHistoryEntity == null)
                 return null;
 
@@ -143,7 +148,7 @@ namespace Arragro.ObjectHistory.Client
 
         public async Task<ObjectHistoryDetailRaw> GetLatestObjectHistoryDeletedDetailRawAsync(string partitionKey)
         {
-            var objectHistoryEntity = await _storageHelper.GetLastObjectHistoryDeletedEntityAsync(partitionKey);
+            var objectHistoryEntity = await _storageHelper.GetLatestObjectHistoryDeletedEntityAsync(partitionKey);
             if (objectHistoryEntity == null)
                 return null;
 

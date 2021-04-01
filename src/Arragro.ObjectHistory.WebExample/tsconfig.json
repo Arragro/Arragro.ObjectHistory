@@ -1,7 +1,8 @@
 {
     "compilerOptions": {
+        "allowSyntheticDefaultImports": true,
         "sourceMap": true,
-        "keyofStringsOnly": true, 
+        "skipLibCheck": true,
         "target": "es5",
         "jsx": "react",
         "module": "esNext",
@@ -13,7 +14,11 @@
         "noUnusedLocals": true,
         "strict": true,
         "outDir": "./dist/",
+        "baseUrl": ".",
+        "types": ["node"],
+        "typeRoots" : ["./types"],
         "lib": ["es6", "es7", "dom"]
     },
-    "exclude": ["dist", "build", "node_modules"]
+    "exclude": ["dist", "build", "node_modules"],
+    "include": ["./types", "./ReactApp", "./ReactAppLibrary"]
 }

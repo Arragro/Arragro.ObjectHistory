@@ -7,6 +7,10 @@ import * as Interfaces from './interfaces'
 import * as utils from './utils'
 import { App } from './app'
 
+import * as dayjs from 'dayjs'
+import * as utc from 'dayjs/plugin/utc'
+dayjs.extend(utc)
+
 import './scss/site.scss'
 
 const { configureStore } = Redux

@@ -7,6 +7,7 @@ namespace Arragro.ObjectHistory.Core.Models
         public string PartitionKey { get; set; }
         public string RowKey { get; set; }
 
+        public int Version { get; set; }
         public string ApplicationName { get; set; }
         public Guid Folder { get; set; }
         public Guid? SubFolder { get; set; }
@@ -18,11 +19,12 @@ namespace Arragro.ObjectHistory.Core.Models
         /// </summary>
         public string SecurityValidationToken { get; set; }
 
-        public ObjectHistoryEntity() { }
+        protected ObjectHistoryEntity() { }
 
         public ObjectHistoryEntity(
             string partitionKey,
             string rowKey,
+            int version,
             string applicationName,
             Guid folder,
             Guid? subFolder,
@@ -33,6 +35,7 @@ namespace Arragro.ObjectHistory.Core.Models
         {
             PartitionKey = partitionKey;
             RowKey = rowKey;
+            Version = version;
             ApplicationName = applicationName;
             Folder = folder;
             SubFolder = subFolder;

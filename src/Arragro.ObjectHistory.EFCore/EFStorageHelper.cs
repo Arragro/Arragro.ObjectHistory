@@ -19,12 +19,28 @@ namespace Arragro.ObjectHistory.EFCore
             _arragroObjectHistoryBaseContext = arragroObjectHistoryBaseContext;
         }
 
+        private PagingToken ConfigureNexPagingToken(PagingToken pagingToken, int total)
+        {
+            var totalPages = total / pagingToken.PageSize + ((total % pagingToken.PageSize) > 0 ? 1 : 0);
+
+            if (pagingToken.Page + 1 > totalPages)
+                pagingToken.NextPage = null;
+            else
+            {
+                if (pagingToken.NextPage == null) pagingToken.NextPage = 1;
+                pagingToken.NextPage += 1;
+            }
+
+            return pagingToken;
+        }
+
         public async Task AddObjectHistoryEntityRecordAsync(ObjectHistoryDetailBase objectHistoryDetails)
         {
             try
             {
                 var objectHistoryEntity = new ObjectHistoryTableEntity(objectHistoryDetails.PartitionKey, objectHistoryDetails.RowKey)
                 {
+                    Version = objectHistoryDetails.Version,
                     ApplicationName = objectHistoryDetails.ApplicationName,
                     User = objectHistoryDetails.User,
                     Folder = objectHistoryDetails.Folder,
@@ -53,6 +69,7 @@ namespace Arragro.ObjectHistory.EFCore
             {
                 var objectHistoryEntity = new ObjectHistoryDeletedTableEntity(objectHistoryDetails.PartitionKey, objectHistoryDetails.RowKey)
                 {
+                    Version = objectHistoryDetails.Version,
                     ApplicationName = objectHistoryDetails.ApplicationName,
                     User = objectHistoryDetails.User,
                     Folder = objectHistoryDetails.Folder,
@@ -80,6 +97,7 @@ namespace Arragro.ObjectHistory.EFCore
             {
                 var objectHistoryEntity = new ObjectHistoryGlobalTableEntity(objectHistoryDetails.ApplicationName, objectHistoryDetails.RowKey)
                 {
+                    Version = objectHistoryDetails.Version,
                     User = objectHistoryDetails.User,
                     ObjectName = objectHistoryDetails.PartitionKey,
                     Folder = objectHistoryDetails.Folder,
@@ -102,7 +120,7 @@ namespace Arragro.ObjectHistory.EFCore
             }
         }
 
-        public async Task<ObjectHistoryEntity> GetLastObjectHistoryEntityAsync(string partitionKey)
+        public async Task<ObjectHistoryEntity> GetLatestObjectHistoryEntityAsync(string partitionKey)
         {
             var objectHistoryTableEntity = await _arragroObjectHistoryBaseContext.ObjectHistoryTableEntity.Where(x => x.PartitionKey == partitionKey).OrderBy(x => x.RowKey).Take(1).SingleOrDefaultAsync();
             if (objectHistoryTableEntity == null)
@@ -110,6 +128,7 @@ namespace Arragro.ObjectHistory.EFCore
             return new ObjectHistoryEntity(
                 objectHistoryTableEntity.PartitionKey,
                 objectHistoryTableEntity.RowKey.ToString(),
+                objectHistoryTableEntity.Version,
                 objectHistoryTableEntity.ApplicationName,
                 objectHistoryTableEntity.Folder,
                 objectHistoryTableEntity.SubFolder,
@@ -119,7 +138,7 @@ namespace Arragro.ObjectHistory.EFCore
                 objectHistoryTableEntity.SecurityValidationToken);
         }
 
-        public async Task<ObjectHistoryDeletedEntity> GetLastObjectHistoryDeletedEntityAsync(string partitionKey)
+        public async Task<ObjectHistoryDeletedEntity> GetLatestObjectHistoryDeletedEntityAsync(string partitionKey)
         {
             var objectHistoryTableEntity = await _arragroObjectHistoryBaseContext.ObjectHistoryDeletedTableEntities.Where(x => x.PartitionKey == partitionKey).OrderBy(x => x.RowKey).Take(1).SingleOrDefaultAsync();
             if (objectHistoryTableEntity == null)
@@ -127,6 +146,7 @@ namespace Arragro.ObjectHistory.EFCore
             return new ObjectHistoryDeletedEntity(
                 objectHistoryTableEntity.PartitionKey,
                 objectHistoryTableEntity.RowKey.ToString(),
+                objectHistoryTableEntity.Version,
                 objectHistoryTableEntity.ApplicationName,
                 objectHistoryTableEntity.Folder,
                 objectHistoryTableEntity.SubFolder,
@@ -137,7 +157,7 @@ namespace Arragro.ObjectHistory.EFCore
 
         public async Task<Guid?> GetLatestBlobFolderNameByPartitionKeyAsync(string partitionKey)
         {
-            var objectHistoryEntity = await GetLastObjectHistoryEntityAsync(partitionKey);
+            var objectHistoryEntity = await GetLatestObjectHistoryEntityAsync(partitionKey);
             if (objectHistoryEntity == null)
                 return null;
 
@@ -151,6 +171,7 @@ namespace Arragro.ObjectHistory.EFCore
             return new ObjectHistoryEntity(
                 objectHistoryTableEntity.PartitionKey,
                 objectHistoryTableEntity.RowKey.ToString(),
+                objectHistoryTableEntity.Version,
                 objectHistoryTableEntity.ApplicationName,
                 objectHistoryTableEntity.Folder,
                 objectHistoryTableEntity.SubFolder,
@@ -162,19 +183,25 @@ namespace Arragro.ObjectHistory.EFCore
 
         public async Task<ObjectHistoryQueryResultContainer> GetObjectHistoryDeletedRecordsAsync(PagingToken pagingToken)
         {
-            var objectHistoryTableEntity = await _arragroObjectHistoryBaseContext.ObjectHistoryDeletedTableEntities.Skip((pagingToken.Page - 1) * pagingToken.PageSize).Take(pagingToken.PageSize).ToListAsync();
+            var objectHistoryTableEntity = await _arragroObjectHistoryBaseContext.ObjectHistoryDeletedTableEntities
+                                                    .OrderBy(x => x.RowKey)
+                                                    .Skip((pagingToken.Page - 1) * pagingToken.PageSize)
+                                                    .Take(pagingToken.PageSize)
+                                                    .ToListAsync();
+            var total = await _arragroObjectHistoryBaseContext.ObjectHistoryDeletedTableEntities.CountAsync();
 
             var entityResults = new ObjectHistoryQueryResultContainer(objectHistoryTableEntity.Select(objectHistoryTableEntity =>
                 new ObjectHistoryDeletedEntity(
                     objectHistoryTableEntity.PartitionKey,
                     objectHistoryTableEntity.RowKey.ToString(),
+                    objectHistoryTableEntity.Version,
                     objectHistoryTableEntity.ApplicationName,
                     objectHistoryTableEntity.Folder,
                     objectHistoryTableEntity.SubFolder,
                     objectHistoryTableEntity.Timestamp,
                     objectHistoryTableEntity.User,
                     objectHistoryTableEntity.SecurityValidationToken)),
-                pagingToken);
+                ConfigureNexPagingToken(pagingToken, total));
 
             return entityResults;
         }
@@ -187,11 +214,13 @@ namespace Arragro.ObjectHistory.EFCore
                                                     .Skip((pagingToken.Page - 1) * pagingToken.PageSize)
                                                     .Take(pagingToken.PageSize)
                                                     .ToListAsync();
+            var total = await _arragroObjectHistoryBaseContext.ObjectHistoryTableEntity.Where(x => x.PartitionKey == partitionKey).CountAsync();
 
             var entityResults = new ObjectHistoryQueryResultContainer(objectHistoryTableEntity.Select(objectHistoryTableEntity =>
                 new ObjectHistoryEntity(
                     objectHistoryTableEntity.PartitionKey,
                     objectHistoryTableEntity.RowKey.ToString(),
+                    objectHistoryTableEntity.Version,
                     objectHistoryTableEntity.ApplicationName,
                     objectHistoryTableEntity.Folder,
                     objectHistoryTableEntity.SubFolder,
@@ -199,7 +228,7 @@ namespace Arragro.ObjectHistory.EFCore
                     objectHistoryTableEntity.User,
                     objectHistoryTableEntity.IsAdd,
                     objectHistoryTableEntity.SecurityValidationToken)),
-                pagingToken, partitionKey);
+                ConfigureNexPagingToken(pagingToken, total), partitionKey);
 
             return entityResults;
         }
@@ -212,17 +241,19 @@ namespace Arragro.ObjectHistory.EFCore
                                                     .Skip((pagingToken.Page - 1) * pagingToken.PageSize)
                                                     .Take(pagingToken.PageSize)
                                                     .ToListAsync();
+            var total = await _arragroObjectHistoryBaseContext.ObjectHistoryGlobalTableEntity.Where(x => x.PartitionKey == partitionKey).CountAsync();
 
             var entityResults = new ObjectHistoryQueryResultContainer(objectHistoryTableEntity.Select(objectHistoryGlobalEntity =>
                 new ObjectHistoryGlobalEntity(
                     objectHistoryGlobalEntity.PartitionKey,
                     objectHistoryGlobalEntity.RowKey.ToString(),
+                    objectHistoryGlobalEntity.Version,
                     objectHistoryGlobalEntity.User,
                     objectHistoryGlobalEntity.ObjectName,
                     objectHistoryGlobalEntity.Folder,
                     objectHistoryGlobalEntity.SubFolder,
                     objectHistoryGlobalEntity.Timestamp)),
-                pagingToken, partitionKey);
+                ConfigureNexPagingToken(pagingToken, total), partitionKey);
 
             return entityResults;
         }
@@ -232,6 +263,11 @@ namespace Arragro.ObjectHistory.EFCore
             var objectHistoriesDeleted = await _arragroObjectHistoryBaseContext.ObjectHistoryDeletedTableEntities.Where(x => x.PartitionKey == partitionKey).ToListAsync();
             _arragroObjectHistoryBaseContext.ObjectHistoryDeletedTableEntities.RemoveRange(objectHistoriesDeleted);
             await _arragroObjectHistoryBaseContext.SaveChangesAsync();
+        }
+
+        public async Task<bool> HasObjectHistoryEntityAsync(string partitionKey)
+        {
+            return await _arragroObjectHistoryBaseContext.ObjectHistoryTableEntity.AnyAsync(x => x.PartitionKey == partitionKey);
         }
     }
 }

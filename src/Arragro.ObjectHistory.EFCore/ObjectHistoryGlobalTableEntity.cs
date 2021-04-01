@@ -6,6 +6,7 @@ namespace Arragro.ObjectHistory.EFCore
     {
         public string PartitionKey { get; set; }
         public long RowKey { get; set; }
+        public int Version { get; set; }
         public string User { get; set; }
         public string ObjectName { get; set; }
         public Guid Folder { get; set; }

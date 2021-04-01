@@ -31,12 +31,16 @@ const History = (props: { objectName?: string }) => {
             console.log(objectName)
             objectHistoryDispatchService.getObjectRecord({ partitionKey: objectName })
         } else {
-            objectHistoryDispatchService.get()
+            objectHistoryDispatchService.getGlobalHistory()
         }
     }
 
     React.useEffect(() => {
         handleUrlParams(objectName)
+
+        return () => {
+            objectHistoryDispatchService.resetState()
+        }
     }, [])
 
     React.useEffect(() => {
@@ -67,12 +71,12 @@ const History = (props: { objectName?: string }) => {
 
     const getRows = (resultContainer: IObjectHistoryQueryResultContainer) => {
 
-        let output = []
+        const output = []
 
         if (resultContainer.results !== undefined) {
 
             for (let i = 0; i < resultContainer.results.length; i++) {
-                let item = resultContainer.results[i]
+                const item = resultContainer.results[i]
 
                 const objectName = item.queryResultType === QueryResultType.Global ?
                     <Link to={`/arragro-object-history/${item.partitionKey}`}>{item.partitionKey}</Link> :
@@ -80,6 +84,7 @@ const History = (props: { objectName?: string }) => {
 
                 output.push(<tr key={item.folder}>
                     <td>{objectName}</td>
+                    <td>{item.version}</td>
                     <td>{item.modifiedBy}</td>
                     <td>{dayjs(item.modifiedDate).utc().local().format('DD/MM/YYYY h:mm:ss a')}</td>
                     <td>{getShowMoreDetails(item, i)}</td>
@@ -104,23 +109,32 @@ const History = (props: { objectName?: string }) => {
     }
 
     const onGetMoreRecordsClick = (pagingToken: IPagingToken) => {
-        objectHistoryDispatchService.getFromToken(pagingToken)
+        pagingToken.page += 1
+        if (objectName !== undefined) 
+            objectHistoryDispatchService.getObjectRecord({ partitionKey: objectName, pagingToken })
+        else
+            objectHistoryDispatchService.getGlobalHistoryFromToken(pagingToken)
     }
 
     const getMoreRecords = (pagingToken?: IPagingToken | null) => {
         if (pagingToken === undefined || pagingToken === null) {
             return null
         }
+        if (pagingToken.tableContinuationToken === null &&
+            pagingToken.nextPage === null) {
+            return null
+        }
 
         return <button className='btn btn-primary' onClick={() => onGetMoreRecordsClick(pagingToken)}>Get More Records</button>
     }
 
-    if (objectHistory.resultContainer === undefined ||
-        objectHistory.loading) {
+    if (objectHistory.resultContainer === undefined) {
         return null
     }
 
-    if (objectHistory.resultContainer.results && 
+    if (!objectHistory.loading &&
+        objectHistory.resultContainer &&
+        objectHistory.resultContainer.results && 
         objectHistory.resultContainer.results.length === 0)
         return <h3>There is no history for this object</h3>
 
@@ -129,6 +143,7 @@ const History = (props: { objectName?: string }) => {
             <thead>
                 <tr>
                     <th>Object Name</th>
+                    <th>Version</th>
                     <th>Modified By</th>
                     <th>Modified Date</th>
                     <th></th>

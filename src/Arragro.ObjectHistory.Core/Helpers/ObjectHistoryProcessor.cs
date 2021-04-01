@@ -38,18 +38,26 @@ namespace Arragro.ObjectHistory.Core.Helpers
 
         public async Task ProcessObjectHistoryDetailAsync(ObjectHistoryDetailRead objectHistoryDetails)
         {
+            var persist = true;
             if (!objectHistoryDetails.IsAdd)
             {
-                objectHistoryDetails.Diff = ProcessDiff(objectHistoryDetails.OldJson.ToString(), objectHistoryDetails.NewJson.ToString()).ToString();
+                var diff = ProcessDiff(objectHistoryDetails.OldJson.ToString(), objectHistoryDetails.NewJson.ToString());
+                if (diff != null)
+                    objectHistoryDetails.Diff = diff.ToString();
+                else
+                    persist = false;
             }
 
-            var objectHistoryJson = _jsonHelper.GetJson(objectHistoryDetails);
+            if (persist)
+            {
+                var objectHistoryJson = _jsonHelper.GetJson(objectHistoryDetails);
 
-            await _storageHelper.UploadJsonFileAsync(objectHistoryDetails.Folder, objectHistoryDetails.SubFolder, Constants.ObjectHistoryFileName, objectHistoryJson);
+                await _storageHelper.UploadJsonFileAsync(objectHistoryDetails.Folder, objectHistoryDetails.SubFolder, Constants.ObjectHistoryFileName, objectHistoryJson);
 
-            await _storageHelper.AddObjectHistoryEntityRecordAsync(objectHistoryDetails);
+                await _storageHelper.AddObjectHistoryEntityRecordAsync(objectHistoryDetails);
 
-            await _storageHelper.AddObjectHistoryGlobalAsync(objectHistoryDetails);
+                await _storageHelper.AddObjectHistoryGlobalAsync(objectHistoryDetails);
+            }
         }
 
         public async Task ProcessObjectHistoryDeletedDetailAsync(ObjectHistoryDetailRead objectHistoryDetails)

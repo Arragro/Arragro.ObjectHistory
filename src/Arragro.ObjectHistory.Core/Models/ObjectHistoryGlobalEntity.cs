@@ -6,7 +6,8 @@ namespace Arragro.ObjectHistory.Core.Models
     {
         public string PartitionKey { get; set; }
         public string RowKey { get; set; }
-
+        
+        public int Version { get; set; }
         public string User { get; set; }
         public string ObjectName { get; set; }
         public Guid Folder { get; set; }
@@ -18,6 +19,7 @@ namespace Arragro.ObjectHistory.Core.Models
         public ObjectHistoryGlobalEntity(
             string partitionKey,
             string rowKey,
+            int version,
             string user,
             string objectName,
             Guid folder,
@@ -26,6 +28,7 @@ namespace Arragro.ObjectHistory.Core.Models
         {
             PartitionKey = partitionKey;
             RowKey = rowKey;
+            Version = version;
             User = user;
             ObjectName = objectName;
             Folder = folder;

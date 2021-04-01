@@ -7,6 +7,7 @@ namespace Arragro.ObjectHistory.Core.Models
         public string PartitionKey { get; set; }
         public string RowKey { get; set; }
         public string ApplicationName { get; set; }
+        public int Version { get; set; }
         public DateTime TimeStamp { get; set; }
         public Guid Folder { get; set; }
         public Guid? SubFolder { get; set; }

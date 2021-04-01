@@ -1,25 +1,22 @@
 {
+    "extends": "./tsconfig",
     "compilerOptions": {
-        "sourceMap": true,
-        "keyofStringsOnly": true,
-        "target": "es5",
-        "jsx": "react",
-        "module": "es6",
-        "moduleResolution": "node",
-        "experimentalDecorators": true,
+        "outDir": "dist/types",
         "declaration": true,
-        "declarationDir": "./dist/types",
-        "removeComments": true,
-        "noImplicitReturns": true,
-        "noUnusedLocals": true,
-        "strict": true,
-        "outDir": "./dist/",
-        "lib": ["es6", "es7", "dom"]
+        "declarationMap": true,
+        "isolatedModules": false,
+        "noEmit": false,
+        "allowJs": false,
+        "emitDeclarationOnly": true
     },
-    "compileOnSave": false,
     "include": [
-        "./ReactAppLibrary/**/*.ts*",
-        "./types"
+        "./ReactAppLibrary/index.ts",
+        "./types/**/*",
     ],
-    "exclude": ["dist", "build", "node_modules", "../Arragro.ObjectHistory.Web.ReactAppLibrary/node_modules", "App"]
+    "exclude": [
+        "wwwroot",
+        "dist",
+        "build",
+        "node_modules"
+    ]
 }

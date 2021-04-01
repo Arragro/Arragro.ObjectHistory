@@ -19,14 +19,16 @@ export interface ITableContinuationToken {
 }
 
 export interface IPagingToken {
-    tableContinuationToken: ITableContinuationToken
+    tableContinuationToken: ITableContinuationToken | null
     page: number
+    nextPage: number | null
     pageSize: number
 }
 
 export interface IObjectHistoryDetailRaw {
     partitionKey: string
     rowKey: string
+    version: number
     applicationName: string
     timeStamp: Date
     folder: string
@@ -40,6 +42,7 @@ export interface IObjectHistoryDetailRaw {
 export interface IObjectHistoryQueryResult {
     partitionKey: string
     rowKey: string
+    version: number
     folder: string
     applicationName: string
     queryResultType: QueryResultType
@@ -51,12 +54,12 @@ export interface IObjectHistoryQueryResult {
 }
 
 export interface IObjectHistoryQueryResultContainer {
-    partitionKey: string
+    partitionKey: string | null
     results: Array<IObjectHistoryQueryResult>
-    pagingToken?: IPagingToken | null
+    pagingToken: IPagingToken | null
 }
 
 export interface IObjectLogsPostParameters {
     partitionKey: string
-    tableContinuationToken?: ITableContinuationToken
+    pagingToken?: IPagingToken
 }

@@ -8,6 +8,7 @@ import {
     HistoryService
 } from '../../../services'
 
+// eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace Services {
 
     export interface ObjectHistoryConnectedState {
@@ -15,15 +16,16 @@ export namespace Services {
     }
 
     export interface ObjectHistoryConnectedDispatch {
-        get (): void
+        getGlobalHistory (): void
         getObjectRecord (objectLogPostParameters: Interfaces.IObjectLogsPostParameters): void
-        getFromToken (continuationToken: Interfaces.ITableContinuationToken): void
+        getGlobalHistoryFromToken (pagingToken: Interfaces.IPagingToken): void
         getDetails (index: number, paritionKey: string, rowKey: string): void
         showDetailsExpand (index: number): void
         showDetailsHide (index: number): void
+        resetState (): void
     }
 
-    function get (): any {
+    function getGlobalHistory (): any {
         return function (dispatch: (action: any) => void) {
             dispatch(Actions.getGlobalHistoryStart())
 
@@ -57,11 +59,11 @@ export namespace Services {
         }
     }
 
-    function getFromToken (continuationToken: Interfaces.ITableContinuationToken): any {
+    function getGlobalHistoryFromToken (pagingToken: Interfaces.IPagingToken): any {
         return function (dispatch: (action: any) => void) {
             dispatch(Actions.getGlobalHistoryFromTokenStart())
 
-            HistoryService.getGlobalLogs(continuationToken)
+            HistoryService.getGlobalLogs(pagingToken)
                 .then((response) => {
                     if (!response.ok) {
                         return dispatch(Actions.getGlobalHistoryFromTokenError(response as any))
@@ -101,14 +103,21 @@ export namespace Services {
         }
     }
 
+    function resetState (): any {
+        return function (dispatch: (action: any) => void) {
+            dispatch(Actions.resetState())
+        }
+    }
+
     export const dispatchServices = (dispatch: Dispatch<AnyAction>): ObjectHistoryConnectedDispatch => {
         return {
-            get: () => dispatch(get()),
+            getGlobalHistory: () => dispatch(getGlobalHistory()),
+            getGlobalHistoryFromToken: (pagingToken: Interfaces.IPagingToken) => dispatch(getGlobalHistoryFromToken(pagingToken)),
             getObjectRecord: (objectLogPostParameters: Interfaces.IObjectLogsPostParameters) => dispatch(getObjectRecord(objectLogPostParameters)),
-            getFromToken: (continuationToken: Interfaces.ITableContinuationToken) => dispatch(getFromToken(continuationToken)),
             getDetails: (index: number, paritionKey: string, rowKey: string) => dispatch(getDetails(index, paritionKey, rowKey)),
             showDetailsExpand: (index: number) => dispatch(showHideDetails(index, true)),
-            showDetailsHide: (index: number) => dispatch(showHideDetails(index, false))
+            showDetailsHide: (index: number) => dispatch(showHideDetails(index, false)),
+            resetState: () => dispatch(resetState())
         }
     }
 }

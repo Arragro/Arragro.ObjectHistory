@@ -37,7 +37,7 @@ namespace Arragro.ObjectHistory.IntegrationTests
                 "Arragro.ObjectHistory.IntegrationTests");
 
             serviceCollection.AddSingleton(_objectHistorySettings)
-                .AddArragroObjectHistoryClient<FakeObjectLogsSecurityAttribute>(_objectHistorySettings);
+                .AddArragroObjectHistoryClient(_objectHistorySettings);
 
             _serviceProvider = serviceCollection.BuildServiceProvider();
         }

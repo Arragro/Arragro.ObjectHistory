@@ -7,6 +7,7 @@ namespace Arragro.ObjectHistory.Core.Models
     {
         public string PartitionKey { get; set; }
         public string RowKey { get; set; }
+        public int Version { get; set; }
         public Guid Folder { get; set; }
         public string ApplicationName { get; set; }
         public string ModifiedBy { get; set; }
@@ -17,6 +18,7 @@ namespace Arragro.ObjectHistory.Core.Models
         {
             Folder = objectHistoryEntity.Folder;
             RowKey = objectHistoryEntity.RowKey;
+            Version = objectHistoryEntity.Version;
             PartitionKey = objectHistoryEntity.PartitionKey;
             ApplicationName = objectHistoryEntity.ApplicationName;
             ModifiedBy = objectHistoryEntity.User;
@@ -28,6 +30,7 @@ namespace Arragro.ObjectHistory.Core.Models
         {
             Folder = objectHistoryEntity.Folder;
             RowKey = objectHistoryEntity.RowKey;
+            Version = objectHistoryEntity.Version;
             PartitionKey = objectHistoryEntity.PartitionKey;
             ApplicationName = objectHistoryEntity.ApplicationName;
             ModifiedBy = objectHistoryEntity.User;
@@ -39,6 +42,7 @@ namespace Arragro.ObjectHistory.Core.Models
         {
             Folder = objectHistoryGlobalEntity.Folder;
             RowKey = objectHistoryGlobalEntity.RowKey;
+            Version = objectHistoryGlobalEntity.Version;
             PartitionKey = objectHistoryGlobalEntity.ObjectName;
             ModifiedBy = objectHistoryGlobalEntity.User;
             ModifiedDate = objectHistoryGlobalEntity.Timestamp;

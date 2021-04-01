@@ -1,6 +1,6 @@
 import { Middleware, MiddlewareAPI, Dispatch } from 'redux'
 
-export const loggerMiddleware = (enabled: boolean = false): Middleware<any, {}, any> =>
+export const loggerMiddleware = (enabled = false): Middleware<any, any, any> =>
     ({ getState }: MiddlewareAPI) =>
         (next: Dispatch) =>
             (action: any): any => {

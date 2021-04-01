@@ -15,16 +15,16 @@ namespace Arragro.ObjectHistory.Client.Extensions
 {
     public static class ServicesConfiguration
     {
-        public static IServiceCollection AddArragroObjectHistoryClient<TObjectLogsSecurityAttribute>(
+        public static IServiceCollection AddArragroObjectHistoryClient(
             this IServiceCollection services,
             ObjectHistorySettings objectHistorySettings)
-            where TObjectLogsSecurityAttribute : class, IObjectLogsSecurityAttribute
         {
             services
-                .AddScoped<IObjectLogsSecurityAttribute, TObjectLogsSecurityAttribute>()
-                .AddSingleton(objectHistorySettings)                
+                .AddSingleton(objectHistorySettings)
                 .AddScoped<IObjectHistoryClient, ObjectHistoryClient>()
                 .AddScoped<ObjectHistoryProcessor>();
+
+            QueueAndBlobStorageHelper.EnsureQueueAndContainer(objectHistorySettings);
 
             var sqlliteInMemoryConnectionString = "DataSource=:memory:";
 
@@ -61,6 +61,7 @@ namespace Arragro.ObjectHistory.Client.Extensions
                     break;
                 default:
                     services.AddScoped<IStorageHelper, AzureStorageHelper>();
+                    AzureStorageHelper.EnsureTables(objectHistorySettings);
                     break;
             }
 
@@ -74,6 +75,19 @@ namespace Arragro.ObjectHistory.Client.Extensions
                     (!arragroObjectHistoryContext.Exists() || (!arragroObjectHistoryContext.AllMigrationsApplied())))
                     arragroObjectHistoryContext.Database.Migrate();
             }
+
+            return services;
+        }
+
+        public static IServiceCollection AddArragroObjectHistoryClient<TObjectLogsSecurityAttribute>(
+            this IServiceCollection services,
+            ObjectHistorySettings objectHistorySettings)
+            where TObjectLogsSecurityAttribute : class, IObjectLogsSecurityAttribute
+        {
+            services = services.AddArragroObjectHistoryClient(objectHistorySettings);
+
+            services
+                .AddScoped<IObjectLogsSecurityAttribute, TObjectLogsSecurityAttribute>();
 
             return services;
         }

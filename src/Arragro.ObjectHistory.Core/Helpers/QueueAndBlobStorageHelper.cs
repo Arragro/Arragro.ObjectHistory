@@ -15,10 +15,18 @@ namespace Arragro.ObjectHistory.Core.Helpers
     {
         protected readonly ObjectHistorySettings _objectHistorySettings;
 
-        protected async Task<QueueClient> GetQueueClientAsync()
+        public static void EnsureQueueAndContainer(ObjectHistorySettings objectHistorySettings)
+        {
+            var queueClient = new QueueClient(objectHistorySettings.AzureStorageConnectionString, objectHistorySettings.ObjectQueueName);
+            queueClient.CreateIfNotExists();
+
+            var containerClient = new BlobContainerClient(objectHistorySettings.AzureStorageConnectionString, objectHistorySettings.ObjectOutputContainerName);
+            containerClient.CreateIfNotExists();
+        }
+
+        protected QueueClient GetQueueClient()
         {
             var queueClient = new QueueClient(_objectHistorySettings.AzureStorageConnectionString, _objectHistorySettings.ObjectQueueName);
-            await queueClient.CreateIfNotExistsAsync();
             return queueClient;
         }
 
@@ -27,10 +35,9 @@ namespace Arragro.ObjectHistory.Core.Helpers
             _objectHistorySettings = objectHistorySettings;
         }
 
-        protected async Task<BlobContainerClient> GetObjectHistoryOutputContainerAsync()
+        protected BlobContainerClient GetObjectHistoryOutputContainer()
         {
             var containerClient = new BlobContainerClient(_objectHistorySettings.AzureStorageConnectionString, _objectHistorySettings.ObjectOutputContainerName);
-            await containerClient.CreateIfNotExistsAsync();
             return containerClient;
         }
 
@@ -46,7 +53,7 @@ namespace Arragro.ObjectHistory.Core.Helpers
         {
             try
             {
-                var containerClient = await GetObjectHistoryOutputContainerAsync();
+                var containerClient = GetObjectHistoryOutputContainer();
                 var blobClient = containerClient.GetBlobClient(subfolder.HasValue ? $"{folder}/{subfolder}/{fileName}" : $"{folder}/{fileName}");
 
                 using (var ms = new MemoryStream())
@@ -65,7 +72,7 @@ namespace Arragro.ObjectHistory.Core.Helpers
         {
             try
             {
-                var queueClient = await GetQueueClientAsync();
+                var queueClient = GetQueueClient();
                 await queueClient.SendMessageAsync(JsonConvert.SerializeObject(new ObjectHistoryMessge { Message = message }));
             }
             catch (Exception ex)
@@ -78,7 +85,7 @@ namespace Arragro.ObjectHistory.Core.Helpers
         {
             try
             {
-                var containerClient = await GetObjectHistoryOutputContainerAsync();
+                var containerClient = GetObjectHistoryOutputContainer();
                 var blobClient = containerClient.GetBlobClient(subFolder.HasValue ? $"{folder}/{subFolder}/{filename}" : $"{folder}/{filename}");
                 return await blobClient.DownloadTextAsync();
             }
@@ -90,7 +97,7 @@ namespace Arragro.ObjectHistory.Core.Helpers
 
         public async Task<BlobClient> GetBlobAsync(string blobName)
         {
-            var containerClient = await GetObjectHistoryOutputContainerAsync();
+            var containerClient = GetObjectHistoryOutputContainer();
 
             var blob = containerClient.GetBlobClient(blobName);
 

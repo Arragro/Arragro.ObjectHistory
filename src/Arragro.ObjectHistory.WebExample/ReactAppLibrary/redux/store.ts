@@ -8,7 +8,7 @@ import { StoreState } from './state'
 
 let store: Store<StoreState>
 
-export function configureStore (history: History, logging: boolean = false, initialState?: object): Store<StoreState> {
+export function configureStore (history: History, logging = false, initialState?: any): Store<StoreState> {
     let middleware = applyMiddleware(thunk, loggerMiddleware(logging))
 
     if (process.env.NODE_ENV !== 'production') {

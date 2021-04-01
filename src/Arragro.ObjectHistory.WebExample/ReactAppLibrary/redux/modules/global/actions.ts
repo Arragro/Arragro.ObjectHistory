@@ -3,6 +3,7 @@
 import * as Interfaces from '../../../interfaces'
 import { Omit } from '../../../utils/helpers'
 
+// eslint-disable-next-line @typescript-eslint/no-namespace
 export namespace Actions {
     export enum Type {
         GET_GLOBAL_RECORDS_START = 'ReactApp/global/GET_GLOBAL_RECORDS_START',
@@ -26,7 +27,8 @@ export namespace Actions {
         SHOW_DETAILS_ERROR = 'ReactApp/global/SHOW_DETAILS_ERROR',
 
         SHOW_DETAILS_EXPAND = 'ReactApp/global/SHOW_DETAILS_EXPAND',
-        SHOW_DETAILS_HIDE = 'ReactApp/global/SHOW_DETAILS_HIDE'
+        SHOW_DETAILS_HIDE = 'ReactApp/global/SHOW_DETAILS_HIDE',
+        RESET_STATE = 'ReactApp/global/RESET_STATE'
     }
 
     export const getGlobalHistoryStart = () => action(Type.GET_GLOBAL_RECORDS_START)
@@ -51,6 +53,7 @@ export namespace Actions {
 
     export const showDetailsExpand = (index: number) => action(Type.SHOW_DETAILS_EXPAND, index)
     export const showDetailsHide = (index: number) => action(Type.SHOW_DETAILS_HIDE, index)
+    export const resetState = () => action(Type.RESET_STATE)
 }
 
 export type Actions = Omit<typeof Actions, 'Type'>

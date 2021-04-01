@@ -4,7 +4,7 @@ export interface IProps {
     type: string
     id: string
     label: string
-    error?: {}
+    error?: any
     disabled?: boolean
     submitCount: number
     value: string
@@ -40,7 +40,7 @@ export default class TextBox extends React.Component<IProps, IState> {
     }
 
     render () {
-        let {
+        const {
             type,
             id,
             label,

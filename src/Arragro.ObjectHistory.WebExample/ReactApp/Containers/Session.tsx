@@ -55,7 +55,7 @@ const SessionPage = () => {
             return null
         }
 
-        let output: Array<JSX.Element> = []
+        const output: Array<JSX.Element> = []
 
         for (let i = 0; i < sessionDrillContainer.drills.length; i++) {
             const drill = sessionDrillContainer.drills[i]

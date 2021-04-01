@@ -2,7 +2,6 @@
 
 export type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 export type Diff<T extends string, U extends string> = ({[P in T]: P } & {[P in U]: never } & { [x: string]: never })[T]
-export type OmitString<T, K extends keyof T> = Pick<T, Diff<keyof T, K>>
 
 export const isExisty = (value: any) => {
     return value !== null && value !== undefined
@@ -38,8 +37,8 @@ export const makeEmptyStringNull = (value: string | undefined | null): string | 
 }
 
 export const setDepth = (obj: any, path: string, value: any) => {
-    let tags = path.split('.')
-    let len = tags.length - 1
+    const tags = path.split('.')
+    const len = tags.length - 1
     for (let i = 0; i < len; i++) {
         obj = obj[tags[i]]
     }
@@ -47,8 +46,8 @@ export const setDepth = (obj: any, path: string, value: any) => {
 }
 
 export const getDepth = (obj: any, path: string): any => {
-    let tags = path.split('.')
-    let len = tags.length - 1
+    const tags = path.split('.')
+    const len = tags.length - 1
     for (let i = 0; i < len; i++) {
         obj = obj[tags[i]]
     }
@@ -62,7 +61,7 @@ export const expand = (str: string, val = {}) => {
 }
 
 export const mergeRecursive = (obj1: any, obj2: any) => {
-    for (let p in obj2) {
+    for (const p in obj2) {
         if (obj2[p] !== undefined && obj2[p].constructor === Object) {
             if (obj1[p]) {
                 mergeRecursive(obj1[p], obj2[p])

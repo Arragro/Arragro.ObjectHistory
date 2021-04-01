@@ -3,11 +3,6 @@ import { Switch, Route, BrowserRouter } from 'react-router-dom'
 
 import { Containers as LibraryContainers } from '../ReactAppLibrary'
 import * as Containers from './Containers'
-
-import * as dayjs from 'dayjs'
-import * as utc from 'dayjs/plugin/utc'
-
-dayjs.extend(utc)
 export interface IAppProps {
     logoUrl?: string,
     applicationName?: string

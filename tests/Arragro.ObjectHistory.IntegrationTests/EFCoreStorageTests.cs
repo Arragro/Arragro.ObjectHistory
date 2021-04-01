@@ -84,7 +84,7 @@ namespace Arragro.ObjectHistory.IntegrationTests
                 storageType);
 
             serviceCollection.AddSingleton(_objectHistorySettings)
-                .AddArragroObjectHistoryClient<FakeObjectLogsSecurityAttribute>(_objectHistorySettings);
+                .AddArragroObjectHistoryClient(_objectHistorySettings);
 
             _serviceProvider = serviceCollection.BuildServiceProvider();
         }
@@ -136,11 +136,12 @@ namespace Arragro.ObjectHistory.IntegrationTests
                 Assert.NotNull(raw);
                 Assert.True(raw.IsAdd);
                 Assert.NotNull(raw.SubFolder);
+                Assert.Equal(1, raw.Version);
             }
 
             var modifyFakeObject = fakeDataContext.FakeDatas.ElementAt(0).Clone();
             modifyFakeObject.Data = "Test XX";
-            await objectHistoryClient.SaveObjectHistoryAsync<FakeData>(() => $"{fakeDataContext.FakeDatas.ElementAt(0).Id}", fakeDataContext.FakeDatas.ElementAt(0), "User1", folder);
+            await objectHistoryClient.SaveObjectHistoryAsync<FakeData>(() => $"{fakeDataContext.FakeDatas.ElementAt(0).Id}", modifyFakeObject, "User1", folder);
 
             global = await objectHistoryClient.GetObjectHistoryRecordsByApplicationNamePartitionKeyAsync();
             //Assert.Equal(101, global.Results.Count());
@@ -152,11 +153,42 @@ namespace Arragro.ObjectHistory.IntegrationTests
             Assert.NotNull(raw);
             Assert.NotNull(raw.OldJson);
             Assert.NotNull(raw.SubFolder);
+            Assert.Equal(2, raw.Version);
 
             raw = await objectHistoryClient.GetObjectHistoryDetailRawAsync(entities.Results.First().PartitionKey, entities.Results.Last().RowKey);
             Assert.Null(raw.OldJson);
             Assert.True(raw.IsAdd);
             Assert.NotNull(raw.SubFolder);
+            Assert.Equal(1, raw.Version);
+
+            modifyFakeObject = fakeDataContext.FakeDatas.ElementAt(0).Clone();
+            modifyFakeObject.Data = "Test XXX";
+            await objectHistoryClient.QueueObjectHistoryAsync<FakeData>(() => $"{fakeDataContext.FakeDatas.ElementAt(0).Id}", modifyFakeObject, "User1", folder);
+            await Utils.ProcessQueue(queueClient, objectHistoryProcessor);
+
+            global = await objectHistoryClient.GetObjectHistoryRecordsByApplicationNamePartitionKeyAsync();
+            //Assert.Equal(101, global.Results.Count());
+
+            entities = await objectHistoryClient.GetObjectHistoryRecordsByObjectNamePartitionKeyAsync($"{typeof(FakeData).FullName}-{modifyFakeObject.Id}");
+            Assert.Equal(3, entities.Results.Count());
+
+            raw = await objectHistoryClient.GetObjectHistoryDetailRawAsync(entities.Results.First().PartitionKey, entities.Results.First().RowKey);
+            Assert.NotNull(raw);
+            Assert.NotNull(raw.OldJson);
+            Assert.NotNull(raw.SubFolder);
+            Assert.Equal(3, raw.Version);
+
+            raw = await objectHistoryClient.GetObjectHistoryDetailRawAsync(entities.Results.First().PartitionKey, entities.Results.Last().RowKey);
+            Assert.Null(raw.OldJson);
+            Assert.True(raw.IsAdd);
+            Assert.NotNull(raw.SubFolder);
+            Assert.Equal(1, raw.Version);
+
+            await objectHistoryClient.QueueObjectHistoryAsync<FakeData>(() => $"{fakeDataContext.FakeDatas.ElementAt(0).Id}", modifyFakeObject, "User1", folder);
+            await Utils.ProcessQueue(queueClient, objectHistoryProcessor);
+
+            entities = await objectHistoryClient.GetObjectHistoryRecordsByObjectNamePartitionKeyAsync($"{typeof(FakeData).FullName}-{modifyFakeObject.Id}");
+            Assert.Equal(3, entities.Results.Count());
 
             var removeFakeData = fakeDataContext.FakeDatas.ElementAt(0);
             var removeFakeDataId = removeFakeData.Id;

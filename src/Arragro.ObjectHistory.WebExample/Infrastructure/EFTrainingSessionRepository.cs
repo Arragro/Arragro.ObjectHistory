@@ -56,12 +56,12 @@ namespace Arragro.ObjectHistory.WebExample.Infrastructure
                 throw;
             }
 
-            await _objectHistoryClient.QueueObjectHistoryAsync<TrainingSession>(() => $"{session.Id}", session, "User1");         
+            await _objectHistoryClient.SaveObjectHistoryAsync<TrainingSession>(() => $"{session.Id}", session, "User1");         
         }
 
         public async Task UpdateAsync(TrainingSession session, TrainingSession unmodifiedSession)
         {
-            _dbContext.Entry(session).State = EntityState.Modified;
+            _dbContext.TrainingSessions.Update(session);
             
             try
             {

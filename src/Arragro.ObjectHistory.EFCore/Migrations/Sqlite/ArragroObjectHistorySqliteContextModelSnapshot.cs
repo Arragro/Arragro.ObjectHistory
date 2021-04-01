@@ -51,6 +51,10 @@ namespace Arragro.ObjectHistory.EFCore.Migrations.Sqlite
                         .HasColumnType("TEXT")
                         .HasColumnName("user");
 
+                    b.Property<int>("Version")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("version");
+
                     b.HasKey("PartitionKey", "RowKey")
                         .HasName("pk_object_history_deleted_table_entities");
 
@@ -98,6 +102,10 @@ namespace Arragro.ObjectHistory.EFCore.Migrations.Sqlite
                         .HasColumnType("TEXT")
                         .HasColumnName("user");
 
+                    b.Property<int>("Version")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("version");
+
                     b.HasKey("PartitionKey", "RowKey")
                         .HasName("pk_object_history_global_table_entity");
 
@@ -144,6 +152,10 @@ namespace Arragro.ObjectHistory.EFCore.Migrations.Sqlite
                     b.Property<string>("User")
                         .HasColumnType("TEXT")
                         .HasColumnName("user");
+
+                    b.Property<int>("Version")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("version");
 
                     b.HasKey("PartitionKey", "RowKey")
                         .HasName("pk_object_history_table_entity");

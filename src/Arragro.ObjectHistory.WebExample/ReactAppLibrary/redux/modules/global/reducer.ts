@@ -14,7 +14,7 @@ const testStateAndPayload = (state: ObjectHistoryState, payload: any) => {
 }
 
 const showHideDetails = (state: ObjectHistoryState, index: number, expanded: boolean) => {
-    let results = state.resultContainer!.results
+    const results = state.resultContainer!.results
 
     results[index].expanded = expanded
 
@@ -25,6 +25,21 @@ const showHideDetails = (state: ObjectHistoryState, index: number, expanded: boo
             results
         }
     }
+}
+
+const appendResultsContainer = (state: ObjectHistoryState, objectHistoryQueryResultContainer?: Interfaces.IObjectHistoryQueryResultContainer) => {
+    if (objectHistoryQueryResultContainer === undefined ||
+        state.resultContainer === undefined) {
+        return objectHistoryQueryResultContainer
+    }
+
+    const resultContainer = state.resultContainer === undefined ? { results: [], partitionKey: null, pagingToken: null } : state.resultContainer
+    resultContainer.partitionKey = objectHistoryQueryResultContainer.partitionKey
+    resultContainer.results.push(...objectHistoryQueryResultContainer.results)
+        
+    resultContainer.pagingToken = objectHistoryQueryResultContainer.pagingToken
+
+    return resultContainer
 }
 
 export const objectHistory = (state = initialState.objectHistory, action: any): ObjectHistoryState => {
@@ -41,7 +56,7 @@ export const objectHistory = (state = initialState.objectHistory, action: any): 
         return {
             ...state,
             loading: false,
-            resultContainer: action.payload
+            resultContainer: appendResultsContainer(state, action.payload)
         }
     case Actions.Type.GET_GLOBAL_RECORDS_ERROR:
     case Actions.Type.GET_OBJECT_RECORDS_ERROR:
@@ -59,8 +74,8 @@ export const objectHistory = (state = initialState.objectHistory, action: any): 
     case Actions.Type.GET_GLOBAL_RECORDS_FROM_TOKEN_SUCCESS: {
         testStateAndPayload(state, action.payload)
 
-        let results = state.resultContainer!.results
-        let resultContainer = action.payload as Interfaces.IObjectHistoryQueryResultContainer
+        const results = state.resultContainer!.results
+        const resultContainer = action.payload as Interfaces.IObjectHistoryQueryResultContainer
         for (let i = 0; i < resultContainer.results.length; i++) {
             results.push(resultContainer.results[i])
         }
@@ -70,7 +85,7 @@ export const objectHistory = (state = initialState.objectHistory, action: any): 
             resultContainer: {
                 ...state.resultContainer!,
                 results,
-                continuationToken: resultContainer.continuationToken
+                pagingToken: resultContainer.pagingToken
             }
         }
     }
@@ -88,7 +103,7 @@ export const objectHistory = (state = initialState.objectHistory, action: any): 
     case Actions.Type.SHOW_DETAILS_SUCCESS: {
         testStateAndPayload(state, action.payload)
 
-        let results = state.resultContainer!.results
+        const results = state.resultContainer!.results
         const index = action.payload.index
         const historyDetail = action.payload.result
 
@@ -115,6 +130,9 @@ export const objectHistory = (state = initialState.objectHistory, action: any): 
     case Actions.Type.SHOW_DETAILS_HIDE: {
         testStateAndPayload(state, action.payload)
         return showHideDetails(state, action.payload, false)
+    }
+    case Actions.Type.RESET_STATE: {
+        return initialState.objectHistory
     }
     default:
         return state

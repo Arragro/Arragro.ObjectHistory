@@ -5,6 +5,7 @@ namespace Arragro.ObjectHistory.AzureStorage
 {
     public class ObjectHistoryGlobalTableEntity : TableEntity
     {
+        public int Verion { get; set; }
         public string User { get; set; }
         public string ObjectName { get; set; }
         public Guid Folder { get; set; }

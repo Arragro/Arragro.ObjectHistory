@@ -20,6 +20,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Newtonsoft.Json;
 
 namespace Arragro.ObjectHistory.WebExample
 {
@@ -90,9 +91,7 @@ namespace Arragro.ObjectHistory.WebExample
         {
             if (env.IsDevelopment())
             {
-                var demoDbContext = app.ApplicationServices.GetService<DemoDbContext>();
-                var repository = app.ApplicationServices.GetService<ITrainingSessionRepository>();
-                CreateAndMigrateDatabase(demoDbContext, repository);
+                CreateAndMigrateDatabase(app.ApplicationServices);
 
                 // app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
                 // {
@@ -124,30 +123,59 @@ namespace Arragro.ObjectHistory.WebExample
         }
 
         public void CreateAndMigrateDatabase(
-            DemoDbContext demoDbContext,
-            ITrainingSessionRepository trainingSessionRepository)
+            IServiceProvider serviceProvider)
         {
+            var demoDbContext = serviceProvider.GetService<DemoDbContext>();
+
             var demoDbExists = demoDbContext.Exists();
 
             if (!demoDbExists || (!demoDbContext.AllMigrationsApplied()))
             {
                 demoDbContext.Database.Migrate();
-                if (!demoDbExists)
+                if (!demoDbContext.TrainingSessions.Any())
                 {
-                    InitializeDatabaseAsync(trainingSessionRepository).Wait();
+                    InitializeDatabaseAsync(serviceProvider).Wait();
                 }
             }
         }
 
-        public async Task InitializeDatabaseAsync(ITrainingSessionRepository repo)
+        public async Task InitializeDatabaseAsync(IServiceProvider serviceProvider)
         {
-            var sessionList = await repo.ListAsync();
+            var repository = serviceProvider.GetService<ITrainingSessionRepository>();
+            var sessionList = await repository.ListAsync();
+            var sessions = GetInitSession();
+
+            using (var scope = serviceProvider.CreateScope())
+            {
+                repository = scope.ServiceProvider.GetService<ITrainingSessionRepository>();
+                if (!sessionList.Any())
+                {
+                    foreach (var session in sessions)
+                    {
+                        await repository.AddAsync(session);
+                    }
+                }
+            }
+
             if (!sessionList.Any())
             {
-                var sessions = GetInitSession();
-                foreach(var session in sessions) 
+                for (var i = 0; i < 100; i++)
                 {
-                    await repo.AddAsync(session);
+                    repository = serviceProvider.GetService<ITrainingSessionRepository>();
+                    var session = await repository.GetByIdAsync(1);
+                    var mod = session.Clone();
+                    mod.AddDrill(new Drill
+                    {
+                        Name = $"Test {i + 1}",
+                        Description = $"Description {i + 1}",
+                        SkillLevel = Difficulty.Beginner
+                    });
+                    using (var scope = serviceProvider.CreateScope())
+                    {
+                        repository = scope.ServiceProvider.GetService<ITrainingSessionRepository>();
+                        await repository.UpdateAsync(mod, session);
+                        session = await repository.GetByIdAsync(1);
+                    }
                 }
             }
         }
@@ -176,6 +204,21 @@ namespace Arragro.ObjectHistory.WebExample
             }
 
             return sessions;
+        }
+    }
+    public static class CloningService
+    {
+        public static T Clone<T>(this T source)
+        {
+            // Don't serialize a null object, simply return the default for that object
+            if (Object.ReferenceEquals(source, null))
+            {
+                return default(T);
+            }
+
+            var deserializeSettings = new JsonSerializerSettings { ObjectCreationHandling = ObjectCreationHandling.Replace };
+            var serializeSettings = new JsonSerializerSettings { ReferenceLoopHandling = ReferenceLoopHandling.Ignore };
+            return JsonConvert.DeserializeObject<T>(JsonConvert.SerializeObject(source, serializeSettings), deserializeSettings);
         }
     }
 }

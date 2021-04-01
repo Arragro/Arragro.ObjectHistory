@@ -13,6 +13,7 @@ namespace Arragro.ObjectHistory.Core.Models
             NewJson = objectHistoryDetailRaw.NewJson;
             OldJson = objectHistoryDetailRaw.OldJson;
             Diff = objectHistoryDetailRaw.Diff;
+            Version = objectHistoryDetailRaw.Version;
         }
 
         protected ObjectHistoryDetailRead() : base() { }
@@ -26,13 +27,14 @@ namespace Arragro.ObjectHistory.Core.Models
         {
             try
             {
-                if (this.IsAdd)
+                if (IsAdd)
                 {
                     return new ObjectHistoryDetailRaw(ObjectHistorySettingsBase, PartitionKey, RowKey, ApplicationName, TimeStamp, User, Folder, SecurityValidationToken, SubFolder, IsAdd)
                     {
                         NewJson = NewJson.ToString(),
                         OldJson = null,
-                        Diff = null
+                        Diff = null,
+                        Version = Version
                     };
                 }
                 else
@@ -41,7 +43,8 @@ namespace Arragro.ObjectHistory.Core.Models
                     {
                         NewJson = NewJson.ToString(),
                         OldJson = OldJson != null ? OldJson.ToString() : null,
-                        Diff = Diff != null ? Diff.ToString() : null
+                        Diff = Diff != null ? Diff.ToString() : null,
+                        Version = Version
                     };
                 }
             }

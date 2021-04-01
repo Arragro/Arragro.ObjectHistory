@@ -17,6 +17,7 @@ namespace Arragro.ObjectHistory.EFCore.Migrations.Sqlite
                 {
                     partition_key = table.Column<string>(type: "TEXT", nullable: false),
                     row_key = table.Column<long>(type: "INTEGER", nullable: false),
+                    version = table.Column<int>(type: "INTEGER", nullable: false),
                     application_name = table.Column<string>(type: "TEXT", nullable: true),
                     folder = table.Column<Guid>(type: "TEXT", nullable: false),
                     sub_folder = table.Column<Guid>(type: "TEXT", nullable: true),
@@ -36,6 +37,7 @@ namespace Arragro.ObjectHistory.EFCore.Migrations.Sqlite
                 {
                     partition_key = table.Column<string>(type: "TEXT", nullable: false),
                     row_key = table.Column<long>(type: "INTEGER", nullable: false),
+                    version = table.Column<int>(type: "INTEGER", nullable: false),
                     user = table.Column<string>(type: "TEXT", nullable: true),
                     object_name = table.Column<string>(type: "TEXT", nullable: true),
                     folder = table.Column<Guid>(type: "TEXT", nullable: false),
@@ -56,6 +58,7 @@ namespace Arragro.ObjectHistory.EFCore.Migrations.Sqlite
                 {
                     partition_key = table.Column<string>(type: "TEXT", nullable: false),
                     row_key = table.Column<long>(type: "INTEGER", nullable: false),
+                    version = table.Column<int>(type: "INTEGER", nullable: false),
                     application_name = table.Column<string>(type: "TEXT", nullable: true),
                     folder = table.Column<Guid>(type: "TEXT", nullable: false),
                     sub_folder = table.Column<Guid>(type: "TEXT", nullable: true),

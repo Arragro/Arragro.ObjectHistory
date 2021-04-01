@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Arragro.ObjectHistory.EFCore.Migrations.Sqlite
 {
     [DbContext(typeof(ArragroObjectHistorySqliteContext))]
-    [Migration("20210330053424_Initial")]
+    [Migration("20210330232538_Initial")]
     partial class Initial
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -52,6 +52,10 @@ namespace Arragro.ObjectHistory.EFCore.Migrations.Sqlite
                     b.Property<string>("User")
                         .HasColumnType("TEXT")
                         .HasColumnName("user");
+
+                    b.Property<int>("Version")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("version");
 
                     b.HasKey("PartitionKey", "RowKey")
                         .HasName("pk_object_history_deleted_table_entities");
@@ -100,6 +104,10 @@ namespace Arragro.ObjectHistory.EFCore.Migrations.Sqlite
                         .HasColumnType("TEXT")
                         .HasColumnName("user");
 
+                    b.Property<int>("Version")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("version");
+
                     b.HasKey("PartitionKey", "RowKey")
                         .HasName("pk_object_history_global_table_entity");
 
@@ -146,6 +154,10 @@ namespace Arragro.ObjectHistory.EFCore.Migrations.Sqlite
                     b.Property<string>("User")
                         .HasColumnType("TEXT")
                         .HasColumnName("user");
+
+                    b.Property<int>("Version")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("version");
 
                     b.HasKey("PartitionKey", "RowKey")
                         .HasName("pk_object_history_table_entity");
