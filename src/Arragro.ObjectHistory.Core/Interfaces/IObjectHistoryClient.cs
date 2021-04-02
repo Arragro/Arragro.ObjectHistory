@@ -6,6 +6,7 @@ namespace Arragro.ObjectHistory.Core
 {
     public interface IObjectHistoryClient
     {
+        Task<bool> HasObjectHistoryEntityAsync(string partitionKey);
         Task<ObjectHistoryDetailRaw> GetLatestObjectHistoryDetailRawAsync(string partitionKey);
         Task<ObjectHistoryDetailRaw> GetLatestObjectHistoryDeletedDetailRawAsync(string partitionKey);
         Task<ObjectHistoryDetailRaw> GetObjectHistoryDetailRawAsync(string partitionKey, string rowKey);

@@ -162,5 +162,10 @@ namespace Arragro.ObjectHistory.Client
         {
             await _storageHelper.DeleteObjectHistoryDeletedByPartitionKey(partitionKey);
         }
+
+        public async Task<bool> HasObjectHistoryEntityAsync(string partitionKey)
+        {
+            return await _storageHelper.HasObjectHistoryEntityAsync(partitionKey);
+        }
     }
 }
