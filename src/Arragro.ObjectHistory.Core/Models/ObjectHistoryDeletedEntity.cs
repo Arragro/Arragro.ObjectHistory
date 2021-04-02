@@ -13,6 +13,7 @@ namespace Arragro.ObjectHistory.Core.Models
         public Guid? SubFolder { get; set; }
         public DateTimeOffset Timestamp { get; set; }
         public string User { get; set; }
+        public string Metadata { get; set; }
         /// <summary>
         /// Use this to help any validation you want to apply to the main controller I
         /// </summary>
@@ -29,6 +30,7 @@ namespace Arragro.ObjectHistory.Core.Models
             Guid? subFolder,
             DateTimeOffset timestamp,
             string user,
+            string metadata,
             string securityValidationToken)
         {
             PartitionKey = partitionKey;
@@ -39,6 +41,7 @@ namespace Arragro.ObjectHistory.Core.Models
             SubFolder = subFolder;
             Timestamp = timestamp;
             User = user;
+            Metadata = metadata;
             SecurityValidationToken = securityValidationToken;
         }
 

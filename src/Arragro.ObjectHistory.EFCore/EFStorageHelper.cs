@@ -46,6 +46,7 @@ namespace Arragro.ObjectHistory.EFCore
                     Folder = objectHistoryDetails.Folder,
                     SubFolder = objectHistoryDetails.SubFolder,
                     IsAdd = objectHistoryDetails.IsAdd,
+                    Metadata = objectHistoryDetails.Metadata,
                     SecurityValidationToken = objectHistoryDetails.SecurityValidationToken
                 };
 
@@ -74,6 +75,7 @@ namespace Arragro.ObjectHistory.EFCore
                     User = objectHistoryDetails.User,
                     Folder = objectHistoryDetails.Folder,
                     SubFolder = objectHistoryDetails.SubFolder,
+                    Metadata = objectHistoryDetails.Metadata,
                     SecurityValidationToken = objectHistoryDetails.SecurityValidationToken
                 };
 
@@ -103,6 +105,7 @@ namespace Arragro.ObjectHistory.EFCore
                     Folder = objectHistoryDetails.Folder,
                     SubFolder = objectHistoryDetails.SubFolder,
                     IsAdd = objectHistoryDetails.IsAdd,
+                    Metadata = objectHistoryDetails.Metadata,
                     SecurityValidationToken = objectHistoryDetails.SecurityValidationToken
                 };
 
@@ -135,6 +138,7 @@ namespace Arragro.ObjectHistory.EFCore
                 objectHistoryTableEntity.Timestamp,
                 objectHistoryTableEntity.User,
                 objectHistoryTableEntity.IsAdd,
+                objectHistoryTableEntity.Metadata,
                 objectHistoryTableEntity.SecurityValidationToken);
         }
 
@@ -152,6 +156,7 @@ namespace Arragro.ObjectHistory.EFCore
                 objectHistoryTableEntity.SubFolder,
                 objectHistoryTableEntity.Timestamp,
                 objectHistoryTableEntity.User,
+                objectHistoryTableEntity.Metadata,
                 objectHistoryTableEntity.SecurityValidationToken);
         }
 
@@ -178,6 +183,7 @@ namespace Arragro.ObjectHistory.EFCore
                 objectHistoryTableEntity.Timestamp,
                 objectHistoryTableEntity.User,
                 objectHistoryTableEntity.IsAdd,
+                objectHistoryTableEntity.Metadata,
                 objectHistoryTableEntity.SecurityValidationToken);
         }
 
@@ -200,6 +206,7 @@ namespace Arragro.ObjectHistory.EFCore
                     objectHistoryTableEntity.SubFolder,
                     objectHistoryTableEntity.Timestamp,
                     objectHistoryTableEntity.User,
+                    objectHistoryTableEntity.Metadata,
                     objectHistoryTableEntity.SecurityValidationToken)),
                 ConfigureNexPagingToken(pagingToken, total));
 
@@ -227,6 +234,7 @@ namespace Arragro.ObjectHistory.EFCore
                     objectHistoryTableEntity.Timestamp,
                     objectHistoryTableEntity.User,
                     objectHistoryTableEntity.IsAdd,
+                    objectHistoryTableEntity.Metadata,
                     objectHistoryTableEntity.SecurityValidationToken)),
                 ConfigureNexPagingToken(pagingToken, total), partitionKey);
 
@@ -252,7 +260,8 @@ namespace Arragro.ObjectHistory.EFCore
                     objectHistoryGlobalEntity.ObjectName,
                     objectHistoryGlobalEntity.Folder,
                     objectHistoryGlobalEntity.SubFolder,
-                    objectHistoryGlobalEntity.Timestamp)),
+                    objectHistoryGlobalEntity.Timestamp,
+                    objectHistoryGlobalEntity.Metadata)),
                 ConfigureNexPagingToken(pagingToken, total), partitionKey);
 
             return entityResults;

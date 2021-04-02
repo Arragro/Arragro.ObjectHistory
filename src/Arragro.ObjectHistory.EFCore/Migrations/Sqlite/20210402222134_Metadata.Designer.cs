@@ -3,14 +3,16 @@ using System;
 using Arragro.ObjectHistory.EFCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 namespace Arragro.ObjectHistory.EFCore.Migrations.Sqlite
 {
     [DbContext(typeof(ArragroObjectHistorySqliteContext))]
-    partial class ArragroObjectHistorySqliteContextModelSnapshot : ModelSnapshot
+    [Migration("20210402222134_Metadata")]
+    partial class Metadata
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

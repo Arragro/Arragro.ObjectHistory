@@ -64,7 +64,8 @@ namespace Arragro.ObjectHistory.AzureStorage
                     Folder = objectHistoryDetails.Folder,
                     SubFolder = objectHistoryDetails.SubFolder,
                     IsAdd = objectHistoryDetails.IsAdd,
-                    SecurityValidationToken = objectHistoryDetails.SecurityValidationToken
+                    SecurityValidationToken = objectHistoryDetails.SecurityValidationToken,
+                    Metadata = objectHistoryDetails.Metadata
                 };
 
                 var insertOperation = TableOperation.Insert(objectHistoryEntity);
@@ -88,7 +89,8 @@ namespace Arragro.ObjectHistory.AzureStorage
                     User = objectHistoryDetails.User,
                     Folder = objectHistoryDetails.Folder,
                     SubFolder = objectHistoryDetails.SubFolder,
-                    SecurityValidationToken = objectHistoryDetails.SecurityValidationToken
+                    SecurityValidationToken = objectHistoryDetails.SecurityValidationToken,
+                    Metadata = objectHistoryDetails.Metadata
                 };
 
                 var insertOperation = TableOperation.Insert(objectHistoryEntity);
@@ -113,7 +115,8 @@ namespace Arragro.ObjectHistory.AzureStorage
                     Folder = objectHistoryDetails.Folder,
                     SubFolder = objectHistoryDetails.SubFolder,
                     IsAdd = objectHistoryDetails.IsAdd,
-                    SecurityValidationToken = objectHistoryDetails.SecurityValidationToken
+                    SecurityValidationToken = objectHistoryDetails.SecurityValidationToken,
+                    Metadata = objectHistoryDetails.Metadata
                 };
 
                 var insertOperation = TableOperation.Insert(objectHistoryEntity);
@@ -146,6 +149,7 @@ namespace Arragro.ObjectHistory.AzureStorage
                 objectHistoryTableEntity.Timestamp,
                 objectHistoryTableEntity.User,
                 objectHistoryTableEntity.IsAdd,
+                objectHistoryTableEntity.Metadata,
                 objectHistoryTableEntity.SecurityValidationToken);
         }
 
@@ -169,6 +173,7 @@ namespace Arragro.ObjectHistory.AzureStorage
                 objectHistoryTableEntity.SubFolder,
                 objectHistoryTableEntity.Timestamp,
                 objectHistoryTableEntity.User,
+                objectHistoryTableEntity.Metadata,
                 objectHistoryTableEntity.SecurityValidationToken);
         }
 
@@ -208,6 +213,7 @@ namespace Arragro.ObjectHistory.AzureStorage
                     objectHistoryTableEntity.Timestamp,
                     objectHistoryTableEntity.User,
                     objectHistoryTableEntity.IsAdd,
+                    objectHistoryTableEntity.Metadata,
                     objectHistoryTableEntity.SecurityValidationToken);
             }
             catch (Exception ex)
@@ -235,6 +241,7 @@ namespace Arragro.ObjectHistory.AzureStorage
                         objectHistoryTableEntity.SubFolder,
                         objectHistoryTableEntity.Timestamp,
                         objectHistoryTableEntity.User,
+                        objectHistoryTableEntity.Metadata,
                         objectHistoryTableEntity.SecurityValidationToken)),
                     new PagingToken(tableContinuationToken));
 
@@ -273,6 +280,7 @@ namespace Arragro.ObjectHistory.AzureStorage
                         objectHistoryTableEntity.Timestamp,
                         objectHistoryTableEntity.User,
                         objectHistoryTableEntity.IsAdd,
+                        objectHistoryTableEntity.Metadata,
                         objectHistoryTableEntity.SecurityValidationToken)), 
                     pagingToken, partitionKey);
 
@@ -309,7 +317,8 @@ namespace Arragro.ObjectHistory.AzureStorage
                         objectHistoryGlobalEntity.ObjectName,
                         objectHistoryGlobalEntity.Folder,
                         objectHistoryGlobalEntity.SubFolder,
-                        objectHistoryGlobalEntity.Timestamp)),
+                        objectHistoryGlobalEntity.Timestamp,
+                        objectHistoryGlobalEntity.Metadata)),
                     pagingToken, partitionKey);
 
                 return entityResults;

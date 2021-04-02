@@ -13,6 +13,7 @@ namespace Arragro.ObjectHistory.EFCore
         public string User { get; set; }
         public bool IsAdd { get; set; }
         public DateTimeOffset Timestamp { get; set; }
+        public string Metadata { get; set; }
         /// <summary>
         /// Use this to help any validation you want to apply to the main controller I
         /// </summary>

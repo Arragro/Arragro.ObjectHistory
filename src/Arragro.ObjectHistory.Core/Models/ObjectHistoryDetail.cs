@@ -13,12 +13,23 @@ namespace Arragro.ObjectHistory.Core.Models
         public Guid? SubFolder { get; set; }
         public string User { get; set; }
         public bool IsAdd { get; set; }
+        public string Metadata { get; set; }
         /// <summary>
         /// Use this to help any validation you want to apply to the main controller I
         /// </summary>
         public string SecurityValidationToken { get; set; }
 
-        public ObjectHistoryDetailBase(string partitionKey, string rowKey, string applicationName, DateTime timeStamp, string user, Guid folder, bool isAdd, Guid? subFolder, string securityValidationToken)
+        public ObjectHistoryDetailBase(
+            string partitionKey, 
+            string rowKey, 
+            string applicationName, 
+            DateTime timeStamp, 
+            string user, 
+            Guid folder, 
+            bool isAdd, 
+            Guid? subFolder, 
+            string metadata,
+            string securityValidationToken)
         {
             PartitionKey = partitionKey;
             RowKey = rowKey;
@@ -28,6 +39,7 @@ namespace Arragro.ObjectHistory.Core.Models
             Folder = folder;
             SubFolder = subFolder;
             IsAdd = isAdd;
+            Metadata = metadata;
             SecurityValidationToken = securityValidationToken;
         }
 

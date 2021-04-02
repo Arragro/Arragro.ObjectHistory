@@ -6,8 +6,8 @@ namespace Arragro.ObjectHistory.Core.Models
     {
         public ObjectHistoryDetailRead(ObjectHistoryDetailRaw objectHistoryDetailRaw)
             : base(objectHistoryDetailRaw.PartitionKey, objectHistoryDetailRaw.RowKey, objectHistoryDetailRaw.ApplicationName, objectHistoryDetailRaw.TimeStamp, 
-                   objectHistoryDetailRaw.User, objectHistoryDetailRaw.Folder, objectHistoryDetailRaw.IsAdd, objectHistoryDetailRaw.SubFolder, 
-                   objectHistoryDetailRaw.SecurityValidationToken)
+                   objectHistoryDetailRaw.User, objectHistoryDetailRaw.Folder, objectHistoryDetailRaw.IsAdd, objectHistoryDetailRaw.SubFolder,
+                   objectHistoryDetailRaw.Metadata, objectHistoryDetailRaw.SecurityValidationToken)
         {
             ObjectHistorySettingsBase = objectHistoryDetailRaw.ObjectHistorySettingsBase;
             NewJson = objectHistoryDetailRaw.NewJson;
@@ -29,7 +29,7 @@ namespace Arragro.ObjectHistory.Core.Models
             {
                 if (IsAdd)
                 {
-                    return new ObjectHistoryDetailRaw(ObjectHistorySettingsBase, PartitionKey, RowKey, ApplicationName, TimeStamp, User, Folder, SecurityValidationToken, SubFolder, IsAdd)
+                    return new ObjectHistoryDetailRaw(ObjectHistorySettingsBase, PartitionKey, RowKey, ApplicationName, TimeStamp, User, Folder, SecurityValidationToken, SubFolder, Metadata, IsAdd)
                     {
                         NewJson = NewJson.ToString(),
                         OldJson = null,
@@ -39,7 +39,7 @@ namespace Arragro.ObjectHistory.Core.Models
                 }
                 else
                 {
-                    return new ObjectHistoryDetailRaw(ObjectHistorySettingsBase, PartitionKey, RowKey, ApplicationName, TimeStamp, User, Folder, SecurityValidationToken, SubFolder, IsAdd)
+                    return new ObjectHistoryDetailRaw(ObjectHistorySettingsBase, PartitionKey, RowKey, ApplicationName, TimeStamp, User, Folder, SecurityValidationToken, SubFolder, Metadata, IsAdd)
                     {
                         NewJson = NewJson.ToString(),
                         OldJson = OldJson != null ? OldJson.ToString() : null,

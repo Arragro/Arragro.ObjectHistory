@@ -12,6 +12,7 @@ namespace Arragro.ObjectHistory.Core.Models
         public string ApplicationName { get; set; }
         public string ModifiedBy { get; set; }
         public DateTimeOffset ModifiedDate { get; set; }
+        public string Metadata { get; set; }
         public QueryResultType QueryResultType { get; set;}
 
         public ObjectHistoryQueryResult(ObjectHistoryEntity objectHistoryEntity)
@@ -23,6 +24,7 @@ namespace Arragro.ObjectHistory.Core.Models
             ApplicationName = objectHistoryEntity.ApplicationName;
             ModifiedBy = objectHistoryEntity.User;
             ModifiedDate = objectHistoryEntity.Timestamp;
+            Metadata = objectHistoryEntity.Metadata;
             QueryResultType = QueryResultType.Object;
         }
 
@@ -35,6 +37,7 @@ namespace Arragro.ObjectHistory.Core.Models
             ApplicationName = objectHistoryEntity.ApplicationName;
             ModifiedBy = objectHistoryEntity.User;
             ModifiedDate = objectHistoryEntity.Timestamp;
+            Metadata = objectHistoryEntity.Metadata;
             QueryResultType = QueryResultType.Deleted;
         }
 
@@ -46,6 +49,7 @@ namespace Arragro.ObjectHistory.Core.Models
             PartitionKey = objectHistoryGlobalEntity.ObjectName;
             ModifiedBy = objectHistoryGlobalEntity.User;
             ModifiedDate = objectHistoryGlobalEntity.Timestamp;
+            Metadata = objectHistoryGlobalEntity.Metadata;
             QueryResultType = QueryResultType.Global;
         }
     }

@@ -6,14 +6,33 @@ namespace Arragro.ObjectHistory.Core.Models
 {
     public class ObjectHistoryDetailRaw : ObjectHistoryDetailBase
     {
-        internal ObjectHistoryDetailRaw(ObjectHistorySettingsBase objectHistorySettingsBase, string partitionKey, string rowKey, string applicationName, DateTime timeStamp, string user, Guid folder, string securityValidationToken, Guid? subFolder, bool isAdd = false)
-            : base(partitionKey, rowKey, applicationName, timeStamp, user, folder, isAdd, subFolder, securityValidationToken)
+        internal ObjectHistoryDetailRaw(
+            ObjectHistorySettingsBase objectHistorySettingsBase, 
+            string partitionKey, 
+            string rowKey, 
+            string applicationName, 
+            DateTime timeStamp, 
+            string user, 
+            Guid folder, 
+            string securityValidationToken, 
+            Guid? subFolder, 
+            string metadata= null,
+            bool isAdd = false)
+            : base(partitionKey, rowKey, applicationName, timeStamp, user, folder, isAdd, subFolder, metadata, securityValidationToken)
         {
             ObjectHistorySettingsBase = objectHistorySettingsBase;
         } 
 
-        public ObjectHistoryDetailRaw(ObjectHistorySettingsBase objectHistorySettingsBase, string partitionKey, string applicationName, string user, Guid? folder = null, string securityValidationToken = null, bool isAdd = false)
-            : base(partitionKey, string.Format("{0:D19}", DateTime.MaxValue.Ticks - DateTime.UtcNow.Ticks), applicationName, DateTime.UtcNow, user, folder.HasValue ? folder.Value : Guid.NewGuid(), isAdd, folder.HasValue ? Guid.NewGuid() : (Guid?)null, securityValidationToken)
+        public ObjectHistoryDetailRaw(
+            ObjectHistorySettingsBase objectHistorySettingsBase, 
+            string partitionKey, 
+            string applicationName, 
+            string user, 
+            Guid? folder = null, 
+            string securityValidationToken = null,
+            string metadata = null,
+            bool isAdd = false)
+            : base(partitionKey, string.Format("{0:D19}", DateTime.MaxValue.Ticks - DateTime.UtcNow.Ticks), applicationName, DateTime.UtcNow, user, folder.HasValue ? folder.Value : Guid.NewGuid(), isAdd, folder.HasValue ? Guid.NewGuid() : (Guid?)null, metadata, securityValidationToken)
         {
             ObjectHistorySettingsBase = objectHistorySettingsBase;
         }

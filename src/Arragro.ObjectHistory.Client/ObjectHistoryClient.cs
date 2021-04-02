@@ -26,12 +26,14 @@ namespace Arragro.ObjectHistory.Client
             _jsonHelper = new JsonHelper();
         }
 
-        private ObjectHistoryDetailRaw GetObjectHistoryDetailRaw<T>(Func<string> getKeys, string user, bool isAdd, Guid? folder = null)
+        private ObjectHistoryDetailRaw GetObjectHistoryDetailRaw<T>(Func<string> getKeys, string user, bool isAdd, Guid? folder, string metadata)
         {
             var fullyQualifiedName = typeof(T).FullName;
 
             var key = getKeys();
             var partitionKey = $"{fullyQualifiedName}-{key}";
+            if (!string.IsNullOrEmpty(metadata) && metadata.Length > 100)
+                metadata = metadata.Substring(0, 100);
 
             return new ObjectHistoryDetailRaw(
                                 _objectHistorySettings.ToObjectHistorySettingsBase(),
@@ -39,7 +41,8 @@ namespace Arragro.ObjectHistory.Client
                                 _objectHistorySettings.ApplicationName,
                                 user,
                                 folder: folder,
-                                isAdd: isAdd);
+                                isAdd: isAdd,
+                                metadata: metadata);
         }
 
         private async Task QueueObjectHistoryAsync(ObjectHistoryDetailRaw objectHistoryDetailRaw)
@@ -58,10 +61,10 @@ namespace Arragro.ObjectHistory.Client
             return pagingToken == null ? new PagingToken(1, 10) : pagingToken;
         }
 
-        private async Task<ObjectHistoryDetailRaw> BuildObjectHistoryDataRawAsync<T>(Func<string> getKeys, T newObject, string user, Guid? folder)
+        private async Task<ObjectHistoryDetailRaw> BuildObjectHistoryDataRawAsync<T>(Func<string> getKeys, T newObject, string user, Guid? folder, string metadata)
         {
             var current = await _storageHelper.GetLatestObjectHistoryEntityAsync($"{typeof(T).FullName}-{getKeys()}");
-            var objectHistoryDetailRaw = GetObjectHistoryDetailRaw<T>(getKeys, user, current == null, folder);
+            var objectHistoryDetailRaw = GetObjectHistoryDetailRaw<T>(getKeys, user, current == null, folder, metadata);
             if (current != null)
             {
                 var blobClient = await _storageHelper.GetBlobAsync($"{current.GetBlobPath()}/{Constants.ObjectHistoryFileName}");
@@ -90,21 +93,21 @@ namespace Arragro.ObjectHistory.Client
             return objectHistoryDetailRaw;
         }
 
-        public async Task QueueObjectHistoryAsync<T>(Func<string> getKeys, T newObject, string user, Guid? folder = null)
+        public async Task QueueObjectHistoryAsync<T>(Func<string> getKeys, T newObject, string user, Guid? folder = null, string metadata = null)
         {
-            var objectHistoryDetailRaw = await BuildObjectHistoryDataRawAsync(getKeys, newObject, user, folder);
+            var objectHistoryDetailRaw = await BuildObjectHistoryDataRawAsync(getKeys, newObject, user, folder, metadata);
             await QueueObjectHistoryAsync(objectHistoryDetailRaw);
         }
 
-        public async Task SaveObjectHistoryAsync<T>(Func<string> getKeys, T newObject, string user, Guid? folder = null)
+        public async Task SaveObjectHistoryAsync<T>(Func<string> getKeys, T newObject, string user, Guid? folder = null, string metadata = null)
         {
-            var objectHistoryDetailRaw = await BuildObjectHistoryDataRawAsync(getKeys, newObject, user, folder);
+            var objectHistoryDetailRaw = await BuildObjectHistoryDataRawAsync(getKeys, newObject, user, folder, metadata);
             await _objectHistoryProcessor.ProcessObjectHistoryDetailAsync(new ObjectHistoryDetailRead( objectHistoryDetailRaw));
         }
 
-        public async Task SaveObjectHistoryDeletedAsync<T>(Func<string> getKeys, T newObject, string user, Guid? folder = null)
+        public async Task SaveObjectHistoryDeletedAsync<T>(Func<string> getKeys, T newObject, string user, Guid? folder = null, string metadata = null)
         {
-            var objectHistoryDetailRaw = GetObjectHistoryDetailRaw<T>(getKeys, user, false, folder);
+            var objectHistoryDetailRaw = GetObjectHistoryDetailRaw<T>(getKeys, user, false, folder, metadata);
             objectHistoryDetailRaw.NewJson = _jsonHelper.GetJson(newObject, true);
 
             await _objectHistoryProcessor.ProcessObjectHistoryDeletedDetailAsync(new ObjectHistoryDetailRead(objectHistoryDetailRaw));

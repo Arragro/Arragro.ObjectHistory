@@ -34,6 +34,9 @@ namespace Arragro.ObjectHistory.EFCore.Migrations.SqlServer
                     b.Property<Guid>("Folder")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<string>("Metadata")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("SecurityValidationToken")
                         .HasColumnType("nvarchar(max)");
 
@@ -69,6 +72,9 @@ namespace Arragro.ObjectHistory.EFCore.Migrations.SqlServer
 
                     b.Property<bool>("IsAdd")
                         .HasColumnType("bit");
+
+                    b.Property<string>("Metadata")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("ObjectName")
                         .HasColumnType("nvarchar(max)");
@@ -111,6 +117,9 @@ namespace Arragro.ObjectHistory.EFCore.Migrations.SqlServer
 
                     b.Property<bool>("IsAdd")
                         .HasColumnType("bit");
+
+                    b.Property<string>("Metadata")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("SecurityValidationToken")
                         .HasColumnType("nvarchar(max)");

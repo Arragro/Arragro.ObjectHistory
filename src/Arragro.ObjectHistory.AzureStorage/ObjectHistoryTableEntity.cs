@@ -11,6 +11,7 @@ namespace Arragro.ObjectHistory.AzureStorage
         public Guid? SubFolder { get; set; }
         public string User { get; set; }
         public bool IsAdd { get; set; }
+        public string Metadata { get; set; }
         /// <summary>
         /// Use this to help any validation you want to apply to the main controller I
         /// </summary>

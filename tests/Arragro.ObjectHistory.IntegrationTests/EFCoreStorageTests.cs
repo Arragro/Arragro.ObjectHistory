@@ -109,7 +109,7 @@ namespace Arragro.ObjectHistory.IntegrationTests
 
             foreach (var fakeData in fakeDataContext.FakeDatas)
             {
-                await objectHistoryClient.QueueObjectHistoryAsync<FakeData>(() => $"{fakeData.Id}", fakeData, "User1", folder);
+                await objectHistoryClient.QueueObjectHistoryAsync<FakeData>(() => $"{fakeData.Id}", fakeData, "User1", folder, $"meta-{fakeData.Id}");
             }
 
             var queueClient = new QueueClient(AzureStorageConnectionString, _objectHistorySettings.ObjectQueueName);
@@ -131,11 +131,13 @@ namespace Arragro.ObjectHistory.IntegrationTests
             {
                 entities = await objectHistoryClient.GetObjectHistoryRecordsByObjectNamePartitionKeyAsync($"{typeof(FakeData).FullName}-{fakeData.Id}");
                 Assert.Single(entities.Results);
+                Assert.NotNull(entities.Results.First().Metadata);
 
                 raw = await objectHistoryClient.GetObjectHistoryDetailRawAsync(entities.Results.First().PartitionKey, entities.Results.First().RowKey);
                 Assert.NotNull(raw);
                 Assert.True(raw.IsAdd);
                 Assert.NotNull(raw.SubFolder);
+                Assert.NotNull(raw.Metadata);
                 Assert.Equal(1, raw.Version);
             }
 
@@ -153,17 +155,19 @@ namespace Arragro.ObjectHistory.IntegrationTests
             Assert.NotNull(raw);
             Assert.NotNull(raw.OldJson);
             Assert.NotNull(raw.SubFolder);
+            Assert.Null(raw.Metadata);
             Assert.Equal(2, raw.Version);
 
             raw = await objectHistoryClient.GetObjectHistoryDetailRawAsync(entities.Results.First().PartitionKey, entities.Results.Last().RowKey);
             Assert.Null(raw.OldJson);
             Assert.True(raw.IsAdd);
             Assert.NotNull(raw.SubFolder);
+            Assert.NotNull(raw.Metadata);
             Assert.Equal(1, raw.Version);
 
             modifyFakeObject = fakeDataContext.FakeDatas.ElementAt(0).Clone();
             modifyFakeObject.Data = "Test XXX";
-            await objectHistoryClient.QueueObjectHistoryAsync<FakeData>(() => $"{fakeDataContext.FakeDatas.ElementAt(0).Id}", modifyFakeObject, "User1", folder);
+            await objectHistoryClient.QueueObjectHistoryAsync<FakeData>(() => $"{fakeDataContext.FakeDatas.ElementAt(0).Id}", modifyFakeObject, "User1", folder, $"meta-{fakeDataContext.FakeDatas.ElementAt(0).Id}");
             await Utils.ProcessQueue(queueClient, objectHistoryProcessor);
 
             global = await objectHistoryClient.GetObjectHistoryRecordsByApplicationNamePartitionKeyAsync();
@@ -176,12 +180,14 @@ namespace Arragro.ObjectHistory.IntegrationTests
             Assert.NotNull(raw);
             Assert.NotNull(raw.OldJson);
             Assert.NotNull(raw.SubFolder);
+            Assert.NotNull(raw.Metadata);
             Assert.Equal(3, raw.Version);
 
             raw = await objectHistoryClient.GetObjectHistoryDetailRawAsync(entities.Results.First().PartitionKey, entities.Results.Last().RowKey);
             Assert.Null(raw.OldJson);
             Assert.True(raw.IsAdd);
             Assert.NotNull(raw.SubFolder);
+            Assert.NotNull(raw.Metadata);
             Assert.Equal(1, raw.Version);
 
             await objectHistoryClient.QueueObjectHistoryAsync<FakeData>(() => $"{fakeDataContext.FakeDatas.ElementAt(0).Id}", modifyFakeObject, "User1", folder);
