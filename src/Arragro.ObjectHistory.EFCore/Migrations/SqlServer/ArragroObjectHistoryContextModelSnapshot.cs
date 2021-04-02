@@ -62,9 +62,11 @@ namespace Arragro.ObjectHistory.EFCore.Migrations.SqlServer
             modelBuilder.Entity("Arragro.ObjectHistory.EFCore.ObjectHistoryGlobalTableEntity", b =>
                 {
                     b.Property<string>("PartitionKey")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(1024)
+                        .HasColumnType("nvarchar(1024)");
 
                     b.Property<long>("RowKey")
+                        .HasMaxLength(50)
                         .HasColumnType("bigint");
 
                     b.Property<Guid>("Folder")
@@ -74,7 +76,8 @@ namespace Arragro.ObjectHistory.EFCore.Migrations.SqlServer
                         .HasColumnType("bit");
 
                     b.Property<string>("Metadata")
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("ObjectName")
                         .HasColumnType("nvarchar(max)");

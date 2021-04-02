@@ -1,10 +1,13 @@
 ﻿using System;
+using System.ComponentModel.DataAnnotations;
 
 namespace Arragro.ObjectHistory.EFCore
 {
     public class ObjectHistoryGlobalTableEntity
     {
+        [MaxLength(1024)]
         public string PartitionKey { get; set; }
+        [MaxLength(50)]
         public long RowKey { get; set; }
         public int Version { get; set; }
         public string User { get; set; }
@@ -13,6 +16,7 @@ namespace Arragro.ObjectHistory.EFCore
         public Guid? SubFolder { get; set; }
         public bool IsAdd { get; set; }
         public DateTimeOffset Timestamp { get; set; }
+        [MaxLength(100)]
         public string Metadata { get; set; }
         /// <summary>
         /// Use this to help any validation you want to apply to the main controller I
