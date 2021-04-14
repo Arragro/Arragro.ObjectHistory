@@ -23,19 +23,23 @@ namespace Arragro.ObjectHistory.EFCore.Migrations.Postgres
             modelBuilder.Entity("Arragro.ObjectHistory.EFCore.ObjectHistoryDeletedTableEntity", b =>
                 {
                     b.Property<string>("PartitionKey")
-                        .HasColumnType("text");
+                        .HasMaxLength(1024)
+                        .HasColumnType("character varying(1024)");
 
                     b.Property<long>("RowKey")
+                        .HasMaxLength(50)
                         .HasColumnType("bigint");
 
                     b.Property<string>("ApplicationName")
-                        .HasColumnType("text");
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
 
                     b.Property<Guid>("Folder")
                         .HasColumnType("uuid");
 
                     b.Property<string>("Metadata")
-                        .HasColumnType("text");
+                        .HasMaxLength(1000)
+                        .HasColumnType("character varying(1000)");
 
                     b.Property<string>("SecurityValidationToken")
                         .HasColumnType("text");
@@ -107,13 +111,16 @@ namespace Arragro.ObjectHistory.EFCore.Migrations.Postgres
             modelBuilder.Entity("Arragro.ObjectHistory.EFCore.ObjectHistoryTableEntity", b =>
                 {
                     b.Property<string>("PartitionKey")
-                        .HasColumnType("text");
+                        .HasMaxLength(1024)
+                        .HasColumnType("character varying(1024)");
 
                     b.Property<long>("RowKey")
+                        .HasMaxLength(50)
                         .HasColumnType("bigint");
 
                     b.Property<string>("ApplicationName")
-                        .HasColumnType("text");
+                        .HasMaxLength(255)
+                        .HasColumnType("character varying(255)");
 
                     b.Property<Guid>("Folder")
                         .HasColumnType("uuid");
@@ -122,7 +129,8 @@ namespace Arragro.ObjectHistory.EFCore.Migrations.Postgres
                         .HasColumnType("boolean");
 
                     b.Property<string>("Metadata")
-                        .HasColumnType("text");
+                        .HasMaxLength(100)
+                        .HasColumnType("character varying(100)");
 
                     b.Property<string>("SecurityValidationToken")
                         .HasColumnType("text");

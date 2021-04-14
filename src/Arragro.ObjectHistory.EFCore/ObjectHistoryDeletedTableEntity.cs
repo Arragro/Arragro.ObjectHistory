@@ -16,7 +16,7 @@ namespace Arragro.ObjectHistory.EFCore
         public Guid? SubFolder { get; set; }
         public string User { get; set; }
         public DateTimeOffset Timestamp { get; set; }
-        [MaxLength(100)]
+        [MaxLength(1000)]
         public string Metadata { get; set; }
         /// <summary>
         /// Use this to help any validation you want to apply to the main controller I
