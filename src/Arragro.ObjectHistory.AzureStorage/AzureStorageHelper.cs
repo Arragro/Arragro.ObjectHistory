@@ -358,31 +358,41 @@ namespace Arragro.ObjectHistory.AzureStorage
         {
             Func<IEnumerable<DynamicTableEntity>, Task> processor = async (entities) =>
             {
-                var batches = new Dictionary<string, TableBatchOperation>();
-
-                foreach (var entity in entities)
+                if (_objectHistorySettings.AzureStorageConnectionString.Contains("=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="))
                 {
-                    TableBatchOperation batch = null;
-
-                    if (batches.TryGetValue(entity.PartitionKey, out batch) == false)
+                    foreach (var entity in entities)
                     {
-                        batches[entity.PartitionKey] = batch = new TableBatchOperation();
-                    }
-
-                    batch.Add(TableOperation.Delete(entity));
-
-                    if (batch.Count == 100)
-                    {
-                        await table.ExecuteBatchAsync(batch);
-                        batches[entity.PartitionKey] = new TableBatchOperation();
+                        await table.ExecuteAsync(TableOperation.Delete(entity));
                     }
                 }
-
-                foreach (var batch in batches.Values)
+                else
                 {
-                    if (batch.Count > 0)
+                    var batches = new Dictionary<string, TableBatchOperation>();
+
+                    foreach (var entity in entities)
                     {
-                        table.ExecuteBatch(batch);
+                        TableBatchOperation batch = null;
+
+                        if (batches.TryGetValue(entity.PartitionKey, out batch) == false)
+                        {
+                            batches[entity.PartitionKey] = batch = new TableBatchOperation();
+                        }
+
+                        batch.Add(TableOperation.Delete(entity));
+
+                        if (batch.Count == 100)
+                        {
+                            await table.ExecuteBatchAsync(batch);
+                            batches[entity.PartitionKey] = new TableBatchOperation();
+                        }
+                    }
+
+                    foreach (var batch in batches.Values)
+                    {
+                        if (batch.Count > 0)
+                        {
+                            await table.ExecuteBatchAsync(batch);
+                        }
                     }
                 }
             };

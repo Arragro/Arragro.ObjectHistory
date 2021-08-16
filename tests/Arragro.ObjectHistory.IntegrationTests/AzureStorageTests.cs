@@ -26,8 +26,7 @@ namespace Arragro.ObjectHistory.IntegrationTests
         {
             DockerExtentions.StartDockerServicesAsync(new List<Func<DockerClient, Task<ContainerListResponse>>>
             {
-                AzuriteMicrosoft.StartAzuriteMicrosoft,
-                AzuriteTables.StartAzuriteTables
+                (client) => AzuriteMicrosoftWithTables.StartAzuriteMicrosoft(client)
             }).Wait();
 
             var serviceCollection = new ServiceCollection();
@@ -35,6 +34,8 @@ namespace Arragro.ObjectHistory.IntegrationTests
             _objectHistorySettings = new ObjectHistorySettings(
                 AzureStorageConnectionString,
                 "Arragro.ObjectHistory.IntegrationTests");
+
+            QueueAndBlobStorageHelper.EnsureQueueAndContainer(_objectHistorySettings);
 
             serviceCollection.AddSingleton(_objectHistorySettings)
                 .AddArragroObjectHistoryClient(_objectHistorySettings);
@@ -47,7 +48,7 @@ namespace Arragro.ObjectHistory.IntegrationTests
             DockerExtentions.RemoveDockerServicesAsync(true).Wait();
         }
 
-        //[Fact]
+        [Fact]
         public async Task test_create_process_read_history()
         {
             var objectHistoryClient = _serviceProvider.GetRequiredService<IObjectHistoryClient>();
@@ -71,7 +72,10 @@ namespace Arragro.ObjectHistory.IntegrationTests
 
             await Utils.ProcessQueue(queueClient, objectHistoryProcessor);
 
-            var global = await objectHistoryClient.GetObjectHistoryRecordsByApplicationNamePartitionKeyAsync();
+            var global = await objectHistoryClient.GetObjectHistoryRecordsByApplicationNamePartitionKeyAsync(new PagingToken
+            {
+                PageSize = 150
+            });
             Assert.Equal(100, global.Results.Count());
 
             ObjectHistoryQueryResultContainer entities;
