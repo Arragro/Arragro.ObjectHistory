@@ -14,7 +14,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Arragro.Core.HostedServices" Version="5.0.0-alpha-20210816.3" />
+        <PackageReference Include="Arragro.Core.HostedServices" Version="5.0.0-alpha-20210917.2" />
         <PackageReference Include="AspNetCore.HealthChecks.AzureStorage" Version="5.0.1" />
         <PackageReference Include="AspNetCore.HealthChecks.CosmosDb" Version="5.0.4" />
         <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="5.0.1" />
