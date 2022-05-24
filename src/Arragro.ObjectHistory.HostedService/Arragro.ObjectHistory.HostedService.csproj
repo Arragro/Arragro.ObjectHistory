@@ -14,7 +14,7 @@
     </ItemGroup>
 
     <ItemGroup>
-        <PackageReference Include="Arragro.Core.HostedServices" Version="6.0.0-alpha-20220313.1" />
+        <PackageReference Include="Arragro.Core.HostedServices" Version="6.0.0-alpha-20220524.3" />
         <PackageReference Include="AspNetCore.HealthChecks.AzureStorage" Version="6.0.4" />
         <PackageReference Include="AspNetCore.HealthChecks.CosmosDb" Version="6.0.2" />
         <PackageReference Include="AspNetCore.HealthChecks.UI.Client" Version="6.0.4" />
@@ -24,7 +24,7 @@
         <PackageReference Include="Serilog.Enrichers.Environment" Version="2.2.0" />
         <PackageReference Include="Serilog.Settings.Configuration" Version="3.3.0" />
         <PackageReference Include="Serilog.Sinks.Console" Version="4.0.1" />
-        <PackageReference Include="Serilog.Sinks.Http" Version="7.2.0" />
+        <PackageReference Include="Serilog.Sinks.Http" Version="8.0.0" />
         <PackageReference Include="Serilog.Sinks.Seq" Version="5.1.1" />
     </ItemGroup>
 </Project>

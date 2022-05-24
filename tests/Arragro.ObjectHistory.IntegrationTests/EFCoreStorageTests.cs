@@ -43,7 +43,7 @@ namespace Arragro.ObjectHistory.IntegrationTests
                     DockerExtentions.StartDockerServicesAsync(new List<Func<DockerClient, Task<ContainerListResponse>>>
                     {
                         AzuriteMicrosoft.StartAzuriteMicrosoft,
-                        Postgres.StartPostgres
+                        (client) => Postgres.StartPostgres(client, "latest")
                     }).Wait();
                     break;
                 case StorageType.Sqlite:
