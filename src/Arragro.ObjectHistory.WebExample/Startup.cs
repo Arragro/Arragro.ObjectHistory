@@ -57,8 +57,8 @@ namespace Arragro.ObjectHistory.WebExample
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<DemoDbContext>(
-                //optionsBuilder => optionsBuilder.UseInMemoryDatabase("InMemoryDb"));
-                optionsBuilder => optionsBuilder.UseSqlServer("data source=localhost;initial catalog=ArragroObjectTracker;integrated security=True;MultipleActiveResultSets=True;App=EntityFramework;", sqlOptions => sqlOptions.EnableRetryOnFailure(3)));
+                optionsBuilder => optionsBuilder.UseInMemoryDatabase("InMemoryDb"));
+                //optionsBuilder => optionsBuilder.UseSqlServer("data source=localhost;initial catalog=ArragroObjectTracker;integrated security=True;MultipleActiveResultSets=True;App=EntityFramework;", sqlOptions => sqlOptions.EnableRetryOnFailure(3)));
             
             services.Configure<CookiePolicyOptions>(options =>
             {
@@ -91,7 +91,7 @@ namespace Arragro.ObjectHistory.WebExample
         {
             if (env.IsDevelopment())
             {
-                CreateAndMigrateDatabase(app.ApplicationServices);
+                //CreateAndMigrateDatabase(app.ApplicationServices);
 
                 // app.UseWebpackDevMiddleware(new WebpackDevMiddlewareOptions
                 // {

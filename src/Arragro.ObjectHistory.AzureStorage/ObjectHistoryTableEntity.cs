@@ -1,9 +1,10 @@
-﻿using Microsoft.Azure.Cosmos.Table;
+﻿using Azure;
+using Newtonsoft.Json;
 using System;
 
 namespace Arragro.ObjectHistory.AzureStorage
 {
-    public class ObjectHistoryTableEntity : TableEntity
+    public class ObjectHistoryTableEntity : Azure.Data.Tables.ITableEntity
     {
         public int Verion { get; set; }
         public string ApplicationName { get; set; }
@@ -17,10 +18,9 @@ namespace Arragro.ObjectHistory.AzureStorage
         /// </summary>
         public string SecurityValidationToken { get; set; }
 
-        public ObjectHistoryTableEntity() { }
-
-        public ObjectHistoryTableEntity(string partitionKey, string rowKey) : base(partitionKey, rowKey)
-        {
-        }
+		public string PartitionKey { get; set; }
+		public string RowKey { get; set; }
+		public DateTimeOffset? Timestamp { get; set; }
+		public ETag ETag { get; set; }
     }
 }

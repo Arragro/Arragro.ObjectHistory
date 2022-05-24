@@ -1,8 +1,8 @@
 ﻿using Arragro.ObjectHistory.Core.Helpers;
 using Arragro.ObjectHistory.Core.Interfaces;
 using Arragro.ObjectHistory.Core.Models;
-using Microsoft.Azure.Cosmos.Table;
-using Microsoft.Azure.Cosmos.Table.Queryable;
+using Azure;
+using Azure.Data.Tables;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,42 +13,35 @@ namespace Arragro.ObjectHistory.AzureStorage
 {
     public class AzureStorageHelper : QueueAndBlobStorageHelper, IStorageHelper
     {
-        public AzureStorageHelper(ObjectHistorySettings objectHistorySettings) : base(objectHistorySettings)
+		public AzureStorageHelper(ObjectHistorySettings objectHistorySettings) : base(objectHistorySettings)
         {
-        }
+		}
 
         public static void EnsureTables(ObjectHistorySettings objectHistorySettings)
         {
-            var tableClient = CloudStorageAccount.Parse(objectHistorySettings.AzureStorageConnectionString).CreateCloudTableClient();
-            var table = tableClient.GetTableReference(objectHistorySettings.ObjectHistoryTable);
+            var table = new TableClient(objectHistorySettings.AzureStorageConnectionString, objectHistorySettings.ObjectHistoryTable);
             table.CreateIfNotExists();
 
-            table = tableClient.GetTableReference(objectHistorySettings.ObjectHistoryDeletedTable);
+            table = new TableClient(objectHistorySettings.AzureStorageConnectionString, objectHistorySettings.ObjectHistoryDeletedTable);
             table.CreateIfNotExists();
 
-            table = tableClient.GetTableReference(objectHistorySettings.GlobalHistoryTable);
+            table = new TableClient(objectHistorySettings.AzureStorageConnectionString, objectHistorySettings.GlobalHistoryTable);
             table.CreateIfNotExists();
         }
 
-        private CloudTable GetObjectHistoryTable()
+        private TableClient GetObjectHistoryTable()
         {
-            var tableClient = CloudStorageAccount.Parse(_objectHistorySettings.AzureStorageConnectionString).CreateCloudTableClient();
-            var table = tableClient.GetTableReference(_objectHistorySettings.ObjectHistoryTable);
-            return table;
+            return new TableClient(_objectHistorySettings.AzureStorageConnectionString, _objectHistorySettings.ObjectHistoryTable);
         }
 
-        private CloudTable GetObjectHistoryDeletedTable()
+        private TableClient GetObjectHistoryDeletedTable()
         {
-            var tableClient = CloudStorageAccount.Parse(_objectHistorySettings.AzureStorageConnectionString).CreateCloudTableClient();
-            var table = tableClient.GetTableReference(_objectHistorySettings.ObjectHistoryDeletedTable);
-            return table;
+            return new TableClient(_objectHistorySettings.AzureStorageConnectionString, _objectHistorySettings.ObjectHistoryDeletedTable);
         }
 
-        private CloudTable GetGlobalHistoryTable()
+        private TableClient GetGlobalHistoryTable()
         {
-            var tableClient = CloudStorageAccount.Parse(_objectHistorySettings.AzureStorageConnectionString).CreateCloudTableClient();
-            var table = tableClient.GetTableReference(_objectHistorySettings.GlobalHistoryTable);
-            return table;
+            return new TableClient(_objectHistorySettings.AzureStorageConnectionString, _objectHistorySettings.GlobalHistoryTable);
         }
 
         public async Task AddObjectHistoryEntityRecordAsync(ObjectHistoryDetailBase objectHistoryDetails)
@@ -56,8 +49,10 @@ namespace Arragro.ObjectHistory.AzureStorage
             try
             {
                 var cloudTable = GetObjectHistoryTable();
-                var objectHistoryEntity = new ObjectHistoryTableEntity(objectHistoryDetails.PartitionKey, objectHistoryDetails.RowKey)
+                var objectHistoryEntity = new ObjectHistoryTableEntity
                 {
+                    PartitionKey = objectHistoryDetails.PartitionKey,
+                    RowKey = objectHistoryDetails.RowKey,
                     Verion = objectHistoryDetails.Version,
                     ApplicationName = objectHistoryDetails.ApplicationName,
                     User = objectHistoryDetails.User,
@@ -68,8 +63,7 @@ namespace Arragro.ObjectHistory.AzureStorage
                     Metadata = objectHistoryDetails.Metadata
                 };
 
-                var insertOperation = TableOperation.Insert(objectHistoryEntity);
-                await cloudTable.ExecuteAsync(insertOperation);
+                await cloudTable.UpsertEntityAsync(objectHistoryEntity, TableUpdateMode.Replace);
             }
             catch (Exception ex)
             {
@@ -82,8 +76,10 @@ namespace Arragro.ObjectHistory.AzureStorage
             try
             {
                 var cloudTable = GetObjectHistoryDeletedTable();
-                var objectHistoryEntity = new ObjectHistoryDeletedTableEntity(objectHistoryDetails.PartitionKey, objectHistoryDetails.RowKey)
+                var objectHistoryEntity = new ObjectHistoryDeletedTableEntity()
                 {
+                    PartitionKey = objectHistoryDetails.PartitionKey,
+                    RowKey = objectHistoryDetails.RowKey,
                     Verion = objectHistoryDetails.Version,
                     ApplicationName = objectHistoryDetails.ApplicationName,
                     User = objectHistoryDetails.User,
@@ -93,8 +89,7 @@ namespace Arragro.ObjectHistory.AzureStorage
                     Metadata = objectHistoryDetails.Metadata
                 };
 
-                var insertOperation = TableOperation.Insert(objectHistoryEntity);
-                await cloudTable.ExecuteAsync(insertOperation);
+                await cloudTable.UpsertEntityAsync(objectHistoryEntity, TableUpdateMode.Replace);
             }
             catch (Exception ex)
             {
@@ -107,8 +102,10 @@ namespace Arragro.ObjectHistory.AzureStorage
             try
             {
                 var cloudTable = GetGlobalHistoryTable();
-                var objectHistoryEntity = new ObjectHistoryGlobalTableEntity(objectHistoryDetails.ApplicationName, objectHistoryDetails.RowKey)
+                var objectHistoryEntity = new ObjectHistoryGlobalTableEntity
                 {
+                    PartitionKey = objectHistoryDetails.ApplicationName,
+                    RowKey = objectHistoryDetails.RowKey,
                     Verion = objectHistoryDetails.Version,
                     User = objectHistoryDetails.User,
                     ObjectName = objectHistoryDetails.PartitionKey,
@@ -119,8 +116,7 @@ namespace Arragro.ObjectHistory.AzureStorage
                     Metadata = objectHistoryDetails.Metadata
                 };
 
-                var insertOperation = TableOperation.Insert(objectHistoryEntity);
-                await cloudTable.ExecuteAsync(insertOperation);
+                await cloudTable.UpsertEntityAsync(objectHistoryEntity, TableUpdateMode.Replace);
             }
             catch (Exception ex)
             {
@@ -131,12 +127,13 @@ namespace Arragro.ObjectHistory.AzureStorage
         public async Task<ObjectHistoryEntity> GetLatestObjectHistoryEntityAsync(string partitionKey)
         {
             var cloudTable = GetObjectHistoryTable();
-            var query = new TableQuery<ObjectHistoryTableEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
-            query = query.Take(1);
-            query.TakeCount = 1;
-
-            var result = await cloudTable.ExecuteQuerySegmentedAsync(query, null);
-            var objectHistoryTableEntity = result.FirstOrDefault();
+            var queryResultsFilter = cloudTable.QueryAsync<ObjectHistoryTableEntity>(filter: TableClient.CreateQueryFilter($"PartitionKey eq {partitionKey}"), maxPerPage: 1);
+            ObjectHistoryTableEntity objectHistoryTableEntity = null;
+            await foreach (ObjectHistoryTableEntity qEntity in queryResultsFilter)
+            {
+                objectHistoryTableEntity = qEntity;
+                break;
+            }
             if (objectHistoryTableEntity == null)
                 return null;
             return new ObjectHistoryEntity(
@@ -155,15 +152,15 @@ namespace Arragro.ObjectHistory.AzureStorage
 
         public async Task<ObjectHistoryDeletedEntity> GetLatestObjectHistoryDeletedEntityAsync(string partitionKey)
         {
-            var cloudTable = GetObjectHistoryDeletedTable();
-            var query = new TableQuery<ObjectHistoryDeletedTableEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
-            query = query.Take(1);
-            query.TakeCount = 1;
+            var cloudTable = GetObjectHistoryTable();
+            var queryResultsFilter = cloudTable.QueryAsync<ObjectHistoryDeletedTableEntity>(filter: TableClient.CreateQueryFilter($"PartitionKey eq {partitionKey}"), maxPerPage: 1);
+            ObjectHistoryDeletedTableEntity objectHistoryTableEntity = null;
+            await foreach (ObjectHistoryDeletedTableEntity qEntity in queryResultsFilter)
+            {
+                objectHistoryTableEntity = qEntity;
+                break;
+            }
 
-            var result = await cloudTable.ExecuteQuerySegmentedAsync(query, null);
-            var objectHistoryTableEntity = result.FirstOrDefault();
-            if (objectHistoryTableEntity == null)
-                return null;
             return new ObjectHistoryDeletedEntity(
                 objectHistoryTableEntity.PartitionKey,
                 objectHistoryTableEntity.RowKey,
@@ -198,10 +195,8 @@ namespace Arragro.ObjectHistory.AzureStorage
             try
             {
                 var cloudTable = GetObjectHistoryTable();
-                var retrieveOperation = TableOperation.Retrieve<ObjectHistoryTableEntity>(partitionKey, rowKey);
-
-                var retrievedResult = await cloudTable.ExecuteAsync(retrieveOperation);
-                var objectHistoryTableEntity = retrievedResult.Result as ObjectHistoryTableEntity;
+                var retrievedResult = await cloudTable.GetEntityAsync<ObjectHistoryTableEntity>(partitionKey, rowKey);
+                var objectHistoryTableEntity = retrievedResult.Value;
 
                 return new ObjectHistoryEntity(
                     objectHistoryTableEntity.PartitionKey,
@@ -226,12 +221,19 @@ namespace Arragro.ObjectHistory.AzureStorage
         {
             try
             {
-                var query = new TableQuery<ObjectHistoryDeletedTableEntity>();
                 var cloudTable = GetObjectHistoryDeletedTable();
-                var queryResult = await cloudTable.ExecuteQuerySegmentedAsync(query.Take(pagingToken.PageSize), pagingToken.TableContinuationToken);
-                var tableContinuationToken = queryResult.ContinuationToken;
+                var pageable = cloudTable.QueryAsync<ObjectHistoryDeletedTableEntity>(maxPerPage: pagingToken.PageSize);
 
-                var entityResults = new ObjectHistoryQueryResultContainer(queryResult.Results.Select(objectHistoryTableEntity =>
+                var queryResult = new List<ObjectHistoryDeletedTableEntity>();
+                string continuationToken = null;
+                await foreach (Page<ObjectHistoryDeletedTableEntity> page in pageable.AsPages(continuationToken: pagingToken.TableContinuationToken))
+                {
+                    queryResult.AddRange(page.Values);
+                    continuationToken= page.ContinuationToken;
+                    break;
+                }
+
+                var entityResults = new ObjectHistoryQueryResultContainer(queryResult.Select(objectHistoryTableEntity =>
                     new ObjectHistoryDeletedEntity(
                         objectHistoryTableEntity.PartitionKey,
                         objectHistoryTableEntity.RowKey,
@@ -243,7 +245,7 @@ namespace Arragro.ObjectHistory.AzureStorage
                         objectHistoryTableEntity.User,
                         objectHistoryTableEntity.Metadata,
                         objectHistoryTableEntity.SecurityValidationToken)),
-                    new PagingToken(tableContinuationToken));
+                    new PagingToken(continuationToken));
 
                 return entityResults;
             }
@@ -257,19 +259,19 @@ namespace Arragro.ObjectHistory.AzureStorage
         {
             try
             {
-                var query = new TableQuery<ObjectHistoryTableEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
-
                 var cloudTable = GetObjectHistoryTable();
-                var queryResult = await cloudTable.ExecuteQuerySegmentedAsync(query.Take(pagingToken.PageSize), pagingToken.TableContinuationToken);
-                var tableContinuationToken = queryResult.ContinuationToken;
+                var pageable = cloudTable.QueryAsync<ObjectHistoryTableEntity>(filter: $"PartitionKey eq '{partitionKey}'", maxPerPage: pagingToken.PageSize);
 
-                pagingToken = new PagingToken(tableContinuationToken);
-                if (tableContinuationToken == null)
+                var queryResult = new List<ObjectHistoryTableEntity>();
+                string continuationToken = null;
+                await foreach (Page<ObjectHistoryTableEntity> page in pageable.AsPages(continuationToken: pagingToken.TableContinuationToken))
                 {
-                    pagingToken = null;
+                    queryResult.AddRange(page.Values);
+                    continuationToken = page.ContinuationToken;
+                    break;
                 }
 
-                var entityResults = new ObjectHistoryQueryResultContainer(queryResult.Results.Select(objectHistoryTableEntity => 
+                var entityResults = new ObjectHistoryQueryResultContainer(queryResult.Select(objectHistoryTableEntity => 
                     new ObjectHistoryEntity(
                         objectHistoryTableEntity.PartitionKey,
                         objectHistoryTableEntity.RowKey,
@@ -296,19 +298,19 @@ namespace Arragro.ObjectHistory.AzureStorage
         {
             try
             {
-                var query = new TableQuery<ObjectHistoryGlobalTableEntity>().Where(TableQuery.GenerateFilterCondition("PartitionKey", QueryComparisons.Equal, partitionKey));
-
                 var cloudTable = GetGlobalHistoryTable();
-                var queryResult = await cloudTable.ExecuteQuerySegmentedAsync(query.Take(pagingToken.PageSize), pagingToken.TableContinuationToken);
-                var tableContinuationToken = queryResult.ContinuationToken;
+                var pageable = cloudTable.QueryAsync<ObjectHistoryGlobalTableEntity>(filter: $"PartitionKey eq '{partitionKey}'", maxPerPage: pagingToken.PageSize);
 
-                pagingToken = new PagingToken(tableContinuationToken);
-                if (tableContinuationToken == null)
+                var queryResult = new List<ObjectHistoryGlobalTableEntity>();
+                string continuationToken = null;
+                await foreach (Page<ObjectHistoryGlobalTableEntity> page in pageable.AsPages(continuationToken: pagingToken.TableContinuationToken))
                 {
-                    pagingToken = null;
+                    queryResult.AddRange(page.Values);
+                    continuationToken = page.ContinuationToken;
+                    break;
                 }
 
-                var entityResults = new ObjectHistoryQueryResultContainer(queryResult.Results.Select(objectHistoryGlobalEntity => 
+                var entityResults = new ObjectHistoryQueryResultContainer(queryResult.Select(objectHistoryGlobalEntity => 
                     new ObjectHistoryGlobalEntity(
                         objectHistoryGlobalEntity.PartitionKey,
                         objectHistoryGlobalEntity.RowKey,
@@ -329,70 +331,49 @@ namespace Arragro.ObjectHistory.AzureStorage
             }
         }
 
-        private async Task ProcessEntitiesAsync(CloudTable table, Func<IEnumerable<DynamicTableEntity>, Task> processor, Expression<Func<DynamicTableEntity, bool>> filters)
+        private async Task ProcessEntitiesAsync(TableClient table, Func<IEnumerable<ITableEntity>, Task> processor, Expression<Func<ITableEntity, bool>> filters)
         {
-            TableQuerySegment<DynamicTableEntity> segment = null;
+            var pageable = table.QueryAsync<ObjectHistoryGlobalTableEntity>(maxPerPage: 100);
 
-            while (segment == null || segment.ContinuationToken != null)
+            var queryResult = new List<ObjectHistoryGlobalTableEntity>();
+            string continuationToken = null;
+            do
             {
-                if (filters == null)
+                await foreach (Page<ObjectHistoryGlobalTableEntity> page in pageable.AsPages(continuationToken: continuationToken))
                 {
-                    segment = await table.ExecuteQuerySegmentedAsync(new TableQuery().Take(100), segment == null ? null : segment.ContinuationToken);
-                }
-                else
-                {
-                    var query = table.CreateQuery<DynamicTableEntity>().Where(filters).Take(100).AsTableQuery();
-                    segment = await query.ExecuteSegmentedAsync(segment == null ? null : segment.ContinuationToken);
-                }
-                segment.Results.ForEach(x =>
-                {
-                    if (x.ETag == null) x.ETag = "*";
-                });
+                    foreach (var val in page.Values)
+                    {
+                        if (val.ETag == null) val.ETag = new ETag("*");
+                    }
 
-                await processor(segment.Results);
-            }
+                    await processor(page.Values);
+                    continuationToken = page.ContinuationToken;
+                    break;
+                }
+            } while (continuationToken != null);
         }
 
         private async Task DeleteAllEntitiesInBatchesAsync(
-            CloudTable table, Expression<Func<DynamicTableEntity, bool>> filter)
+            TableClient table, Expression<Func<ITableEntity, bool>> filter)
         {
-            Func<IEnumerable<DynamicTableEntity>, Task> processor = async (entities) =>
+            Func<IEnumerable<ITableEntity>, Task> processor = async (entities) =>
             {
                 if (_objectHistorySettings.AzureStorageConnectionString.Contains("=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw=="))
                 {
                     foreach (var entity in entities)
                     {
-                        await table.ExecuteAsync(TableOperation.Delete(entity));
+                        await table.DeleteEntityAsync(entity.PartitionKey, entity.RowKey);
                     }
                 }
                 else
                 {
-                    var batches = new Dictionary<string, TableBatchOperation>();
-
-                    foreach (var entity in entities)
+                    var entityCount = entities.Count();
+                    var loopCount = entityCount / 100 + entityCount % 100;
+                    for (var i = 0; i < loopCount; i++)
                     {
-                        TableBatchOperation batch = null;
-
-                        if (batches.TryGetValue(entity.PartitionKey, out batch) == false)
-                        {
-                            batches[entity.PartitionKey] = batch = new TableBatchOperation();
-                        }
-
-                        batch.Add(TableOperation.Delete(entity));
-
-                        if (batch.Count == 100)
-                        {
-                            await table.ExecuteBatchAsync(batch);
-                            batches[entity.PartitionKey] = new TableBatchOperation();
-                        }
-                    }
-
-                    foreach (var batch in batches.Values)
-                    {
-                        if (batch.Count > 0)
-                        {
-                            await table.ExecuteBatchAsync(batch);
-                        }
+                        var deleteEntitiesBatch = new List<TableTransactionAction>();
+                        deleteEntitiesBatch.AddRange(entities.Skip(i*100).Take(100).Select(x => new TableTransactionAction(TableTransactionActionType.Delete, x)));
+                        await table.SubmitTransactionAsync(deleteEntitiesBatch).ConfigureAwait(false);
                     }
                 }
             };

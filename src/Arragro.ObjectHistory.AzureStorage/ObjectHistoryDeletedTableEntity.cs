@@ -1,9 +1,10 @@
-﻿using Microsoft.Azure.Cosmos.Table;
+﻿using Azure;
+using Azure.Data.Tables;
 using System;
 
 namespace Arragro.ObjectHistory.AzureStorage
 {
-    public class ObjectHistoryDeletedTableEntity : TableEntity
+    public class ObjectHistoryDeletedTableEntity : ITableEntity
     {
         public int Verion { get; set; }
         public string ApplicationName { get; set; }
@@ -16,10 +17,9 @@ namespace Arragro.ObjectHistory.AzureStorage
         /// </summary>
         public string SecurityValidationToken { get; set; }
 
-        public ObjectHistoryDeletedTableEntity() { }
-
-        public ObjectHistoryDeletedTableEntity(string partitionKey, string rowKey) : base(partitionKey, rowKey)
-        {
-        }
+        public string PartitionKey { get; set; }
+        public string RowKey { get; set; }
+        public DateTimeOffset? Timestamp { get; set; }
+        public ETag ETag { get; set; }
     }
 }

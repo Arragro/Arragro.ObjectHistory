@@ -12,7 +12,7 @@ namespace Arragro.ObjectHistory.Core.Models
         public string ObjectName { get; set; }
         public Guid Folder { get; set; }
         public Guid? SubFolder { get; set; }
-        public DateTimeOffset Timestamp { get; set; }
+        public DateTimeOffset? Timestamp { get; set; }
         public string Metadata { get; set; }
 
         public ObjectHistoryGlobalEntity() { }
@@ -25,7 +25,7 @@ namespace Arragro.ObjectHistory.Core.Models
             string objectName,
             Guid folder,
             Guid? subFolder,
-            DateTimeOffset timestamp,
+            DateTimeOffset? timestamp,
             string metadata)
         {
             PartitionKey = partitionKey;

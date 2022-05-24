@@ -11,7 +11,7 @@ namespace Arragro.ObjectHistory.Core.Models
         public Guid Folder { get; set; }
         public string ApplicationName { get; set; }
         public string ModifiedBy { get; set; }
-        public DateTimeOffset ModifiedDate { get; set; }
+        public DateTimeOffset? ModifiedDate { get; set; }
         public string Metadata { get; set; }
         public QueryResultType QueryResultType { get; set;}
 

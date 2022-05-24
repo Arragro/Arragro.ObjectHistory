@@ -11,7 +11,7 @@ namespace Arragro.ObjectHistory.Core.Models
         public string ApplicationName { get; set; }
         public Guid Folder { get; set; }
         public Guid? SubFolder { get; set; }
-        public DateTimeOffset Timestamp { get; set; }
+        public DateTimeOffset? Timestamp { get; set; }
         public string User { get; set; }
         public string Metadata { get; set; }
         /// <summary>
@@ -28,7 +28,7 @@ namespace Arragro.ObjectHistory.Core.Models
             string applicationName,
             Guid folder,
             Guid? subFolder,
-            DateTimeOffset timestamp,
+            DateTimeOffset? timestamp,
             string user,
             string metadata,
             string securityValidationToken)
