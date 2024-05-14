@@ -1,5 +1,4 @@
-﻿using Arragro.ObjectHistory.Client;
-using Arragro.ObjectHistory.Core;
+﻿using Arragro.ObjectHistory.Core;
 using Arragro.ObjectHistory.Core.Models;
 using Arragro.ObjectHistory.Web.Areas.ObjectHistory.Models;
 using Microsoft.AspNetCore.Mvc;

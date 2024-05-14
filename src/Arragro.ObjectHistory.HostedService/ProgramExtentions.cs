@@ -1,5 +1,10 @@
-﻿using Arragro.ObjectHistory.Core;
-using Arragro.ObjectHistory.Core.Models;
+﻿using Arragro.ObjectHistory.Core.Models;
+using Azure.Data.Tables;
+using Azure.Storage.Blobs;
+using Azure.Storage.Queues;
+using HealthChecks.Azure.Data.Tables;
+using HealthChecks.Azure.Storage.Blobs;
+using HealthChecks.Azure.Storage.Queues;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Diagnostics.HealthChecks;
@@ -22,11 +27,31 @@ namespace Arragro.ObjectHistory.HostedService
 
             var storageConnection = configuration.GetValue<string>("ConnectionStrings:StorageConnection");
 
-            hcBuilder.AddAzureBlobStorage(storageConnection, objectHistorySettings.ObjectInputContainerName, name: "Input");
-            hcBuilder.AddAzureBlobStorage(storageConnection, objectHistorySettings.ObjectOutputContainerName, name: "Output");
-            hcBuilder.AddAzureQueueStorage(storageConnection, objectHistorySettings.ObjectQueueName);
-            hcBuilder.AddAzureTable(storageConnection, objectHistorySettings.GlobalHistoryTable, name: "GlobalHistoryTable");
-            hcBuilder.AddAzureTable(storageConnection, objectHistorySettings.ObjectHistoryTable, name: "ObjectHistoryTable");
+            hcBuilder.Services.AddSingleton(sp => new BlobServiceClient(storageConnection));
+            hcBuilder.Services.AddSingleton(sp => new QueueServiceClient(storageConnection));
+            hcBuilder.Services.AddSingleton(sp => new TableServiceClient(storageConnection));
+            hcBuilder.AddAzureBlobStorage(optionsFactory: sp => new AzureBlobStorageHealthCheckOptions()
+            {
+                ContainerName = objectHistorySettings.ObjectInputContainerName
+            }, name: "Input");
+            hcBuilder.AddAzureBlobStorage(optionsFactory: sp => new AzureBlobStorageHealthCheckOptions()
+            {
+                ContainerName = objectHistorySettings.ObjectOutputContainerName
+            }, name: "Output");
+
+            hcBuilder.AddAzureQueueStorage(optionsFactory: sp => new AzureQueueStorageHealthCheckOptions()
+            {
+                QueueName = objectHistorySettings.ObjectQueueName
+            });
+
+            hcBuilder.AddAzureTable(optionsFactory: sp => new AzureTableServiceHealthCheckOptions()
+            {
+                TableName = objectHistorySettings.GlobalHistoryTable
+            }, name: "GlobalHistoryTable");
+            hcBuilder.AddAzureTable(optionsFactory: sp => new AzureTableServiceHealthCheckOptions()
+            {
+                TableName = objectHistorySettings.ObjectHistoryTable
+            }, name: "ObjectHistoryTable");
 
             return services;
         }

@@ -152,7 +152,7 @@ namespace Arragro.ObjectHistory.AzureStorage
 
         public async Task<ObjectHistoryDeletedEntity> GetLatestObjectHistoryDeletedEntityAsync(string partitionKey)
         {
-            var cloudTable = GetObjectHistoryTable();
+            var cloudTable = GetObjectHistoryDeletedTable();
             var queryResultsFilter = cloudTable.QueryAsync<ObjectHistoryDeletedTableEntity>(filter: TableClient.CreateQueryFilter($"PartitionKey eq {partitionKey}"), maxPerPage: 1);
             ObjectHistoryDeletedTableEntity objectHistoryTableEntity = null;
             await foreach (ObjectHistoryDeletedTableEntity qEntity in queryResultsFilter)
@@ -160,6 +160,8 @@ namespace Arragro.ObjectHistory.AzureStorage
                 objectHistoryTableEntity = qEntity;
                 break;
             }
+            if (objectHistoryTableEntity == null)
+                return null;
 
             return new ObjectHistoryDeletedEntity(
                 objectHistoryTableEntity.PartitionKey,

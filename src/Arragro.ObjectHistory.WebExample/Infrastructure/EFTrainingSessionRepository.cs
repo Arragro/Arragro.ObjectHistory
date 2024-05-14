@@ -1,5 +1,4 @@
-﻿using Arragro.ObjectHistory.Client;
-using Arragro.ObjectHistory.Core;
+﻿using Arragro.ObjectHistory.Core;
 using Arragro.ObjectHistory.WebExample.Core.Entities;
 using Arragro.ObjectHistory.WebExample.Core.Interfaces;
 using Microsoft.EntityFrameworkCore;

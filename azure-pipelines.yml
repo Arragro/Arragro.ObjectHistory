@@ -8,6 +8,7 @@ trigger:
 - dev
 - netstandard
 - net_core_7
+- net_core_8
 
 variables:
   ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
@@ -18,6 +19,8 @@ variables:
     MyRunNumber: '6.0.0-alpha-$(Build.BuildNumber)'
   ${{ if eq(variables['Build.SourceBranchName'], 'net_core_7') }}:
     MyRunNumber: '7.0.0-alpha-$(Build.BuildNumber)'
+  ${{ if eq(variables['Build.SourceBranchName'], 'net_core_8') }}:
+    MyRunNumber: '8.0.0-alpha-$(Build.BuildNumber)'
 
 stages:
 #- stage: Test
@@ -59,7 +62,7 @@ stages:
     - task: UseDotNet@2
       inputs:
         packageType: 'sdk'
-        version: '7.0.201'
+        version: '8.0.204'
 
     - task: DotNetCoreCLI@2
       displayName: 'dotnet restore'

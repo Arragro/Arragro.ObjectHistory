@@ -35,21 +35,21 @@ namespace Arragro.ObjectHistory.IntegrationTests
                 case StorageType.SqlServer:
                     DockerExtentions.StartDockerServicesAsync(new List<Func<DockerClient, Task<ContainerListResponse>>>
                     {
-                        AzuriteMicrosoft.StartAzuriteMicrosoft,
+                        (client) => AzuriteMicrosoftWithTables.StartAzuriteMicrosoft(client, "3.30.0"),
                         SqlServer.StartSqlServer
                     }).Wait();
                     break;
                 case StorageType.Postgres:
                     DockerExtentions.StartDockerServicesAsync(new List<Func<DockerClient, Task<ContainerListResponse>>>
                     {
-                        AzuriteMicrosoft.StartAzuriteMicrosoft,
+                        (client) => AzuriteMicrosoftWithTables.StartAzuriteMicrosoft(client, "3.30.0"),
                         (client) => Postgres.StartPostgres(client, "latest")
                     }).Wait();
                     break;
                 case StorageType.Sqlite:
                     DockerExtentions.StartDockerServicesAsync(new List<Func<DockerClient, Task<ContainerListResponse>>>
                     {
-                        AzuriteMicrosoft.StartAzuriteMicrosoft
+                        (client) => AzuriteMicrosoftWithTables.StartAzuriteMicrosoft(client, "3.30.0")
                     }).Wait();
                     break;
 
@@ -59,7 +59,7 @@ namespace Arragro.ObjectHistory.IntegrationTests
                 File.Delete(fileName);
 
             var postgresConnectionString = "host=localhost;port=5432;database=arragro-object-history;user id=postgres;password=password1;";
-            var sqlServerConnectionString = "Server=127.0.0.1,1435;Database=arragro-object-history;User Id=sa;Password=P@ssword123;";
+            var sqlServerConnectionString = "Server=127.0.0.1,1435;Database=arragro-object-history;User Id=sa;Password=P@ssword123;TrustServerCertificate=true;";
 
             var connectionString = "";
             switch (storageType)

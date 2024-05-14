@@ -1,5 +1,4 @@
 ﻿using Azure;
-using Newtonsoft.Json;
 using System;
 
 namespace Arragro.ObjectHistory.AzureStorage

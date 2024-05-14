@@ -8,7 +8,6 @@ using Arragro.ObjectHistory.Client.Extensions;
 using Arragro.ObjectHistory.Core.Helpers;
 using Arragro.ObjectHistory.Core.Models;
 using Arragro.ObjectHistory.HostedService;
-using Arragro.ObjectHistory.Web;
 using Arragro.ObjectHistory.WebExample.Core.Entities;
 using Arragro.ObjectHistory.WebExample.Core.Interfaces;
 using Arragro.ObjectHistory.WebExample.Infrastructure;

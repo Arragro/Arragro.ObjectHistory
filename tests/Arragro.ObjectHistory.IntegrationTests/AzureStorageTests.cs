@@ -26,7 +26,7 @@ namespace Arragro.ObjectHistory.IntegrationTests
         {
             DockerExtentions.StartDockerServicesAsync(new List<Func<DockerClient, Task<ContainerListResponse>>>
             {
-                (client) => AzuriteMicrosoftWithTables.StartAzuriteMicrosoft(client, "3.14.2")
+                (client) => AzuriteMicrosoftWithTables.StartAzuriteMicrosoft(client, "3.30.0")
             }).Wait();
 
             var serviceCollection = new ServiceCollection();
