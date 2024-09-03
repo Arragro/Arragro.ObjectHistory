@@ -35,12 +35,14 @@ namespace Arragro.ObjectHistory.Core.Models
             string azureStorageConnectionString,
             string databaseConnectionString,
             string applicationName,
-            StorageType storageType)
+            StorageType storageType = StorageType.AzureStorage)
         {
             if (string.IsNullOrEmpty(azureStorageConnectionString))
                 throw new ArgumentNullException(nameof(azureStorageConnectionString));
             if (string.IsNullOrEmpty(databaseConnectionString))
                 throw new ArgumentNullException(nameof(databaseConnectionString));
+            if (string.IsNullOrEmpty(applicationName))
+                throw new ArgumentNullException(nameof(applicationName));
 
             AzureStorageConnectionString = azureStorageConnectionString;
             DatabaseConnectionString = databaseConnectionString;
