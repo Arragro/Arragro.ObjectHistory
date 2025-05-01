@@ -36,7 +36,7 @@ namespace Arragro.ObjectHistory.Core.Helpers
             await blob.DeleteAsync();
         }
 
-        public async Task ProcessObjectHistoryDetailAsync(ObjectHistoryDetailRead objectHistoryDetails)
+        public async Task ProcessObjectHistoryDetailAsync(ObjectHistoryDetailRead objectHistoryDetails, bool force = false)
         {
             var persist = true;
             if (!objectHistoryDetails.IsAdd)
@@ -48,7 +48,7 @@ namespace Arragro.ObjectHistory.Core.Helpers
                     persist = false;
             }
 
-            if (persist)
+            if (persist || force)
             {
                 var objectHistoryJson = _jsonHelper.GetJson(objectHistoryDetails);
 

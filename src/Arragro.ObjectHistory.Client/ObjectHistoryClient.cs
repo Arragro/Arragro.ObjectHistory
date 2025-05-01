@@ -99,10 +99,10 @@ namespace Arragro.ObjectHistory.Client
             await QueueObjectHistoryAsync(objectHistoryDetailRaw);
         }
 
-        public async Task SaveObjectHistoryAsync<T>(Func<string> getKeys, T newObject, string user, Guid? folder = null, string metadata = null)
+        public async Task SaveObjectHistoryAsync<T>(Func<string> getKeys, T newObject, string user, Guid? folder = null, string metadata = null, bool force = false)
         {
             var objectHistoryDetailRaw = await BuildObjectHistoryDataRawAsync(getKeys, newObject, user, folder, metadata);
-            await _objectHistoryProcessor.ProcessObjectHistoryDetailAsync(new ObjectHistoryDetailRead( objectHistoryDetailRaw));
+            await _objectHistoryProcessor.ProcessObjectHistoryDetailAsync(new ObjectHistoryDetailRead( objectHistoryDetailRaw), force);
         }
 
         public async Task SaveObjectHistoryDeletedAsync<T>(Func<string> getKeys, T newObject, string user, Guid? folder = null, string metadata = null)
