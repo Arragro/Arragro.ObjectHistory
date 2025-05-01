@@ -13,7 +13,7 @@ namespace Arragro.ObjectHistory.Core
         Task<ObjectHistoryQueryResultContainer> GetObjectHistoryRecordsByApplicationNamePartitionKeyAsync(PagingToken pagingToken = null);
         Task<ObjectHistoryQueryResultContainer> GetObjectHistoryRecordsByObjectNamePartitionKeyAsync(string partitionKey, PagingToken pagingToken = null);
         Task QueueObjectHistoryAsync<T>(Func<string> getKeys, T newObject, string user, Guid? folder = null, string metadata= null);
-        Task SaveObjectHistoryAsync<T>(Func<string> getKeys, T newObject, string user, Guid? folder = null, string metadata = null);
+        Task SaveObjectHistoryAsync<T>(Func<string> getKeys, T newObject, string user, Guid? folder = null, string metadata = null, bool force = false);
         Task SaveObjectHistoryDeletedAsync<T>(Func<string> getKeys, T newObject, string user, Guid? folder = null, string metadata = null);
         Task DeletedObjectHistoryDeletedByPartitionKey(string partitionKey);
     }
