@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
+#nullable disable
+
 namespace Arragro.ObjectHistory.EFCore.Migrations.SqlServer
 {
     [DbContext(typeof(ArragroObjectHistoryContext))]
@@ -16,142 +18,181 @@ namespace Arragro.ObjectHistory.EFCore.Migrations.SqlServer
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("object_history")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128)
-                .HasAnnotation("ProductVersion", "5.0.4")
-                .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
+                .HasAnnotation("ProductVersion", "8.0.7")
+                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+
+            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
             modelBuilder.Entity("Arragro.ObjectHistory.EFCore.ObjectHistoryDeletedTableEntity", b =>
                 {
                     b.Property<string>("PartitionKey")
                         .HasMaxLength(1024)
-                        .HasColumnType("nvarchar(1024)");
+                        .HasColumnType("nvarchar(1024)")
+                        .HasColumnName("partition_key");
 
                     b.Property<long>("RowKey")
                         .HasMaxLength(50)
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("row_key");
 
                     b.Property<string>("ApplicationName")
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("application_name");
 
                     b.Property<Guid>("Folder")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("folder");
 
                     b.Property<string>("Metadata")
                         .HasMaxLength(1000)
-                        .HasColumnType("nvarchar(1000)");
+                        .HasColumnType("nvarchar(1000)")
+                        .HasColumnName("metadata");
 
                     b.Property<string>("SecurityValidationToken")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("security_validation_token");
 
                     b.Property<Guid?>("SubFolder")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("sub_folder");
 
                     b.Property<DateTimeOffset>("Timestamp")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("timestamp");
 
                     b.Property<string>("User")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("user");
 
                     b.Property<int>("Version")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("version");
 
-                    b.HasKey("PartitionKey", "RowKey");
+                    b.HasKey("PartitionKey", "RowKey")
+                        .HasName("pk_object_history_deleted_table_entities");
 
-                    b.HasIndex("RowKey");
+                    b.HasIndex("RowKey")
+                        .HasDatabaseName("ix_object_history_deleted_table_entities_row_key");
 
-                    b.ToTable("ObjectHistoryDeletedTableEntities");
+                    b.ToTable("object_history_deleted_table_entities", "object_history");
                 });
 
             modelBuilder.Entity("Arragro.ObjectHistory.EFCore.ObjectHistoryGlobalTableEntity", b =>
                 {
                     b.Property<string>("PartitionKey")
                         .HasMaxLength(1024)
-                        .HasColumnType("nvarchar(1024)");
+                        .HasColumnType("nvarchar(1024)")
+                        .HasColumnName("partition_key");
 
                     b.Property<long>("RowKey")
                         .HasMaxLength(50)
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("row_key");
 
                     b.Property<Guid>("Folder")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("folder");
 
                     b.Property<bool>("IsAdd")
-                        .HasColumnType("bit");
+                        .HasColumnType("bit")
+                        .HasColumnName("is_add");
 
                     b.Property<string>("Metadata")
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("metadata");
 
                     b.Property<string>("ObjectName")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("object_name");
 
                     b.Property<string>("SecurityValidationToken")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("security_validation_token");
 
                     b.Property<Guid?>("SubFolder")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("sub_folder");
 
                     b.Property<DateTimeOffset>("Timestamp")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("timestamp");
 
                     b.Property<string>("User")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("user");
 
                     b.Property<int>("Version")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("version");
 
-                    b.HasKey("PartitionKey", "RowKey");
+                    b.HasKey("PartitionKey", "RowKey")
+                        .HasName("pk_object_history_global_table_entity");
 
-                    b.HasIndex("RowKey");
+                    b.HasIndex("RowKey")
+                        .HasDatabaseName("ix_object_history_global_table_entity_row_key");
 
-                    b.ToTable("ObjectHistoryGlobalTableEntity");
+                    b.ToTable("object_history_global_table_entity", "object_history");
                 });
 
             modelBuilder.Entity("Arragro.ObjectHistory.EFCore.ObjectHistoryTableEntity", b =>
                 {
                     b.Property<string>("PartitionKey")
                         .HasMaxLength(1024)
-                        .HasColumnType("nvarchar(1024)");
+                        .HasColumnType("nvarchar(1024)")
+                        .HasColumnName("partition_key");
 
                     b.Property<long>("RowKey")
                         .HasMaxLength(50)
-                        .HasColumnType("bigint");
+                        .HasColumnType("bigint")
+                        .HasColumnName("row_key");
 
                     b.Property<string>("ApplicationName")
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("nvarchar(255)")
+                        .HasColumnName("application_name");
 
                     b.Property<Guid>("Folder")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("folder");
 
                     b.Property<bool>("IsAdd")
-                        .HasColumnType("bit");
+                        .HasColumnType("bit")
+                        .HasColumnName("is_add");
 
                     b.Property<string>("Metadata")
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("nvarchar(100)")
+                        .HasColumnName("metadata");
 
                     b.Property<string>("SecurityValidationToken")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("security_validation_token");
 
                     b.Property<Guid?>("SubFolder")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uniqueidentifier")
+                        .HasColumnName("sub_folder");
 
                     b.Property<DateTimeOffset>("Timestamp")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("datetimeoffset")
+                        .HasColumnName("timestamp");
 
                     b.Property<string>("User")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("nvarchar(max)")
+                        .HasColumnName("user");
 
                     b.Property<int>("Version")
-                        .HasColumnType("int");
+                        .HasColumnType("int")
+                        .HasColumnName("version");
 
-                    b.HasKey("PartitionKey", "RowKey");
+                    b.HasKey("PartitionKey", "RowKey")
+                        .HasName("pk_object_history_table_entity");
 
-                    b.HasIndex("RowKey");
+                    b.HasIndex("RowKey")
+                        .HasDatabaseName("ix_object_history_table_entity_row_key");
 
-                    b.ToTable("ObjectHistoryTableEntity");
+                    b.ToTable("object_history_table_entity", "object_history");
                 });
 #pragma warning restore 612, 618
         }

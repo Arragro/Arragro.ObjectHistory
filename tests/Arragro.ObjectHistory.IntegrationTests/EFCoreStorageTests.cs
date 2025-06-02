@@ -13,6 +13,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
 
@@ -35,21 +36,21 @@ namespace Arragro.ObjectHistory.IntegrationTests
                 case StorageType.SqlServer:
                     DockerExtentions.StartDockerServicesAsync(new List<Func<DockerClient, Task<ContainerListResponse>>>
                     {
-                        (client) => AzuriteMicrosoftWithTables.StartAzuriteMicrosoft(client, "3.30.0"),
-                        SqlServer.StartSqlServer
+                        (client) => AzuriteMicrosoftWithTables.StartAzuriteMicrosoft(client, "latest"),
+                        (client) => SqlServer.StartSqlServer(client)
                     }).Wait();
                     break;
                 case StorageType.Postgres:
                     DockerExtentions.StartDockerServicesAsync(new List<Func<DockerClient, Task<ContainerListResponse>>>
                     {
-                        (client) => AzuriteMicrosoftWithTables.StartAzuriteMicrosoft(client, "3.30.0"),
+                        (client) => AzuriteMicrosoftWithTables.StartAzuriteMicrosoft(client, "latest"),
                         (client) => Postgres.StartPostgres(client, "latest")
                     }).Wait();
                     break;
                 case StorageType.Sqlite:
                     DockerExtentions.StartDockerServicesAsync(new List<Func<DockerClient, Task<ContainerListResponse>>>
                     {
-                        (client) => AzuriteMicrosoftWithTables.StartAzuriteMicrosoft(client, "3.30.0")
+                        (client) => AzuriteMicrosoftWithTables.StartAzuriteMicrosoft(client, "latest")
                     }).Wait();
                     break;
 
@@ -129,7 +130,7 @@ namespace Arragro.ObjectHistory.IntegrationTests
 
             foreach (var fakeData in fakeDataContext.FakeDatas)
             {
-                entities = await objectHistoryClient.GetObjectHistoryRecordsByObjectNamePartitionKeyAsync($"{typeof(FakeData).FullName}-{fakeData.Id}");
+                entities = await objectHistoryClient.GetObjectHistoryRecordsByObjectNamePartitionKeyAsync($"{typeof(FakeData).FullName}|{fakeData.Id}");
                 Assert.Single(entities.Results);
                 Assert.NotNull(entities.Results.First().Metadata);
 
@@ -148,7 +149,7 @@ namespace Arragro.ObjectHistory.IntegrationTests
             global = await objectHistoryClient.GetObjectHistoryRecordsByApplicationNamePartitionKeyAsync();
             //Assert.Equal(101, global.Results.Count());
 
-            entities = await objectHistoryClient.GetObjectHistoryRecordsByObjectNamePartitionKeyAsync($"{typeof(FakeData).FullName}-{modifyFakeObject.Id}");
+            entities = await objectHistoryClient.GetObjectHistoryRecordsByObjectNamePartitionKeyAsync($"{typeof(FakeData).FullName}|{modifyFakeObject.Id}");
             Assert.Equal(2, entities.Results.Count());
 
             raw = await objectHistoryClient.GetObjectHistoryDetailRawAsync(entities.Results.First().PartitionKey, entities.Results.First().RowKey);
@@ -173,7 +174,7 @@ namespace Arragro.ObjectHistory.IntegrationTests
             global = await objectHistoryClient.GetObjectHistoryRecordsByApplicationNamePartitionKeyAsync();
             //Assert.Equal(101, global.Results.Count());
 
-            entities = await objectHistoryClient.GetObjectHistoryRecordsByObjectNamePartitionKeyAsync($"{typeof(FakeData).FullName}-{modifyFakeObject.Id}");
+            entities = await objectHistoryClient.GetObjectHistoryRecordsByObjectNamePartitionKeyAsync($"{typeof(FakeData).FullName}|{modifyFakeObject.Id}");
             Assert.Equal(3, entities.Results.Count());
 
             raw = await objectHistoryClient.GetObjectHistoryDetailRawAsync(entities.Results.First().PartitionKey, entities.Results.First().RowKey);
@@ -193,21 +194,21 @@ namespace Arragro.ObjectHistory.IntegrationTests
             await objectHistoryClient.QueueObjectHistoryAsync<FakeData>(() => $"{fakeDataContext.FakeDatas.ElementAt(0).Id}", modifyFakeObject, "User1", folder);
             await Utils.ProcessQueue(queueClient, objectHistoryProcessor);
 
-            entities = await objectHistoryClient.GetObjectHistoryRecordsByObjectNamePartitionKeyAsync($"{typeof(FakeData).FullName}-{modifyFakeObject.Id}");
+            entities = await objectHistoryClient.GetObjectHistoryRecordsByObjectNamePartitionKeyAsync($"{typeof(FakeData).FullName}|{modifyFakeObject.Id}");
             Assert.Equal(3, entities.Results.Count());
 
             var removeFakeData = fakeDataContext.FakeDatas.ElementAt(0);
             var removeFakeDataId = removeFakeData.Id;
             await objectHistoryClient.SaveObjectHistoryDeletedAsync(() => $"{removeFakeDataId}", removeFakeData, "User1", folder);
             fakeDataContext.FakeDatas.Remove(removeFakeData);
-            var deletedFakeData = await objectHistoryClient.GetLatestObjectHistoryDeletedDetailRawAsync($"{typeof(FakeData).FullName}-{removeFakeDataId}");
+            var deletedFakeData = await objectHistoryClient.GetLatestObjectHistoryDeletedDetailRawAsync($"{typeof(FakeData).FullName}|{removeFakeDataId}");
             Assert.NotNull(deletedFakeData);
             using (var scope = _serviceProvider.CreateScope())
             {
                 var tempObjectHistoryClient = scope.ServiceProvider.GetRequiredService<IObjectHistoryClient>();
-                await tempObjectHistoryClient.DeletedObjectHistoryDeletedByPartitionKey($"{typeof(FakeData).FullName}-{removeFakeDataId}");
+                await tempObjectHistoryClient.DeletedObjectHistoryDeletedByPartitionKey($"{typeof(FakeData).FullName}|{removeFakeDataId}");
             }
-            var deletedFakeDataTest = await objectHistoryClient.GetLatestObjectHistoryDeletedDetailRawAsync($"{typeof(FakeData).FullName}-{removeFakeDataId}");
+            var deletedFakeDataTest = await objectHistoryClient.GetLatestObjectHistoryDeletedDetailRawAsync($"{typeof(FakeData).FullName}|{removeFakeDataId}");
             Assert.Null(deletedFakeDataTest);
             fakeDataContext.FakeDatas = fakeDataContext.FakeDatas.Prepend(JsonConvert.DeserializeObject<FakeData>(deletedFakeData.NewJson)).ToList();
         }

@@ -26,7 +26,7 @@ namespace Arragro.ObjectHistory.IntegrationTests
         {
             DockerExtentions.StartDockerServicesAsync(new List<Func<DockerClient, Task<ContainerListResponse>>>
             {
-                (client) => AzuriteMicrosoftWithTables.StartAzuriteMicrosoft(client, "3.30.0")
+                (client) => AzuriteMicrosoftWithTables.StartAzuriteMicrosoft(client, "latest")
             }).Wait();
 
             var serviceCollection = new ServiceCollection();
@@ -83,7 +83,7 @@ namespace Arragro.ObjectHistory.IntegrationTests
 
             foreach (var fakeData in fakeDataContext.FakeDatas)
             {
-                entities = await objectHistoryClient.GetObjectHistoryRecordsByObjectNamePartitionKeyAsync($"{typeof(FakeData).FullName}-{fakeData.Id}");
+                entities = await objectHistoryClient.GetObjectHistoryRecordsByObjectNamePartitionKeyAsync($"{typeof(FakeData).FullName}|{fakeData.Id}");
                 Assert.Single(entities.Results);
 
                 raw = await objectHistoryClient.GetObjectHistoryDetailRawAsync(entities.Results.First().PartitionKey, entities.Results.First().RowKey);
@@ -99,7 +99,7 @@ namespace Arragro.ObjectHistory.IntegrationTests
             global = await objectHistoryClient.GetObjectHistoryRecordsByApplicationNamePartitionKeyAsync();
             //Assert.Equal(101, global.Results.Count());
 
-            entities = await objectHistoryClient.GetObjectHistoryRecordsByObjectNamePartitionKeyAsync($"{typeof(FakeData).FullName}-{modifyFakeObject.Id}");
+            entities = await objectHistoryClient.GetObjectHistoryRecordsByObjectNamePartitionKeyAsync($"{typeof(FakeData).FullName}|{modifyFakeObject.Id}");
             Assert.Equal(2, entities.Results.Count());
 
             raw = await objectHistoryClient.GetObjectHistoryDetailRawAsync(entities.Results.First().PartitionKey, entities.Results.First().RowKey);
@@ -116,10 +116,10 @@ namespace Arragro.ObjectHistory.IntegrationTests
             var removeFakeDataId = removeFakeData.Id;
             await objectHistoryClient.SaveObjectHistoryDeletedAsync(() => $"{removeFakeDataId}", removeFakeData, "User1", folder);
             fakeDataContext.FakeDatas.Remove(removeFakeData);
-            var deletedFakeData = await objectHistoryClient.GetLatestObjectHistoryDeletedDetailRawAsync($"{typeof(FakeData).FullName}-{removeFakeDataId}");
+            var deletedFakeData = await objectHistoryClient.GetLatestObjectHistoryDeletedDetailRawAsync($"{typeof(FakeData).FullName}|{removeFakeDataId}");
             Assert.NotNull(deletedFakeData);
             await objectHistoryClient.DeletedObjectHistoryDeletedByPartitionKey($"{typeof(FakeData).FullName}-{removeFakeDataId}");
-            var deletedFakeDataTest = await objectHistoryClient.GetLatestObjectHistoryDeletedDetailRawAsync($"{typeof(FakeData).FullName}-{removeFakeDataId}");
+            var deletedFakeDataTest = await objectHistoryClient.GetLatestObjectHistoryDeletedDetailRawAsync($"{typeof(FakeData).FullName}|{removeFakeDataId}");
             Assert.Null(deletedFakeDataTest);
             fakeDataContext.FakeDatas = fakeDataContext.FakeDatas.Prepend(JsonConvert.DeserializeObject<FakeData>(deletedFakeData.NewJson)).ToList();
         }

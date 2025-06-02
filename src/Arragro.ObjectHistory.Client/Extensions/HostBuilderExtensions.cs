@@ -32,14 +32,14 @@ namespace Arragro.ObjectHistory.Client.Extensions
             {
                 case StorageType.Postgres:
                     services.AddDbContext<ArragroObjectHistoryPGContext>(
-                        options => options.UseNpgsql(objectHistorySettings.DatabaseConnectionString)
+                        options => options.UseNpgsql(objectHistorySettings.DatabaseConnectionString, (o) => o.EnableRetryOnFailure(5))
                     );
                     services.AddScoped<ArragroObjectHistoryBaseContext, ArragroObjectHistoryPGContext>();
                     services.AddScoped<IStorageHelper, EFStorageHelper>();
                     break;
                 case StorageType.SqlServer:
                     services.AddDbContext<ArragroObjectHistoryContext>(
-                        options => options.UseSqlServer(objectHistorySettings.DatabaseConnectionString)
+                        options => options.UseSqlServer(objectHistorySettings.DatabaseConnectionString, (o) => o.EnableRetryOnFailure(5))
                     );
                     services.AddScoped<ArragroObjectHistoryBaseContext, ArragroObjectHistoryContext>();
                     services.AddScoped<IStorageHelper, EFStorageHelper>();

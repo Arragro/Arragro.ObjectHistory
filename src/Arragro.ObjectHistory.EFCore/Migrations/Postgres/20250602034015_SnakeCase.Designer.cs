@@ -3,66 +3,73 @@ using System;
 using Arragro.ObjectHistory.EFCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Arragro.ObjectHistory.EFCore.Migrations.Sqlite
+namespace Arragro.ObjectHistory.EFCore.Migrations.Postgres
 {
-    [DbContext(typeof(ArragroObjectHistorySqliteContext))]
-    partial class ArragroObjectHistorySqliteContextModelSnapshot : ModelSnapshot
+    [DbContext(typeof(ArragroObjectHistoryPGContext))]
+    [Migration("20250602034015_SnakeCase")]
+    partial class SnakeCase
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("object_history")
-                .HasAnnotation("ProductVersion", "8.0.7");
+                .HasAnnotation("ProductVersion", "8.0.7")
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
+
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Arragro.ObjectHistory.EFCore.ObjectHistoryDeletedTableEntity", b =>
                 {
                     b.Property<string>("PartitionKey")
                         .HasMaxLength(1024)
-                        .HasColumnType("TEXT")
+                        .HasColumnType("character varying(1024)")
                         .HasColumnName("partition_key");
 
                     b.Property<long>("RowKey")
                         .HasMaxLength(50)
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("bigint")
                         .HasColumnName("row_key");
 
                     b.Property<string>("ApplicationName")
                         .HasMaxLength(255)
-                        .HasColumnType("TEXT")
+                        .HasColumnType("character varying(255)")
                         .HasColumnName("application_name");
 
                     b.Property<Guid>("Folder")
-                        .HasColumnType("TEXT")
+                        .HasColumnType("uuid")
                         .HasColumnName("folder");
 
                     b.Property<string>("Metadata")
                         .HasMaxLength(1000)
-                        .HasColumnType("TEXT")
+                        .HasColumnType("character varying(1000)")
                         .HasColumnName("metadata");
 
                     b.Property<string>("SecurityValidationToken")
-                        .HasColumnType("TEXT")
+                        .HasColumnType("text")
                         .HasColumnName("security_validation_token");
 
                     b.Property<Guid?>("SubFolder")
-                        .HasColumnType("TEXT")
+                        .HasColumnType("uuid")
                         .HasColumnName("sub_folder");
 
-                    b.Property<long>("Timestamp")
-                        .HasColumnType("INTEGER")
+                    b.Property<DateTimeOffset>("Timestamp")
+                        .HasColumnType("timestamp with time zone")
                         .HasColumnName("timestamp");
 
                     b.Property<string>("User")
-                        .HasColumnType("TEXT")
+                        .HasColumnType("text")
                         .HasColumnName("user");
 
                     b.Property<int>("Version")
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("integer")
                         .HasColumnName("version");
 
                     b.HasKey("PartitionKey", "RowKey")
@@ -78,49 +85,49 @@ namespace Arragro.ObjectHistory.EFCore.Migrations.Sqlite
                 {
                     b.Property<string>("PartitionKey")
                         .HasMaxLength(1024)
-                        .HasColumnType("TEXT")
+                        .HasColumnType("character varying(1024)")
                         .HasColumnName("partition_key");
 
                     b.Property<long>("RowKey")
                         .HasMaxLength(50)
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("bigint")
                         .HasColumnName("row_key");
 
                     b.Property<Guid>("Folder")
-                        .HasColumnType("TEXT")
+                        .HasColumnType("uuid")
                         .HasColumnName("folder");
 
                     b.Property<bool>("IsAdd")
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("boolean")
                         .HasColumnName("is_add");
 
                     b.Property<string>("Metadata")
                         .HasMaxLength(100)
-                        .HasColumnType("TEXT")
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("metadata");
 
                     b.Property<string>("ObjectName")
-                        .HasColumnType("TEXT")
+                        .HasColumnType("text")
                         .HasColumnName("object_name");
 
                     b.Property<string>("SecurityValidationToken")
-                        .HasColumnType("TEXT")
+                        .HasColumnType("text")
                         .HasColumnName("security_validation_token");
 
                     b.Property<Guid?>("SubFolder")
-                        .HasColumnType("TEXT")
+                        .HasColumnType("uuid")
                         .HasColumnName("sub_folder");
 
-                    b.Property<long>("Timestamp")
-                        .HasColumnType("INTEGER")
+                    b.Property<DateTimeOffset>("Timestamp")
+                        .HasColumnType("timestamp with time zone")
                         .HasColumnName("timestamp");
 
                     b.Property<string>("User")
-                        .HasColumnType("TEXT")
+                        .HasColumnType("text")
                         .HasColumnName("user");
 
                     b.Property<int>("Version")
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("integer")
                         .HasColumnName("version");
 
                     b.HasKey("PartitionKey", "RowKey")
@@ -136,50 +143,50 @@ namespace Arragro.ObjectHistory.EFCore.Migrations.Sqlite
                 {
                     b.Property<string>("PartitionKey")
                         .HasMaxLength(1024)
-                        .HasColumnType("TEXT")
+                        .HasColumnType("character varying(1024)")
                         .HasColumnName("partition_key");
 
                     b.Property<long>("RowKey")
                         .HasMaxLength(50)
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("bigint")
                         .HasColumnName("row_key");
 
                     b.Property<string>("ApplicationName")
                         .HasMaxLength(255)
-                        .HasColumnType("TEXT")
+                        .HasColumnType("character varying(255)")
                         .HasColumnName("application_name");
 
                     b.Property<Guid>("Folder")
-                        .HasColumnType("TEXT")
+                        .HasColumnType("uuid")
                         .HasColumnName("folder");
 
                     b.Property<bool>("IsAdd")
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("boolean")
                         .HasColumnName("is_add");
 
                     b.Property<string>("Metadata")
                         .HasMaxLength(100)
-                        .HasColumnType("TEXT")
+                        .HasColumnType("character varying(100)")
                         .HasColumnName("metadata");
 
                     b.Property<string>("SecurityValidationToken")
-                        .HasColumnType("TEXT")
+                        .HasColumnType("text")
                         .HasColumnName("security_validation_token");
 
                     b.Property<Guid?>("SubFolder")
-                        .HasColumnType("TEXT")
+                        .HasColumnType("uuid")
                         .HasColumnName("sub_folder");
 
-                    b.Property<long>("Timestamp")
-                        .HasColumnType("INTEGER")
+                    b.Property<DateTimeOffset>("Timestamp")
+                        .HasColumnType("timestamp with time zone")
                         .HasColumnName("timestamp");
 
                     b.Property<string>("User")
-                        .HasColumnType("TEXT")
+                        .HasColumnType("text")
                         .HasColumnName("user");
 
                     b.Property<int>("Version")
-                        .HasColumnType("INTEGER")
+                        .HasColumnType("integer")
                         .HasColumnName("version");
 
                     b.HasKey("PartitionKey", "RowKey")

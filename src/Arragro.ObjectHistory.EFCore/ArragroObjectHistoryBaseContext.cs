@@ -44,10 +44,9 @@ namespace Arragro.ObjectHistory.EFCore
             modelBuilder.Entity<ObjectHistoryTableEntity>()
                 .HasIndex(x => x.RowKey);
 
+            modelBuilder.SnakeCaseTablesAndProperties();
 
             if (Database.ProviderName != "Microsoft.EntityFrameworkCore.Sqlite") return;
-
-            modelBuilder.SnakeCaseTablesAndProperties();
 
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
             {

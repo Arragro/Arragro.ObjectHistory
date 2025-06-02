@@ -3,6 +3,7 @@ using System;
 using Arragro.ObjectHistory.EFCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -10,9 +11,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Arragro.ObjectHistory.EFCore.Migrations.Sqlite
 {
     [DbContext(typeof(ArragroObjectHistorySqliteContext))]
-    partial class ArragroObjectHistorySqliteContextModelSnapshot : ModelSnapshot
+    [Migration("20250602034127_SnakeCase")]
+    partial class SnakeCase
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

@@ -31,7 +31,7 @@ namespace Arragro.ObjectHistory.Client
             var fullyQualifiedName = typeof(T).FullName;
 
             var key = getKeys();
-            var partitionKey = $"{fullyQualifiedName}-{key}";
+            var partitionKey = $"{fullyQualifiedName}|{key}";
             if (!string.IsNullOrEmpty(metadata) && metadata.Length > 100)
                 metadata = metadata.Substring(0, 100);
 
@@ -63,7 +63,7 @@ namespace Arragro.ObjectHistory.Client
 
         private async Task<ObjectHistoryDetailRaw> BuildObjectHistoryDataRawAsync<T>(Func<string> getKeys, T newObject, string user, Guid? folder, string metadata)
         {
-            var current = await _storageHelper.GetLatestObjectHistoryEntityAsync($"{typeof(T).FullName}-{getKeys()}");
+            var current = await _storageHelper.GetLatestObjectHistoryEntityAsync($"{typeof(T).FullName}|{getKeys()}");
             var objectHistoryDetailRaw = GetObjectHistoryDetailRaw<T>(getKeys, user, current == null, folder, metadata);
             if (current != null)
             {
